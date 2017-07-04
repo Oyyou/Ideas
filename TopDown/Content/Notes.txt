@@ -1,0 +1,15 @@
+﻿Build
+------
+House
+Blacksmith
+Library
+Farm -> different types
+Lumber
+Miner -> different types
+
+Labour
+	Blacksmith
+	Farm
+	Lumber Mill
+	Mine
+
