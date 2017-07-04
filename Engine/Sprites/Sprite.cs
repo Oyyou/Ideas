@@ -103,6 +103,9 @@ namespace Engine.Sprites
 
     public override void CheckCollision(Component component)
     {
+      if (component.CollisionRectangles == null)
+        return;
+
       foreach (var rectangle in component.CollisionRectangles)
       {
         if (Velocity.X > 0 && this.IsTouchingLeft(rectangle))

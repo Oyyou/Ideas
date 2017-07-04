@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Engine.Sprites;
 using Microsoft.Xna.Framework.Input;
 using Engine.Controls;
+using TopDown.States;
 
 namespace TopDown.Controls.BuildMenu
 {
@@ -17,7 +18,9 @@ namespace TopDown.Controls.BuildMenu
   {
     private List<Button> _buildOptions;
 
-    private Texture2D _buttonTexture;
+    private GameState _gameState;
+
+    private Texture2D _mainButtonTexture;
 
     private ContentManager _content;
 
@@ -29,21 +32,35 @@ namespace TopDown.Controls.BuildMenu
 
     private KeyboardState _previousKey;
 
+    private Texture2D _subButtonTexture;
+
     public Vector2 Position { get; private set; }
 
     private void ArtsButton_Click(object sender, EventArgs e)
     {
       _buildOptions = new List<Button>()
       {
-        new Button(_buttonTexture, _font)
+        new BuildMenuSubOption(_subButtonTexture, _font)
         {
           Text = "Library",
           Layer =  0.99f,
+          ResourceCost = new Models.Resources()
+          {
+            Food = 30,
+            Gold = 10,
+            Wood = 50,
+            Stone = 75,
+          },
         },
       };
 
       foreach (var component in _buildOptions)
         component.LoadContent(_content);
+    }
+
+    public BuildMenuWindow(GameState gameState)
+    {
+      _gameState = gameState;
     }
 
     public override void CheckCollision(Component component)
@@ -73,37 +90,35 @@ namespace TopDown.Controls.BuildMenu
 
     private void HousingButton_Click(object sender, EventArgs e)
     {
+      var smallHouse = new BuildMenuSubOption(_subButtonTexture, _font)
+      {
+        Text = "Small House",
+        Layer = 0.99f,
+        ResourceCost = new Models.Resources()
+        {
+          Food = 5,
+          Gold = 1,
+          Wood = 10,
+          Stone = 10,
+        },
+      };
+
+      smallHouse.Click += SmallHouse_Click;
+
       _buildOptions = new List<Button>()
       {
-        new Button(_buttonTexture, _font)
+        smallHouse,
+        new BuildMenuSubOption(_subButtonTexture, _font)
         {
-          Text = "House",
+          Text = "Large House",
           Layer =  0.99f,
-        },
-        new Button(_buttonTexture, _font)
-        {
-          Text = "Filler01",
-          Layer =  0.99f,
-        },
-        new Button(_buttonTexture, _font)
-        {
-          Text = "Filler02",
-          Layer =  0.99f,
-        },
-        new Button(_buttonTexture, _font)
-        {
-          Text = "Filler03",
-          Layer =  0.99f,
-        },
-        new Button(_buttonTexture, _font)
-        {
-          Text = "Filler04",
-          Layer =  0.99f,
-        },
-        new Button(_buttonTexture, _font)
-        {
-          Text = "Filler05",
-          Layer =  0.99f,
+          ResourceCost = new Models.Resources()
+          {
+            Food = 15,
+            Gold = 10,
+            Wood = 30,
+            Stone = 40,
+          },
         },
       };
 
@@ -111,29 +126,65 @@ namespace TopDown.Controls.BuildMenu
         component.LoadContent(_content);
     }
 
+    private void SmallHouse_Click(object sender, EventArgs e)
+    {
+      _gameState.AddBuilding(new Buildings.Building(_gameState)
+      {
+        BuildingState = Buildings.BuildingStates.Placing,
+      });
+    }
+
     private void LabourButton_Click(object sender, EventArgs e)
     {
       _buildOptions = new List<Button>()
       {
-        new Button(_buttonTexture, _font)
+        new BuildMenuSubOption(_subButtonTexture, _font)
         {
           Text = "Blacksmith",
           Layer =  0.99f,
+          ResourceCost = new Models.Resources()
+          {
+            Food = 15,
+            Gold = 10,
+            Wood = 30,
+            Stone = 40,
+          },
         },
-        new Button(_buttonTexture, _font)
+        new BuildMenuSubOption(_subButtonTexture, _font)
         {
           Text = "Farm",
           Layer =  0.99f,
+          ResourceCost = new Models.Resources()
+          {
+            Food = 15,
+            Gold = 10,
+            Wood = 30,
+            Stone = 40,
+          },
         },
-        new Button(_buttonTexture, _font)
+        new BuildMenuSubOption(_subButtonTexture, _font)
         {
           Text = "Lumber Mill",
           Layer =  0.99f,
+          ResourceCost = new Models.Resources()
+          {
+            Food = 15,
+            Gold = 10,
+            Wood = 30,
+            Stone = 40,
+          },
         },
-        new Button(_buttonTexture, _font)
+        new BuildMenuSubOption(_subButtonTexture, _font)
         {
           Text = "Mine",
           Layer =  0.99f,
+          ResourceCost = new Models.Resources()
+          {
+            Food = 15,
+            Gold = 10,
+            Wood = 30,
+            Stone = 40,
+          },
         },
       };
 
@@ -146,7 +197,8 @@ namespace TopDown.Controls.BuildMenu
       _content = content;
 
       var backgroundTexture = content.Load<Texture2D>("Controls/BuildMenu");
-      _buttonTexture = content.Load<Texture2D>("Controls/BuildMenuOptionButton");
+      _mainButtonTexture = content.Load<Texture2D>("Controls/BuildMenuMainOptionButton");
+      _subButtonTexture = content.Load<Texture2D>("Controls/BuildMenuSubOptionButton");
       var closeButtonTexture = content.Load<Texture2D>("Controls/Close");
 
       Position = new Vector2(
@@ -173,7 +225,7 @@ namespace TopDown.Controls.BuildMenu
       _font = content.Load<SpriteFont>("Fonts/Font");
       _fontPosition = new Vector2(Position.X + 5, Position.Y + 5);
 
-      var housingButton = new Button(_buttonTexture, _font)
+      var housingButton = new Button(_mainButtonTexture, _font)
       {
         Text = "Housing",
         Position = new Vector2(Position.X + 11, Position.Y + 56),
@@ -182,7 +234,7 @@ namespace TopDown.Controls.BuildMenu
 
       housingButton.Click += HousingButton_Click;
 
-      var labourButton = new Button(_buttonTexture, _font)
+      var labourButton = new Button(_mainButtonTexture, _font)
       {
         Text = "Labour",
         Position = new Vector2(housingButton.Position.X, housingButton.Rectangle.Bottom + 5),
@@ -191,7 +243,7 @@ namespace TopDown.Controls.BuildMenu
 
       labourButton.Click += LabourButton_Click;
 
-      var artsButton = new Button(_buttonTexture, _font)
+      var artsButton = new Button(_mainButtonTexture, _font)
       {
         Text = "Arts",
         Position = new Vector2(labourButton.Position.X, labourButton.Rectangle.Bottom + 5),

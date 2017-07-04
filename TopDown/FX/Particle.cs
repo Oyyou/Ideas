@@ -10,9 +10,9 @@ using Engine;
 
 namespace TopDown.FX
 {
-  public class RockParticle : Sprite
+  public class Particle : Sprite
   {
-    public RockParticle(Texture2D texture) : base(texture)
+    public Particle(Texture2D texture) : base(texture)
     {
       var xSpeed = (float)GameEngine.Random.NextDouble() * (2 - -2) + -2;
       var ySpeed = (float)GameEngine.Random.NextDouble() * (-1 - -2) + -2;

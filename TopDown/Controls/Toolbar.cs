@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Engine.Sprites;
 using Engine.Controls;
 using TopDown.States;
+using Microsoft.Xna.Framework.Input;
 
 namespace TopDown.Controls
 {
@@ -34,17 +35,25 @@ namespace TopDown.Controls
         icon.Draw(gameTime, spriteBatch);
     }
 
+    private void FistButton_Click(object sender, EventArgs e)
+    {
+      GameState.Mouse.MouseState = MouseStates.Building;
+    }
+
     public override void LoadContent(ContentManager content)
     {
       _toolbarSprite = new Sprite(content.Load<Texture2D>("Controls/Toolbar"));
       _toolbarSprite.Position = new Vector2((GameEngine.ScreenWidth / 2) - (_toolbarSprite.Rectangle.Width / 2), GameEngine.ScreenHeight - _toolbarSprite.Rectangle.Height - 20);
 
+      var fistButton = new Button(content.Load<Texture2D>("Controls/Icons/Fist"));
+      fistButton.Click += FistButton_Click;
 
       var pickaxeButton = new Button(content.Load<Texture2D>("Controls/Icons/Pickaxe"));
       pickaxeButton.Click += PickaxeButton_Click;
 
       _icons = new List<Button>()
       {
+        fistButton,
         pickaxeButton,
       };
 
@@ -60,7 +69,7 @@ namespace TopDown.Controls
 
     private void PickaxeButton_Click(object sender, EventArgs e)
     {
-      throw new NotImplementedException();
+      GameState.Mouse.MouseState = MouseStates.Mining;
     }
 
     public Toolbar(GameState gameState)
@@ -75,6 +84,11 @@ namespace TopDown.Controls
 
     public override void Update(GameTime gameTime)
     {
+      if (Keyboard.GetState().IsKeyDown(Keys.D1))
+        GameState.Mouse.MouseState = MouseStates.Building;
+      else if (Keyboard.GetState().IsKeyDown(Keys.D2))
+        GameState.Mouse.MouseState = MouseStates.Mining;
+
       _toolbarSprite.Update(gameTime);
 
       foreach (var icon in _icons)

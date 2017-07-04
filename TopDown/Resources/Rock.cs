@@ -36,7 +36,7 @@ namespace TopDown.Resources
       );
 
       Components.Add(
-        new RockParticle(_rockParticleTexture)
+        new Particle(_rockParticleTexture)
         {
           Position = position,
           Layer = this.Layer + 0.01f,
@@ -77,6 +77,9 @@ namespace TopDown.Resources
     public override void Update(GameTime gameTime)
     {
       Color = Color.White;
+
+      if (GameState.Mouse.MouseState != Controls.MouseStates.Mining)
+        return;
 
       if (GameState.Mouse.RectangleWithCamera.Intersects(this.Rectangle))
       {

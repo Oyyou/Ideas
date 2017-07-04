@@ -12,13 +12,27 @@ namespace Engine.Controls
 {
   public class Button : Component
   {
-    private MouseState _currentMouse;
+    protected Color _colour
+    {
+      get
+      {
+        if (IsSelected)
+          return Color.Yellow;
 
-    private SpriteFont _font;
+        if (IsHovering)
+          return Color.Gray;
 
-    private MouseState _previousMouse;
+        return Color.White;
+      }
+    }
 
-    private Texture2D _texture;
+    protected MouseState _currentMouse;
+
+    protected SpriteFont _font;
+
+    protected MouseState _previousMouse;
+
+    protected Texture2D _texture;
 
     public event EventHandler Click;
 
@@ -76,25 +90,7 @@ namespace Engine.Controls
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      var colour = Color.White;
-
-      if (!IsSelected)
-      {
-        if (IsHovering)
-        {
-          colour = Color.Gray;
-        }
-        else
-        {
-          colour = Color.White;
-        }
-      }
-      else
-      {
-        colour = Color.Yellow;
-      }
-
-      spriteBatch.Draw(_texture, Rectangle, null, colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
+      spriteBatch.Draw(_texture, Rectangle, null, _colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
 
       if (!string.IsNullOrEmpty(Text) && _font != null)
       {

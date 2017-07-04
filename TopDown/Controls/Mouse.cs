@@ -12,11 +12,21 @@ using Engine.Sprites;
 
 namespace TopDown.Controls
 {
+  public enum MouseStates
+  {
+    Building,
+    Mining,
+  }
+
   public class Mouse : Component
   {
     private Camera _camera;
 
     private Microsoft.Xna.Framework.Input.MouseState _currentMouse;
+
+    private Sprite _fistCursor;
+
+    private MouseStates _mouseState;
 
     private Sprite _pickaxeCursor;
 
@@ -36,6 +46,34 @@ namespace TopDown.Controls
       get
       {
         return _currentMouse.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed;
+      }
+    }
+
+    public MouseStates MouseState
+    {
+      get { return _mouseState; }
+      set
+      {
+        if (_mouseState == value)
+          return;
+
+        _mouseState = value;
+      }
+    }
+
+    public Vector2 Position
+    {
+      get
+      {
+        return _currentMouse.Position.ToVector2();
+      }
+    }
+
+    public Vector2 PositionWithCamera
+    {
+      get
+      {
+        return new Vector2(RectangleWithCamera.X, RectangleWithCamera.Y);
       }
     }
 
@@ -75,16 +113,34 @@ namespace TopDown.Controls
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      _pickaxeCursor.Draw(gameTime, spriteBatch);
+      switch (MouseState)
+      {
+        case MouseStates.Building:
+          _fistCursor.Draw(gameTime, spriteBatch);
+          break;
+        case MouseStates.Mining:
+          _pickaxeCursor.Draw(gameTime, spriteBatch);
+          break;
+        default:
+          break;
+      }
     }
 
     public override void LoadContent(ContentManager content)
     {
-      var pickaxeTexture = content.Load<Texture2D>("Cursors/Piackaxe");
+      var _fistTexture = content.Load<Texture2D>("Cursors/Fist");
 
-      _pickaxeCursor = new Sprite(pickaxeTexture)
+      var _pickaxeTexture = content.Load<Texture2D>("Cursors/Pickaxe");
+
+      _fistCursor = new Sprite(_fistTexture)
       {
-        Origin = new Vector2(pickaxeTexture.Width / 2, pickaxeTexture.Height / 2),
+        Origin = new Vector2(_fistTexture.Width / 2, _fistTexture.Height / 2),
+        Layer = 1f,
+      };
+
+      _pickaxeCursor = new Sprite(_pickaxeTexture)
+      {
+        Origin = new Vector2(_pickaxeTexture.Width / 2, _pickaxeTexture.Height / 2),
         Layer = 1f,
       };
     }
@@ -96,7 +152,9 @@ namespace TopDown.Controls
 
     public override void UnloadContent()
     {
+      _fistCursor.UnloadContent();
 
+      _pickaxeCursor.UnloadContent();
     }
 
     public override void Update(GameTime gameTime)
@@ -104,6 +162,7 @@ namespace TopDown.Controls
       _previousMouse = _currentMouse;
       _currentMouse = Microsoft.Xna.Framework.Input.Mouse.GetState();
 
+      _fistCursor.Position = _currentMouse.Position.ToVector2();
       _pickaxeCursor.Position = _currentMouse.Position.ToVector2();
     }
   }

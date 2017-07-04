@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TopDown.Buildings;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
 using TopDown.Core;
@@ -35,6 +36,13 @@ namespace TopDown.States
     public TopDown.Sprites.Player Player { get; private set; }
 
     public Models.Resources Resources { get; set; }
+
+    public void AddBuilding(Building building)
+    {
+      building.LoadContent(_content);
+
+      _gameComponents.Add(building);
+    }
 
     public override void Draw(GameTime gameTime)
     {
@@ -61,7 +69,7 @@ namespace TopDown.States
     {
       base.LoadContent(gameModel);
 
-      _buildMenu = new BuildMenuWindow();
+      _buildMenu = new BuildMenuWindow(this);
 
       _camera = new Camera();
 

@@ -41,13 +41,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Controls\BuildMenu\BuildMenuOption.cs" />
+    <Compile Include="Buildings\Building.cs" />
+    <Compile Include="Controls\BuildMenu\BuildMenuSubOption.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuWindow.cs" />
     <Compile Include="Controls\Mouse.cs" />
     <Compile Include="Controls\ResourceView.cs" />
     <Compile Include="Controls\Toolbar.cs" />
     <Compile Include="Core\Camera.cs" />
-    <Compile Include="FX\RockParticle.cs" />
+    <Compile Include="FX\Particle.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Models\Resources.cs" />
     <Compile Include="Program.cs" />

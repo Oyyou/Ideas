@@ -27,6 +27,9 @@ namespace Engine
 
     public void PostUpdate(GameTime gameTime)
     {
+      if (Components == null)
+        return;
+
       for (int i = 0; i < Components.Count; i++)
       {
         if (Components[i].IsRemoved)
