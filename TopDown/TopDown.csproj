@@ -44,6 +44,8 @@
     <Compile Include="Buildings\Building.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuSubOption.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuWindow.cs" />
+    <Compile Include="Controls\BuildMenu\ItemMenu.cs" />
+    <Compile Include="Controls\Keyboard.cs" />
     <Compile Include="Controls\Mouse.cs" />
     <Compile Include="Controls\ResourceView.cs" />
     <Compile Include="Controls\Toolbar.cs" />

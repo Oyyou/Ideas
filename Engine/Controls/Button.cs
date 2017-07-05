@@ -38,6 +38,8 @@ namespace Engine.Controls
 
     public Color PenColor { get; set; }
 
+    public bool IsClicked { get; set; }
+
     public bool IsHovering { get; private set; }
 
     public bool IsSelected { get; set; }
@@ -121,6 +123,7 @@ namespace Engine.Controls
       var mouseRectangle = new Rectangle(_currentMouse.X, _currentMouse.Y, 1, 1);
 
       IsHovering = false;
+      IsClicked = false;
 
       if (mouseRectangle.Intersects(Rectangle))
       {
@@ -129,6 +132,7 @@ namespace Engine.Controls
         if (_currentMouse.LeftButton == ButtonState.Released && _previousMouse.LeftButton == ButtonState.Pressed)
         {
           //IsSelected = true;
+          IsClicked = true;
           Click?.Invoke(this, new EventArgs());
         }
       }

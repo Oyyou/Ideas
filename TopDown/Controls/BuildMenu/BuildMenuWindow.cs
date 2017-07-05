@@ -16,7 +16,7 @@ namespace TopDown.Controls.BuildMenu
 {
   public class BuildMenuWindow : Component
   {
-    private List<Button> _buildOptions;
+    private List<Button> _buildSubOptions;
 
     private GameState _gameState;
 
@@ -24,13 +24,9 @@ namespace TopDown.Controls.BuildMenu
 
     private ContentManager _content;
 
-    private KeyboardState _currentKey;
-
     private SpriteFont _font;
 
     private Vector2 _fontPosition;
-
-    private KeyboardState _previousKey;
 
     private Texture2D _subButtonTexture;
 
@@ -38,7 +34,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void ArtsButton_Click(object sender, EventArgs e)
     {
-      _buildOptions = new List<Button>()
+      _buildSubOptions = new List<Button>()
       {
         new BuildMenuSubOption(_subButtonTexture, _font)
         {
@@ -54,7 +50,7 @@ namespace TopDown.Controls.BuildMenu
         },
       };
 
-      foreach (var component in _buildOptions)
+      foreach (var component in _buildSubOptions)
         component.LoadContent(_content);
     }
 
@@ -70,19 +66,18 @@ namespace TopDown.Controls.BuildMenu
 
     private void CloseButton_Click(object sender, EventArgs e)
     {
-      IsEnabled = false;
-      ((Button)sender).IsSelected = false;
+      _gameState.State = States.States.Playing;
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      if (!IsEnabled)
+      if (_gameState.State != States.States.BuildMenu)
         return;
 
       foreach (var component in Components)
         component.Draw(gameTime, spriteBatch);
 
-      foreach (var component in _buildOptions)
+      foreach (var component in _buildSubOptions)
         component.Draw(gameTime, spriteBatch);
 
       spriteBatch.DrawString(_font, "Build", _fontPosition, Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.99f);
@@ -105,7 +100,7 @@ namespace TopDown.Controls.BuildMenu
 
       smallHouse.Click += SmallHouse_Click;
 
-      _buildOptions = new List<Button>()
+      _buildSubOptions = new List<Button>()
       {
         smallHouse,
         new BuildMenuSubOption(_subButtonTexture, _font)
@@ -122,7 +117,7 @@ namespace TopDown.Controls.BuildMenu
         },
       };
 
-      foreach (var component in _buildOptions)
+      foreach (var component in _buildSubOptions)
         component.LoadContent(_content);
     }
 
@@ -136,7 +131,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void LabourButton_Click(object sender, EventArgs e)
     {
-      _buildOptions = new List<Button>()
+      _buildSubOptions = new List<Button>()
       {
         new BuildMenuSubOption(_subButtonTexture, _font)
         {
@@ -188,7 +183,7 @@ namespace TopDown.Controls.BuildMenu
         },
       };
 
-      foreach (var component in _buildOptions)
+      foreach (var component in _buildSubOptions)
         component.LoadContent(_content);
     }
 
@@ -264,7 +259,7 @@ namespace TopDown.Controls.BuildMenu
       foreach (var component in Components)
         component.LoadContent(content);
 
-      _buildOptions = new List<Button>();
+      _buildSubOptions = new List<Button>();
     }
 
     public override void UnloadContent()
@@ -272,19 +267,17 @@ namespace TopDown.Controls.BuildMenu
       foreach (var component in Components)
         component.UnloadContent();
 
-      foreach (var component in _buildOptions)
+      foreach (var component in _buildSubOptions)
         component.UnloadContent();
+
+      Components?.Clear();
+      
+      _buildSubOptions?.Clear();
     }
 
     public override void Update(GameTime gameTime)
     {
-      _previousKey = _currentKey;
-      _currentKey = Keyboard.GetState();
-
-      if (_currentKey.IsKeyUp(Keys.B) && _previousKey.IsKeyDown(Keys.B))
-        IsEnabled = !IsEnabled;
-
-      if (!IsEnabled)
+      if (_gameState.State != States.States.BuildMenu)
         return;
 
       foreach (var component in Components)
@@ -295,7 +288,7 @@ namespace TopDown.Controls.BuildMenu
 
       var y = Position.Y + 56;
 
-      foreach (var component in _buildOptions)
+      foreach (var component in _buildSubOptions)
       {
         component.Position = new Vector2(x + xIncrement, y);
 
@@ -308,6 +301,9 @@ namespace TopDown.Controls.BuildMenu
         }
 
         component.Update(gameTime);
+
+        if (component.IsClicked)
+          _gameState.State = States.States.PlacingBuilding;
       }
     }
   }

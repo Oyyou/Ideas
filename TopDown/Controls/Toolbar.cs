@@ -84,9 +84,9 @@ namespace TopDown.Controls
 
     public override void Update(GameTime gameTime)
     {
-      if (Keyboard.GetState().IsKeyDown(Keys.D1))
+      if (GameState.Keyboard.IsKeyPressed(Keys.D1))
         GameState.Mouse.MouseState = MouseStates.Building;
-      else if (Keyboard.GetState().IsKeyDown(Keys.D2))
+      else if (GameState.Keyboard.IsKeyPressed(Keys.D2))
         GameState.Mouse.MouseState = MouseStates.Mining;
 
       _toolbarSprite.Update(gameTime);

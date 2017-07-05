@@ -126,7 +126,10 @@ namespace TopDown.Buildings
               _buildTimer += _hitTimer;
 
               if (_buildTimer > _maxBuildTimer)
+              {
                 BuildingState = BuildingStates.Built;
+                _gameState.State = States.States.Playing;
+              }
 
               _hitTimer = 0f;
 
@@ -232,18 +235,44 @@ namespace TopDown.Buildings
         case BuildingStates.Placing:
 
           if (Keyboard.GetState().IsKeyDown(Keys.B))
+          {
+            _gameState.State = States.States.BuildMenu;
             IsRemoved = true;
+          }
+
+          if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+          {
+            _gameState.State = States.States.Playing;
+            IsRemoved = true;
+          }
 
           Position = new Vector2(
             (float)Math.Floor((decimal)GameState.Mouse.PositionWithCamera.X / 32) * 32,
             (float)Math.Floor((decimal)GameState.Mouse.PositionWithCamera.Y / 32) * 32);
 
           if (GameState.Mouse.LeftClicked)
+          {
             BuildingState = BuildingStates.Placed;
-
+            _gameState.State = States.States.PlacingItems;
+          }
+          
           break;
         case BuildingStates.Placed:
+
+          if (GameState.Keyboard.IsKeyPressed(Keys.B))
+          {
+            _gameState.State = States.States.BuildMenu;
+            IsRemoved = true;
+          }
+
+          if (GameState.Keyboard.IsKeyPressed(Keys.Escape))
+          {
+            _gameState.State = States.States.Playing;
+            IsRemoved = true;
+          }
+
           Build(gameTime);
+
           break;
         case BuildingStates.Building:
           break;

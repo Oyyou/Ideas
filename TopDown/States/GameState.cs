@@ -6,6 +6,7 @@ using Engine.States;
 using Engine.TmxSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,14 @@ using TopDown.Sprites.Fences;
 
 namespace TopDown.States
 {
+  public enum States
+  {
+    Playing,
+    BuildMenu,
+    PlacingBuilding,
+    PlacingItems,
+  }
+
   public class GameState : State
   {
     private BuildMenuWindow _buildMenu;
@@ -31,11 +40,17 @@ namespace TopDown.States
 
     private List<Component> _guiComponents;
 
+    private ItemMenu _itemMenu;
+
+    public static Controls.Keyboard Keyboard;
+
     public static Controls.Mouse Mouse;
 
     public TopDown.Sprites.Player Player { get; private set; }
 
     public Models.Resources Resources { get; set; }
+
+    public States State { get; set; }
 
     public void AddBuilding(Building building)
     {
@@ -69,11 +84,16 @@ namespace TopDown.States
     {
       base.LoadContent(gameModel);
 
+      State = States.Playing;
+
       _buildMenu = new BuildMenuWindow(this);
+      _itemMenu = new ItemMenu(this);
 
       _camera = new Camera();
 
-      Mouse = new Mouse(_camera);
+      Keyboard = new Controls.Keyboard();
+
+      Mouse = new TopDown.Controls.Mouse(_camera);
 
       Resources = new Models.Resources();
 
@@ -175,10 +195,12 @@ namespace TopDown.States
 
       _guiComponents = new List<Component>()
       {
+        Keyboard,
         Mouse,
         new Toolbar(this),
         new ResourceView(Resources),
         _buildMenu,
+        _itemMenu,
       };
 
       foreach (var component in _gameComponents)
@@ -220,14 +242,70 @@ namespace TopDown.States
 
     public override void Update(GameTime gameTime)
     {
-      if (_buildMenu.IsEnabled)
+      switch (State)
       {
-        foreach (var component in _guiComponents)
-          component.Update(gameTime);
+        case States.Playing:
 
-        return;
+          Playing(gameTime);
+
+          break;
+        case States.BuildMenu:
+
+          foreach (var component in _guiComponents)
+            component.Update(gameTime);
+
+          if (Keyboard.IsKeyPressed(Keys.B) || 
+              Keyboard.IsKeyPressed(Keys.Escape))
+            State = States.Playing;
+
+          break;
+        case States.PlacingBuilding:
+
+          foreach (var component in _guiComponents)
+            component.Update(gameTime);
+
+          foreach (var component in _gameComponents)
+            component.Update(gameTime);
+
+          for (int i = 0; i < _gameComponents.Count; i++)
+          {
+            for (int j = i + 1; j < _gameComponents.Count; j++)
+            {
+              _gameComponents[i].CheckCollision(_gameComponents[j]);
+            }
+          }
+
+          _camera.Follow(((Sprite)_gameComponents[0]).Position);
+
+          break;
+        case States.PlacingItems:
+
+          foreach (var component in _guiComponents)
+            component.Update(gameTime);
+
+          foreach (var component in _gameComponents)
+            component.Update(gameTime);
+
+          for (int i = 0; i < _gameComponents.Count; i++)
+          {
+            for (int j = i + 1; j < _gameComponents.Count; j++)
+            {
+              _gameComponents[i].CheckCollision(_gameComponents[j]);
+            }
+          }
+
+          _camera.Follow(((Sprite)_gameComponents[0]).Position);
+
+          break;
+        default:
+          throw new Exception("Unknown state: " + State.ToString());
       }
+    }
 
+    private void Playing(GameTime gameTime)
+    {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
 
       foreach (var component in _gameComponents)
         component.Update(gameTime);
@@ -240,10 +318,10 @@ namespace TopDown.States
         }
       }
 
-      foreach (var component in _guiComponents)
-        component.Update(gameTime);
-
       _camera.Follow(((Sprite)_gameComponents[0]).Position);
+
+      if (GameState.Keyboard.IsKeyPressed(Keys.B))
+        State = States.BuildMenu;
     }
   }
 }
