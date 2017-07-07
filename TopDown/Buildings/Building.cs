@@ -11,6 +11,7 @@ using TopDown.States;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using TopDown.FX;
+using Engine.Sprites;
 
 namespace TopDown.Buildings
 {
@@ -24,15 +25,13 @@ namespace TopDown.Buildings
 
   public class Building : Component
   {
-    private BuildingStates _buildingState;
-
-    private Texture2D _buildingTexture;
+    private Sprite _buildingSprite;
 
     private float _buildTimer;
 
-    private Texture2D _builtTexture;
+    private Sprite _builtSprite;
 
-    private GameState _gameState;
+    private GameScreen _gameState;
 
     private float _hitTimer;
 
@@ -40,7 +39,7 @@ namespace TopDown.Buildings
 
     private const float _maxHitTimer = 0.3f;
 
-    private Texture2D _placedTexture;
+    private Sprite _placedSprite;
 
     private SoundEffect _soundEffect;
 
@@ -53,15 +52,18 @@ namespace TopDown.Buildings
 
     public BuildingStates BuildingState
     {
-      get { return _buildingState; }
+      get { return State; }
       set
       {
-        if (_buildingState == value)
+        if (State == value)
           return;
 
-        _buildingState = value;
+        State = value;
 
-        switch (_buildingState)
+        var height = CurrentSprite.Rectangle.Height;
+        var width = CurrentSprite.Rectangle.Width;
+
+        switch (State)
         {
           case BuildingStates.Placing:
             CollisionRectangles = new List<Rectangle>();
@@ -70,17 +72,17 @@ namespace TopDown.Buildings
           case BuildingStates.Building:
             CollisionRectangles = new List<Rectangle>()
             {
-              new Rectangle((int)Position.X, (int)Position.Y, _placedTexture.Width, _placedTexture.Height),
+              new Rectangle((int)Position.X, (int)Position.Y, width, height),
             };
             break;
           case BuildingStates.Built:
             CollisionRectangles = new List<Rectangle>()
             {
-              new Rectangle((int)Position.X, (int)Position.Y, _placedTexture.Width, 1),
-              new Rectangle((int)Position.X, (int)Position.Y, 1, _placedTexture.Height),
-              new Rectangle((int)Position.X + (_placedTexture.Width - 1), (int)Position.Y, 1, _placedTexture.Height),
-              new Rectangle((int)Position.X, (int)Position.Y + _placedTexture.Height, 21, 1),
-              new Rectangle((int)Position.X + 61, (int)Position.Y + _placedTexture.Height, 131, 1),
+              new Rectangle((int)Position.X, (int)Position.Y, width, 1),
+              new Rectangle((int)Position.X, (int)Position.Y, 1, height),
+              new Rectangle((int)Position.X + (width - 1), (int)Position.Y, 1, height),
+              new Rectangle((int)Position.X, (int)Position.Y + height, 21, 1),
+              new Rectangle((int)Position.X + 61, (int)Position.Y + height, 131, 1),
             };
             break;
         }
@@ -89,28 +91,71 @@ namespace TopDown.Buildings
 
     public Color Color { get; set; }
 
-    public Vector2 Position;
+    public Sprite CurrentSprite
+    {
+      get
+      {
+        switch (BuildingState)
+        {
+          case BuildingStates.Placing:
+            return _builtSprite;
+
+          case BuildingStates.Placed:
+            return _placedSprite;
+
+          case BuildingStates.Building:
+            return _buildingSprite;
+
+          case BuildingStates.Built:
+            return _builtSprite;
+
+          default:
+            throw new Exception("Unknown state: " + BuildingState);
+        }
+      }
+    }
+
+    public float Layer
+    {
+      get
+      {
+        return CurrentSprite.Layer;
+      }
+    }
+
+    public Vector2 Position
+    {
+      get { return CurrentSprite.Position; }
+      set
+      {
+        //_buildingSprite.Position = value;
+        _builtSprite.Position = value;
+        _placedSprite.Position = value;
+      }
+    }
 
     public Rectangle Rectangle
     {
       get
       {
-        return new Rectangle((int)Position.X, (int)Position.Y, _placedTexture.Width, _placedTexture.Height);
+        return new Rectangle((int)Position.X, (int)Position.Y, CurrentSprite.Rectangle.Width, CurrentSprite.Rectangle.Height);
       }
     }
 
+    public BuildingStates State;
+
     public void Build(GameTime gameTime)
     {
-      if (GameState.Mouse.MouseState != Controls.MouseStates.Building)
+      if (GameScreen.Mouse.MouseState != Controls.MouseStates.Building)
         return;
 
-      if (GameState.Mouse.RectangleWithCamera.Intersects(this.Rectangle))
+      if (GameScreen.Mouse.RectangleWithCamera.Intersects(this.Rectangle))
       {
         if (Vector2.Distance(this.Position + new Vector2(Rectangle.Width / 2, Rectangle.Height / 2), _gameState.Player.Position) < 150)
         {
           Color = Color.Yellow;
 
-          if (GameState.Mouse.LeftDown)
+          if (GameScreen.Mouse.LeftDown)
           {
             _hitTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -151,7 +196,7 @@ namespace TopDown.Buildings
       }
     }
 
-    public Building(GameState gameState)
+    public Building(GameScreen gameState)
     {
       _gameState = gameState;
     }
@@ -166,17 +211,21 @@ namespace TopDown.Buildings
       switch (BuildingState)
       {
         case BuildingStates.Placing:
-          spriteBatch.Draw(_builtTexture, Position, Color.White);
+          _builtSprite.Draw(gameTime, spriteBatch);
           break;
+
         case BuildingStates.Placed:
-          spriteBatch.Draw(_placedTexture, Position, Color.White);
+          _placedSprite.Draw(gameTime, spriteBatch);
           break;
+
         case BuildingStates.Building:
-          spriteBatch.Draw(_buildingTexture, Position, Color.White);
+          _buildingSprite.Draw(gameTime, spriteBatch);
           break;
+
         case BuildingStates.Built:
-          spriteBatch.Draw(_builtTexture, Position, Color.White);
+          _builtSprite.Draw(gameTime, spriteBatch);
           break;
+
         default:
           break;
       }
@@ -205,9 +254,9 @@ namespace TopDown.Buildings
 
     public override void LoadContent(ContentManager content)
     {
-      _builtTexture = content.Load<Texture2D>("Buildings/SmallHouse");
+      _builtSprite = new Sprite(content.Load<Texture2D>("Buildings/SmallHouse"));
 
-      _placedTexture = content.Load<Texture2D>("Buildings/SmallHouse_Placed");
+      _placedSprite = new Sprite(content.Load<Texture2D>("Buildings/SmallHouse_Placed"));
 
       _soundEffect = content.Load<SoundEffect>("Sounds/Sawing");
       _soundEffectInstance = _soundEffect.CreateInstance();
@@ -219,9 +268,9 @@ namespace TopDown.Buildings
 
     public override void UnloadContent()
     {
-      _builtTexture?.Dispose();
-      _buildingTexture?.Dispose();
-      _placedTexture?.Dispose();
+      _builtSprite?.UnloadContent();
+      _placedSprite?.UnloadContent();
+      _buildingSprite?.UnloadContent();
       _soundEffect?.Dispose();
 
       foreach (var component in Components)
@@ -247,34 +296,22 @@ namespace TopDown.Buildings
           }
 
           Position = new Vector2(
-            (float)Math.Floor((decimal)GameState.Mouse.PositionWithCamera.X / 32) * 32,
-            (float)Math.Floor((decimal)GameState.Mouse.PositionWithCamera.Y / 32) * 32);
+            (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
+            (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
 
-          if (GameState.Mouse.LeftClicked)
+          if (GameScreen.Mouse.LeftClicked)
           {
             BuildingState = BuildingStates.Placed;
-            _gameState.State = States.States.PlacingItems;
+            _gameState.State = States.States.ItemMenu;
           }
-          
+
           break;
         case BuildingStates.Placed:
 
-          if (GameState.Keyboard.IsKeyPressed(Keys.B))
-          {
-            _gameState.State = States.States.BuildMenu;
-            IsRemoved = true;
-          }
-
-          if (GameState.Keyboard.IsKeyPressed(Keys.Escape))
-          {
-            _gameState.State = States.States.Playing;
-            IsRemoved = true;
-          }
-
-          Build(gameTime);
-
           break;
         case BuildingStates.Building:
+
+          Build(gameTime);
           break;
         case BuildingStates.Built:
           break;

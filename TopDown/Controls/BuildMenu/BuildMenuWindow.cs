@@ -18,7 +18,7 @@ namespace TopDown.Controls.BuildMenu
   {
     private List<Button> _buildSubOptions;
 
-    private GameState _gameState;
+    private GameScreen _gameState;
 
     private Texture2D _mainButtonTexture;
 
@@ -36,7 +36,7 @@ namespace TopDown.Controls.BuildMenu
     {
       _buildSubOptions = new List<Button>()
       {
-        new BuildMenuSubOption(_subButtonTexture, _font)
+        new BuildMenuSubItem(_subButtonTexture, _font)
         {
           Text = "Library",
           Layer =  0.99f,
@@ -54,7 +54,7 @@ namespace TopDown.Controls.BuildMenu
         component.LoadContent(_content);
     }
 
-    public BuildMenuWindow(GameState gameState)
+    public BuildMenuWindow(GameScreen gameState)
     {
       _gameState = gameState;
     }
@@ -85,7 +85,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void HousingButton_Click(object sender, EventArgs e)
     {
-      var smallHouse = new BuildMenuSubOption(_subButtonTexture, _font)
+      var smallHouse = new BuildMenuSubItem(_subButtonTexture, _font)
       {
         Text = "Small House",
         Layer = 0.99f,
@@ -103,7 +103,7 @@ namespace TopDown.Controls.BuildMenu
       _buildSubOptions = new List<Button>()
       {
         smallHouse,
-        new BuildMenuSubOption(_subButtonTexture, _font)
+        new BuildMenuSubItem(_subButtonTexture, _font)
         {
           Text = "Large House",
           Layer =  0.99f,
@@ -123,7 +123,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void SmallHouse_Click(object sender, EventArgs e)
     {
-      _gameState.AddBuilding(new Buildings.Building(_gameState)
+      _gameState.AddComponent(new Buildings.Building(_gameState)
       {
         BuildingState = Buildings.BuildingStates.Placing,
       });
@@ -133,7 +133,7 @@ namespace TopDown.Controls.BuildMenu
     {
       _buildSubOptions = new List<Button>()
       {
-        new BuildMenuSubOption(_subButtonTexture, _font)
+        new BuildMenuSubItem(_subButtonTexture, _font)
         {
           Text = "Blacksmith",
           Layer =  0.99f,
@@ -145,7 +145,7 @@ namespace TopDown.Controls.BuildMenu
             Stone = 40,
           },
         },
-        new BuildMenuSubOption(_subButtonTexture, _font)
+        new BuildMenuSubItem(_subButtonTexture, _font)
         {
           Text = "Farm",
           Layer =  0.99f,
@@ -157,7 +157,7 @@ namespace TopDown.Controls.BuildMenu
             Stone = 40,
           },
         },
-        new BuildMenuSubOption(_subButtonTexture, _font)
+        new BuildMenuSubItem(_subButtonTexture, _font)
         {
           Text = "Lumber Mill",
           Layer =  0.99f,
@@ -169,7 +169,7 @@ namespace TopDown.Controls.BuildMenu
             Stone = 40,
           },
         },
-        new BuildMenuSubOption(_subButtonTexture, _font)
+        new BuildMenuSubItem(_subButtonTexture, _font)
         {
           Text = "Mine",
           Layer =  0.99f,

@@ -9,12 +9,11 @@ using Microsoft.Xna.Framework;
 
 namespace TopDown.Controls.BuildMenu
 {
-  public class BuildMenuSubOption : Button
+  public class BuildMenuSubItem : Button
   {
-
     public Models.Resources ResourceCost;
 
-    public BuildMenuSubOption(Texture2D texture, SpriteFont font)
+    public BuildMenuSubItem(Texture2D texture, SpriteFont font)
       : base(texture, font)
     {
 

@@ -16,7 +16,7 @@ namespace TopDown.Resources
 {
   public class Rock : Sprite
   {
-    private GameState _gameState;
+    private GameScreen _gameState;
 
     private const float _hitTimer = 0.3f;
 
@@ -60,7 +60,7 @@ namespace TopDown.Resources
       _soundEffect = content.Load<SoundEffect>("Sounds/RockHit");
     }
 
-    public Rock(Texture2D texture, GameState gameState) : base(texture)
+    public Rock(Texture2D texture, GameScreen gameState) : base(texture)
     {
       _gameState = gameState;
     }
@@ -78,16 +78,16 @@ namespace TopDown.Resources
     {
       Color = Color.White;
 
-      if (GameState.Mouse.MouseState != Controls.MouseStates.Mining)
+      if (GameScreen.Mouse.MouseState != Controls.MouseStates.Mining)
         return;
 
-      if (GameState.Mouse.RectangleWithCamera.Intersects(this.Rectangle))
+      if (GameScreen.Mouse.RectangleWithCamera.Intersects(this.Rectangle))
       {
         if (Vector2.Distance(this.Position, _gameState.Player.Position) < 100)
         {
           Color = Color.Yellow;
 
-          if (GameState.Mouse.LeftDown)
+          if (GameScreen.Mouse.LeftDown)
           {
             _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 

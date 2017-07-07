@@ -18,7 +18,7 @@ namespace TopDown.Controls
   {
     private List<Button> _icons;
 
-    private GameState _gameState;
+    private GameScreen _gameState;
 
     private Sprite _toolbarSprite;
 
@@ -37,7 +37,7 @@ namespace TopDown.Controls
 
     private void FistButton_Click(object sender, EventArgs e)
     {
-      GameState.Mouse.MouseState = MouseStates.Building;
+      GameScreen.Mouse.MouseState = MouseStates.Building;
     }
 
     public override void LoadContent(ContentManager content)
@@ -69,10 +69,10 @@ namespace TopDown.Controls
 
     private void PickaxeButton_Click(object sender, EventArgs e)
     {
-      GameState.Mouse.MouseState = MouseStates.Mining;
+      GameScreen.Mouse.MouseState = MouseStates.Mining;
     }
 
-    public Toolbar(GameState gameState)
+    public Toolbar(GameScreen gameState)
     {
       _gameState = gameState;
     }
@@ -84,10 +84,10 @@ namespace TopDown.Controls
 
     public override void Update(GameTime gameTime)
     {
-      if (GameState.Keyboard.IsKeyPressed(Keys.D1))
-        GameState.Mouse.MouseState = MouseStates.Building;
-      else if (GameState.Keyboard.IsKeyPressed(Keys.D2))
-        GameState.Mouse.MouseState = MouseStates.Mining;
+      if (GameScreen.Keyboard.IsKeyPressed(Keys.D1))
+        GameScreen.Mouse.MouseState = MouseStates.Building;
+      else if (GameScreen.Keyboard.IsKeyPressed(Keys.D2))
+        GameScreen.Mouse.MouseState = MouseStates.Mining;
 
       _toolbarSprite.Update(gameTime);
 

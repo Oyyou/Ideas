@@ -42,9 +42,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Buildings\Building.cs" />
-    <Compile Include="Controls\BuildMenu\BuildMenuSubOption.cs" />
+    <Compile Include="Buildings\Furniture.cs" />
+    <Compile Include="Controls\BuildMenu\BuildMenuMainItem.cs" />
+    <Compile Include="Controls\BuildMenu\BuildMenuSubItem.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuWindow.cs" />
     <Compile Include="Controls\BuildMenu\ItemMenu.cs" />
+    <Compile Include="Controls\BuildMenu\ItemMenuOption.cs" />
     <Compile Include="Controls\Keyboard.cs" />
     <Compile Include="Controls\Mouse.cs" />
     <Compile Include="Controls\ResourceView.cs" />
@@ -64,8 +67,8 @@
     <Compile Include="Sprites\Fences\CornerFence.cs" />
     <Compile Include="Sprites\Fences\VerticalFence.cs" />
     <Compile Include="Sprites\Player.cs" />
-    <Compile Include="States\GameState.cs" />
-    <Compile Include="States\MenuState.cs" />
+    <Compile Include="Screens\GameScreen.cs" />
+    <Compile Include="Screens\MenuScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

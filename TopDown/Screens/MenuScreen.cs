@@ -16,7 +16,7 @@ using Engine;
 
 namespace TopDown.States
 {
-  public class MenuState : State
+  public class MenuScreen : State
   {
     private List<Component> _guiComponents;
 
@@ -61,14 +61,14 @@ namespace TopDown.States
         component.LoadContent(_content);
     }
 
-    public MenuState()
+    public MenuScreen()
     {
 
     }
 
     private void NewGameButton_Click(object sender, EventArgs e)
     {
-      _game.ChangeState(new GameState());
+      _game.ChangeState(new GameScreen());
     }
 
     public override void PostUpdate(GameTime gameTime)

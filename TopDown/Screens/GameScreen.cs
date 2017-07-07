@@ -27,10 +27,11 @@ namespace TopDown.States
     Playing,
     BuildMenu,
     PlacingBuilding,
+    ItemMenu,
     PlacingItems,
   }
 
-  public class GameState : State
+  public class GameScreen : State
   {
     private BuildMenuWindow _buildMenu;
 
@@ -50,13 +51,28 @@ namespace TopDown.States
 
     public Models.Resources Resources { get; set; }
 
+    public Building SelectedBuilding { get; set; }
+
     public States State { get; set; }
 
-    public void AddBuilding(Building building)
+    public void AddComponent(Building building)
     {
+      SelectedBuilding = building;
       building.LoadContent(_content);
 
       _gameComponents.Add(building);
+    }
+
+    private void BuildMenuUpdate(GameTime gameTime)
+    {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
+
+      if (Keyboard.IsKeyPressed(Keys.B) ||
+          Keyboard.IsKeyPressed(Keys.Escape))
+      {
+        State = States.Playing;
+      }
     }
 
     public override void Draw(GameTime gameTime)
@@ -210,9 +226,31 @@ namespace TopDown.States
         component.LoadContent(_content);
     }
 
-    public GameState()
+    public GameScreen()
     {
 
+    }
+
+    private void PlayingUpdate(GameTime gameTime)
+    {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
+
+      foreach (var component in _gameComponents)
+        component.Update(gameTime);
+
+      for (int i = 0; i < _gameComponents.Count; i++)
+      {
+        for (int j = i + 1; j < _gameComponents.Count; j++)
+        {
+          _gameComponents[i].CheckCollision(_gameComponents[j]);
+        }
+      }
+
+      _camera.Follow(((Sprite)_gameComponents[0]).Position);
+
+      if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
+        State = States.BuildMenu;
     }
 
     public override void PostUpdate(GameTime gameTime)
@@ -246,17 +284,12 @@ namespace TopDown.States
       {
         case States.Playing:
 
-          Playing(gameTime);
+          PlayingUpdate(gameTime);
 
           break;
         case States.BuildMenu:
 
-          foreach (var component in _guiComponents)
-            component.Update(gameTime);
-
-          if (Keyboard.IsKeyPressed(Keys.B) || 
-              Keyboard.IsKeyPressed(Keys.Escape))
-            State = States.Playing;
+          BuildMenuUpdate(gameTime);
 
           break;
         case States.PlacingBuilding:
@@ -278,6 +311,37 @@ namespace TopDown.States
           _camera.Follow(((Sprite)_gameComponents[0]).Position);
 
           break;
+        case States.ItemMenu:
+          
+          foreach (var component in _guiComponents)
+            component.Update(gameTime);
+
+          foreach (var component in _gameComponents)
+            component.Update(gameTime);
+
+          for (int i = 0; i < _gameComponents.Count; i++)
+          {
+            for (int j = i + 1; j < _gameComponents.Count; j++)
+            {
+              _gameComponents[i].CheckCollision(_gameComponents[j]);
+            }
+          }
+
+          _camera.Follow(((Sprite)_gameComponents[0]).Position);
+
+          if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
+          {
+            State = States.BuildMenu;
+            SelectedBuilding.IsRemoved = true;
+          }
+
+          if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
+          {
+            State = States.Playing;
+            SelectedBuilding.IsRemoved = true;
+          }
+
+          break;
         case States.PlacingItems:
 
           foreach (var component in _guiComponents)
@@ -296,32 +360,16 @@ namespace TopDown.States
 
           _camera.Follow(((Sprite)_gameComponents[0]).Position);
 
+          if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
+          {
+            State = States.ItemMenu;
+            SelectedBuilding.Components.Last().IsRemoved = true;
+          }
+
           break;
         default:
           throw new Exception("Unknown state: " + State.ToString());
       }
-    }
-
-    private void Playing(GameTime gameTime)
-    {
-      foreach (var component in _guiComponents)
-        component.Update(gameTime);
-
-      foreach (var component in _gameComponents)
-        component.Update(gameTime);
-
-      for (int i = 0; i < _gameComponents.Count; i++)
-      {
-        for (int j = i + 1; j < _gameComponents.Count; j++)
-        {
-          _gameComponents[i].CheckCollision(_gameComponents[j]);
-        }
-      }
-
-      _camera.Follow(((Sprite)_gameComponents[0]).Position);
-
-      if (GameState.Keyboard.IsKeyPressed(Keys.B))
-        State = States.BuildMenu;
     }
   }
 }

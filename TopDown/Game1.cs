@@ -50,7 +50,7 @@ namespace TopDown
 
       _gameModel = new Engine.Models.GameModel(Content, this, _graphics.GraphicsDevice, _spriteBatch);
 
-      _currentState = new GameState();
+      _currentState = new GameScreen();
       _currentState.LoadContent(_gameModel);
     }
 
