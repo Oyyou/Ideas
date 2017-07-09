@@ -124,6 +124,9 @@ namespace Engine.Sprites
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      if (!IsVisible)
+        return;
+
       Position += Velocity;
 
       if (_texture != null)
@@ -153,6 +156,8 @@ namespace Engine.Sprites
       Color = Color.White;
 
       Origin = new Vector2(0, 0);
+
+      IsVisible = true;
     }
 
     protected bool IsTouchingLeft(Sprite sprite)

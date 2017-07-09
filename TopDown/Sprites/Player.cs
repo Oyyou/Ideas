@@ -23,6 +23,16 @@ namespace TopDown.Sprites
       }
     }
 
+    public bool IsIn(Rectangle rectangle)
+    {
+      var playerRectangle = CollisionRectangles.FirstOrDefault();
+
+      return playerRectangle.Left >= rectangle.Left &&
+        playerRectangle.Top >= rectangle.Top &&
+        playerRectangle.Right <= rectangle.Right &&
+        playerRectangle.Bottom <= rectangle.Bottom;
+    }
+
     public Player(Dictionary<string, Animation> animations)
      : base(animations)
     {

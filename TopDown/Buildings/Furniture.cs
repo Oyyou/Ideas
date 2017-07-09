@@ -65,6 +65,7 @@ namespace TopDown.Buildings
             {
               State = FurnatureStates.Placed;
               _gameState.State = States.States.ItemMenu;
+              _gameState.ItemMenu.CurrentButton.State = Controls.BuildMenu.ItemMenuOptionStates.Placed;
             }
           }
           else

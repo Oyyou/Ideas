@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="Buildings\Building.cs" />
     <Compile Include="Buildings\Furniture.cs" />
+    <Compile Include="Buildings\Templates\BuildingTemplate.cs" />
+    <Compile Include="Buildings\Templates\SmallHouseTemplate.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuMainItem.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuSubItem.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuWindow.cs" />

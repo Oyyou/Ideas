@@ -11,6 +11,7 @@ using Engine.Sprites;
 using Microsoft.Xna.Framework.Input;
 using Engine.Controls;
 using TopDown.States;
+using TopDown.Buildings.Templates;
 
 namespace TopDown.Controls.BuildMenu
 {
@@ -123,7 +124,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void SmallHouse_Click(object sender, EventArgs e)
     {
-      _gameState.AddComponent(new Buildings.Building(_gameState)
+      _gameState.AddComponent(new Buildings.Building(_gameState, new SmallHouseTemplate())
       {
         BuildingState = Buildings.BuildingStates.Placing,
       });
@@ -271,7 +272,7 @@ namespace TopDown.Controls.BuildMenu
         component.UnloadContent();
 
       Components?.Clear();
-      
+
       _buildSubOptions?.Clear();
     }
 

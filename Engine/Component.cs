@@ -19,6 +19,8 @@ namespace Engine
 
     public bool IsRemoved { get; set; }
 
+    public bool IsVisible { get; set; }
+
     public abstract void CheckCollision(Component component);
 
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);

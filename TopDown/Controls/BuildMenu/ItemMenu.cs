@@ -21,11 +21,13 @@ namespace TopDown.Controls.BuildMenu
 
     private Texture2D _bedTexture;
 
-    private List<Button> _items;
+    private List<ItemMenuOption> _items;
 
     private GameScreen _gameState;
 
     private Vector2 _position;
+
+    public ItemMenuOption CurrentButton;
 
     public override void CheckCollision(Component component)
     {
@@ -51,7 +53,7 @@ namespace TopDown.Controls.BuildMenu
 
     public override void LoadContent(ContentManager content)
     {
-      _bedTexture = content.Load<Texture2D>("Buildings/Bed");
+      _bedTexture = content.Load<Texture2D>("Furniture/Bed");
 
       _position = new Vector2(25, 25);
 
@@ -67,7 +69,7 @@ namespace TopDown.Controls.BuildMenu
 
       var font = content.Load<SpriteFont>("Fonts/Font");
 
-      var bed = new Button(buttonTexture, font)
+      var bed = new ItemMenuOption(buttonTexture, font)
       {
         Text = "Bed",
         Layer = _background.Layer + 0.01f,
@@ -75,24 +77,33 @@ namespace TopDown.Controls.BuildMenu
 
       bed.Click += Bed_Click;
 
-      _items = new List<Button>()
+      var done = new ItemMenuOption(buttonTexture, font)
+      {
+        Text = "Done",
+        Layer = _background.Layer + 0.01f,
+      };
+
+      done.Click += Done_Click;
+
+      _items = new List<ItemMenuOption>()
       {
         bed,
-        new Button(buttonTexture, font)
+        new ItemMenuOption(buttonTexture, font)
         {
           Text = "Toilet",
           Layer = _background.Layer + 0.01f,
         },
-        new Button(buttonTexture, font)
+        new ItemMenuOption(buttonTexture, font)
         {
           Text = "Bath",
           Layer = _background.Layer + 0.01f,
         },
-        new Button(buttonTexture, font)
+        new ItemMenuOption(buttonTexture, font)
         {
           Text = "Fridge",
           Layer = _background.Layer + 0.01f,
         },
+        done,
       };
 
       var y = _position.Y + 5;
@@ -118,6 +129,16 @@ namespace TopDown.Controls.BuildMenu
         Position = GameScreen.Mouse.PositionWithCamera,
         Layer = _gameState.SelectedBuilding.Layer + 0.01f,
       });
+
+      CurrentButton = sender as ItemMenuOption;
+      _gameState.State = States.States.PlacingItems;
+    }
+
+    private void Done_Click(object sender, EventArgs e)
+    {
+      _gameState.State = States.States.Playing;
+      _gameState.SelectedBuilding.State = BuildingStates.Building;
+      _gameState.SelectedBuilding = null;
     }
 
     public override void UnloadContent()
@@ -139,8 +160,6 @@ namespace TopDown.Controls.BuildMenu
       foreach (var item in _items)
       {
         item.Update(gameTime);
-        if (item.IsClicked)
-          _gameState.State = States.States.PlacingItems;
       }
     }
   }

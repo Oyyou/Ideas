@@ -41,7 +41,7 @@ namespace TopDown.States
 
     private List<Component> _guiComponents;
 
-    private ItemMenu _itemMenu;
+    public ItemMenu ItemMenu { get; set; }
 
     public static Controls.Keyboard Keyboard;
 
@@ -103,7 +103,7 @@ namespace TopDown.States
       State = States.Playing;
 
       _buildMenu = new BuildMenuWindow(this);
-      _itemMenu = new ItemMenu(this);
+      ItemMenu = new ItemMenu(this);
 
       _camera = new Camera();
 
@@ -216,7 +216,7 @@ namespace TopDown.States
         new Toolbar(this),
         new ResourceView(Resources),
         _buildMenu,
-        _itemMenu,
+        ItemMenu,
       };
 
       foreach (var component in _gameComponents)
@@ -309,6 +309,18 @@ namespace TopDown.States
           }
 
           _camera.Follow(((Sprite)_gameComponents[0]).Position);
+
+          if (Keyboard.IsKeyPressed(Keys.B))
+          {
+            State = States.BuildMenu;
+            SelectedBuilding.IsRemoved = true;
+          }
+
+          if (Keyboard.IsKeyPressed(Keys.Escape))
+          {
+            State = States.Playing;
+            SelectedBuilding.IsRemoved = true;
+          }
 
           break;
         case States.ItemMenu:
