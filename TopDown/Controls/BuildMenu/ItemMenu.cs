@@ -19,8 +19,6 @@ namespace TopDown.Controls.BuildMenu
   {
     private Sprite _background;
 
-    private Texture2D _bedTexture;
-
     private List<ItemMenuOption> _items;
 
     private GameScreen _gameState;
@@ -53,8 +51,6 @@ namespace TopDown.Controls.BuildMenu
 
     public override void LoadContent(ContentManager content)
     {
-      _bedTexture = content.Load<Texture2D>("Furniture/Bed");
-
       _position = new Vector2(25, 25);
 
       _background = new Sprite(content.Load<Texture2D>("Controls/ItemMenu"))
@@ -73,9 +69,27 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Bed",
         Layer = _background.Layer + 0.01f,
+        Furniture = new Furniture(content.Load<Texture2D>("Furniture/Bed"), _gameState)
+        {
+          State = FurnatureStates.Placing,
+          Position = GameScreen.Mouse.PositionWithCamera,
+        },
       };
 
-      bed.Click += Bed_Click;
+      bed.Click += Item_Click;
+
+      var toilet = new ItemMenuOption(buttonTexture, font)
+      {
+        Text = "Toilet",
+        Layer = _background.Layer + 0.01f,
+        Furniture = new Furniture(content.Load<Texture2D>("Furniture/Toilet"), _gameState)
+        {
+          State = FurnatureStates.Placing,
+          Position = GameScreen.Mouse.PositionWithCamera,
+        },
+      };
+
+      toilet.Click += Item_Click;
 
       var done = new ItemMenuOption(buttonTexture, font)
       {
@@ -88,11 +102,7 @@ namespace TopDown.Controls.BuildMenu
       _items = new List<ItemMenuOption>()
       {
         bed,
-        new ItemMenuOption(buttonTexture, font)
-        {
-          Text = "Toilet",
-          Layer = _background.Layer + 0.01f,
-        },
+        toilet,
         new ItemMenuOption(buttonTexture, font)
         {
           Text = "Bath",
@@ -118,19 +128,22 @@ namespace TopDown.Controls.BuildMenu
       }
     }
 
-    private void Bed_Click(object sender, EventArgs e)
+    private void Item_Click(object sender, EventArgs e)
     {
       if (_gameState.State == States.States.PlacingItems)
         return;
 
-      _gameState.SelectedBuilding.Components.Add(new Furniture(_bedTexture, _gameState, _gameState.SelectedBuilding)
-      {
-        State = FurnatureStates.Placing,
-        Position = GameScreen.Mouse.PositionWithCamera,
-        Layer = _gameState.SelectedBuilding.Layer + 0.01f,
-      });
+      var itemOption = sender as ItemMenuOption;
 
-      CurrentButton = sender as ItemMenuOption;
+      if (itemOption.Furniture == null)
+        throw new Exception($"Furniture hasn't been set for '{itemOption.Text}' option.");
+
+      itemOption.Furniture.Building = _gameState.SelectedBuilding;
+      itemOption.Furniture.Layer = _gameState.SelectedBuilding.Layer + 0.01f;
+
+      _gameState.SelectedBuilding.Components.Add(itemOption.Furniture);
+
+      CurrentButton = itemOption;
       _gameState.State = States.States.PlacingItems;
     }
 
@@ -151,7 +164,7 @@ namespace TopDown.Controls.BuildMenu
 
     public override void Update(GameTime gameTime)
     {
-      if (_gameState.State != States.States.PlacingItems && 
+      if (_gameState.State != States.States.PlacingItems &&
         _gameState.State != States.States.ItemMenu)
         return;
 

@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Engine.Sprites;
 using Microsoft.Xna.Framework;
 using TopDown.States;
+using TopDown.Buildings;
 
 namespace TopDown.Controls.BuildMenu
 {
@@ -23,6 +24,8 @@ namespace TopDown.Controls.BuildMenu
     private SpriteFont _font;
 
     public event EventHandler Click;
+
+    public Furniture Furniture { get; set; }
     
     public bool IsClicked { get; set; }
 

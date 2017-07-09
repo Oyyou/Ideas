@@ -23,9 +23,9 @@ namespace TopDown.Buildings
   {
     private GameScreen _gameState;
 
-    private Building _parent;
-
     private bool _updated;
+
+    public Building Building { get; set; }
 
     public FurnatureStates State { get; set; }
 
@@ -34,11 +34,9 @@ namespace TopDown.Buildings
       base.LoadContent(content);
     }
 
-    public Furniture(Texture2D texture, GameScreen gameState, Building parent) : base(texture)
+    public Furniture(Texture2D texture, GameScreen gameState) : base(texture)
     {
       _gameState = gameState;
-
-      _parent = parent;
     }
 
     public override void Update(GameTime gameTime)
@@ -84,10 +82,10 @@ namespace TopDown.Buildings
 
     private bool IsInParent()
     {
-      return this.Rectangle.Left >= _parent.Rectangle.Left &&
-        this.Rectangle.Top >= _parent.Rectangle.Top &&
-        this.Rectangle.Right <= _parent.Rectangle.Right &&
-        this.Rectangle.Bottom <= _parent.Rectangle.Bottom;
+      return this.Rectangle.Left >= Building.Rectangle.Left &&
+        this.Rectangle.Top >= Building.Rectangle.Top &&
+        this.Rectangle.Right <= Building.Rectangle.Right &&
+        this.Rectangle.Bottom <= Building.Rectangle.Bottom;
     }
   }
 }
