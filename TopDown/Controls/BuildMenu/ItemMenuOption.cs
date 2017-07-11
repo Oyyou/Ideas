@@ -23,17 +23,21 @@ namespace TopDown.Controls.BuildMenu
   {
     private SpriteFont _font;
 
+    public bool CanClick { get; set; }
+
     public event EventHandler Click;
 
     public Furniture Furniture { get; set; }
-    
+
     public bool IsClicked { get; set; }
 
     public bool IsHovering { get; set; }
 
     public Color PenColor { get; set; }
 
-    public ItemMenuOptionStates State { get; set; }
+    public ItemMenuOptionStates CurrentState { get; set; }
+
+    public ItemMenuOptionStates PreviousState { get; set; }
 
     public string Text { get; set; }
 
@@ -41,9 +45,11 @@ namespace TopDown.Controls.BuildMenu
     {
       _font = font;
 
-      State = ItemMenuOptionStates.Clickable;
+      CurrentState = ItemMenuOptionStates.Clickable;
 
       PenColor = Color.Black;
+
+      CanClick = true;
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -61,7 +67,9 @@ namespace TopDown.Controls.BuildMenu
 
     public override void Update(GameTime gameTime)
     {
-      switch (State)
+      PreviousState = CurrentState;
+
+      switch (CurrentState)
       {
         case ItemMenuOptionStates.Clickable:
           Color = Color.Green;
@@ -74,9 +82,9 @@ namespace TopDown.Controls.BuildMenu
             IsHovering = true;
             Color = Color.DarkGreen;
 
-            if (GameScreen.Mouse.LeftClicked)
+            if (GameScreen.Mouse.LeftClicked && CanClick)
             {
-              State = ItemMenuOptionStates.Clicked;
+              CurrentState = ItemMenuOptionStates.Clicked;
               IsClicked = true;
               Click?.Invoke(this, new EventArgs());
             }
@@ -85,6 +93,18 @@ namespace TopDown.Controls.BuildMenu
           break;
         case ItemMenuOptionStates.Clicked:
           Color = Color.Yellow;
+
+          if (GameScreen.Mouse.Rectangle.Intersects(Rectangle))
+          {
+            IsHovering = true;
+            Color = Color.Orange;
+
+            if (GameScreen.Mouse.LeftClicked)
+            {
+              Click?.Invoke(this, new EventArgs());
+            }
+          }
+
           break;
         case ItemMenuOptionStates.Placed:
           Color = Color.Gray;

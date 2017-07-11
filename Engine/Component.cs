@@ -21,6 +21,8 @@ namespace Engine
 
     public bool IsVisible { get; set; }
 
+    public virtual float Layer { get; set; }
+
     public abstract void CheckCollision(Component component);
 
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);

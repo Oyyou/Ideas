@@ -278,7 +278,22 @@ namespace TopDown.Buildings
         case BuildingStates.Built_In:
 
           foreach (var component in Components)
+          {
+            component.Layer = CurrentSprite.Layer + 0.001f;
             component.Draw(gameTime, spriteBatch);
+          }
+
+          //foreach (var rec in CollisionRectangles)
+          //  spriteBatch.Draw(_t, rec, Color.Red);
+          break;
+
+        case BuildingStates.Built_Out:
+
+          foreach (var component in Components)
+          {
+            component.Layer = CurrentSprite.Layer - 0.001f;
+            component.Draw(gameTime, spriteBatch);
+          }
 
           //foreach (var rec in CollisionRectangles)
           //  spriteBatch.Draw(_t, rec, Color.Red);
@@ -351,7 +366,21 @@ namespace TopDown.Buildings
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
 
-          if (GameScreen.Mouse.LeftClicked)
+          bool canPlace = true;
+
+          CurrentSprite.Color = Color.White;
+
+          foreach (var component in _gameState.CollidableComponents)
+          {
+            if (component.CollisionRectangles.Any(c => c.Intersects(this.Rectangle)))
+            {
+              canPlace = false;
+              CurrentSprite.Color = Color.Red;
+              break;
+            }
+          }
+
+          if (GameScreen.Mouse.LeftClicked && canPlace)
           {
             BuildingState = BuildingStates.Placed;
             _gameState.State = States.States.ItemMenu;

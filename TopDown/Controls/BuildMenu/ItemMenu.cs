@@ -32,6 +32,15 @@ namespace TopDown.Controls.BuildMenu
 
     }
 
+    private void Done_Click(object sender, EventArgs e)
+    {
+      _gameState.State = States.States.Playing;
+      _gameState.SelectedBuilding.State = BuildingStates.Building;
+      _gameState.SelectedBuilding = null;
+
+      Reset();
+    }
+
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       if (_gameState.State != States.States.PlacingItems &&
@@ -42,6 +51,42 @@ namespace TopDown.Controls.BuildMenu
 
       foreach (var item in _items)
         item.Draw(gameTime, spriteBatch);
+    }
+
+    private void Item_Click(object sender, EventArgs e)
+    {
+      var itemOption = sender as ItemMenuOption;
+
+      if (_gameState.State == States.States.PlacingItems)
+      {
+        if (itemOption.CurrentState == ItemMenuOptionStates.Clicked)
+        {
+          _gameState.SelectedBuilding.Components.Last().IsRemoved = true;
+          itemOption.CurrentState = ItemMenuOptionStates.Clickable;
+          _gameState.State = States.States.ItemMenu;
+
+          foreach (var item in _items)
+          {
+            item.CanClick = true;
+          }
+        }
+
+        return;
+      }
+
+      if (itemOption.Furniture == null)
+        throw new Exception($"Furniture hasn't been set for '{itemOption.Text}' option.");
+
+      itemOption.Furniture.Building = _gameState.SelectedBuilding;
+      itemOption.Furniture.Layer = _gameState.SelectedBuilding.Layer + 0.01f;
+
+      _gameState.SelectedBuilding.Components.Add((Furniture)itemOption.Furniture.Clone());
+
+      CurrentButton = itemOption;
+      _gameState.State = States.States.PlacingItems;
+
+      foreach (var item in _items)
+        item.CanClick = false;
     }
 
     public ItemMenu(GameScreen gameState)
@@ -128,30 +173,13 @@ namespace TopDown.Controls.BuildMenu
       }
     }
 
-    private void Item_Click(object sender, EventArgs e)
+    public void Reset()
     {
-      if (_gameState.State == States.States.PlacingItems)
-        return;
-
-      var itemOption = sender as ItemMenuOption;
-
-      if (itemOption.Furniture == null)
-        throw new Exception($"Furniture hasn't been set for '{itemOption.Text}' option.");
-
-      itemOption.Furniture.Building = _gameState.SelectedBuilding;
-      itemOption.Furniture.Layer = _gameState.SelectedBuilding.Layer + 0.01f;
-
-      _gameState.SelectedBuilding.Components.Add(itemOption.Furniture);
-
-      CurrentButton = itemOption;
-      _gameState.State = States.States.PlacingItems;
-    }
-
-    private void Done_Click(object sender, EventArgs e)
-    {
-      _gameState.State = States.States.Playing;
-      _gameState.SelectedBuilding.State = BuildingStates.Building;
-      _gameState.SelectedBuilding = null;
+      foreach (var item in _items)
+      {
+        item.CanClick = true;
+        item.CurrentState = ItemMenuOptionStates.Clickable;
+      }
     }
 
     public override void UnloadContent()
@@ -169,6 +197,21 @@ namespace TopDown.Controls.BuildMenu
         return;
 
       _background.Update(gameTime);
+
+      foreach (var item in _items)
+      {
+        if (item.PreviousState == ItemMenuOptionStates.Clicked &&
+          item.CurrentState == ItemMenuOptionStates.Placed)
+        {
+          foreach (var i in _items)
+          {
+            if (i == item)
+              continue;
+
+            i.CanClick = true;
+          }
+        }
+      }
 
       foreach (var item in _items)
       {

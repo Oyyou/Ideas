@@ -42,7 +42,7 @@ namespace Engine.Sprites
 
     public Color Color { get; set; }
 
-    public float Layer
+    public override float Layer
     {
       get { return _layer; }
       set

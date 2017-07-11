@@ -41,6 +41,14 @@ namespace TopDown.States
 
     private List<Component> _guiComponents;
 
+    public List<Component> CollidableComponents
+    {
+      get
+      {
+        return _gameComponents.Where(c => c.CollisionRectangles != null && c.CollisionRectangles.Count > 0).ToList();
+      }
+    }
+
     public ItemMenu ItemMenu { get; set; }
 
     public static Controls.Keyboard Keyboard;
@@ -345,12 +353,14 @@ namespace TopDown.States
           {
             State = States.BuildMenu;
             SelectedBuilding.IsRemoved = true;
+            ItemMenu.Reset();
           }
 
           if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
           {
             State = States.Playing;
             SelectedBuilding.IsRemoved = true;
+            ItemMenu.Reset();
           }
 
           break;
@@ -376,6 +386,7 @@ namespace TopDown.States
           {
             State = States.ItemMenu;
             SelectedBuilding.Components.Last().IsRemoved = true;
+            ItemMenu.Reset();
           }
 
           break;

@@ -19,7 +19,7 @@ namespace TopDown.Buildings
     Placed,
   }
 
-  public class Furniture : Sprite
+  public class Furniture : Sprite, ICloneable
   {
     private GameScreen _gameState;
 
@@ -63,7 +63,7 @@ namespace TopDown.Buildings
             {
               State = FurnatureStates.Placed;
               _gameState.State = States.States.ItemMenu;
-              _gameState.ItemMenu.CurrentButton.State = Controls.BuildMenu.ItemMenuOptionStates.Placed;
+              _gameState.ItemMenu.CurrentButton.CurrentState = Controls.BuildMenu.ItemMenuOptionStates.Placed;
             }
           }
           else
@@ -86,6 +86,11 @@ namespace TopDown.Buildings
         this.Rectangle.Top >= Building.Rectangle.Top &&
         this.Rectangle.Right <= Building.Rectangle.Right &&
         this.Rectangle.Bottom <= Building.Rectangle.Bottom;
+    }
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
     }
   }
 }
