@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TopDown.Builders;
 using TopDown.Buildings;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
@@ -225,6 +226,7 @@ namespace TopDown.States
         new ResourceView(Resources),
         _buildMenu,
         ItemMenu,
+        new PathBuilder(),
       };
 
       foreach (var component in _gameComponents)

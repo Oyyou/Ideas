@@ -41,8 +41,11 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Builders\PathBuilder.cs" />
     <Compile Include="Buildings\Building.cs" />
     <Compile Include="Buildings\Furniture.cs" />
+    <Compile Include="Buildings\Path.cs" />
+    <Compile Include="Buildings\SmallHouse.cs" />
     <Compile Include="Buildings\Templates\BuildingTemplate.cs" />
     <Compile Include="Buildings\Templates\SmallHouseTemplate.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuMainItem.cs" />
@@ -57,6 +60,7 @@
     <Compile Include="Core\Camera.cs" />
     <Compile Include="FX\Particle.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Logic\Pathfinder.cs" />
     <Compile Include="Models\Resources.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

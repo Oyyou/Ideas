@@ -124,7 +124,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void SmallHouse_Click(object sender, EventArgs e)
     {
-      _gameState.AddComponent(new Buildings.Building(_gameState, new SmallHouseTemplate())
+      _gameState.AddComponent(new Buildings.SmallHouse(_gameState, new SmallHouseTemplate())
       {
         BuildingState = Buildings.BuildingStates.Placing,
       });
@@ -248,6 +248,15 @@ namespace TopDown.Controls.BuildMenu
 
       artsButton.Click += ArtsButton_Click;
 
+      var miscButton = new Button(_mainButtonTexture, _font)
+      {
+        Text = "Misc",
+        Position = new Vector2(artsButton.Position.X, artsButton.Rectangle.Bottom + 5),
+        Layer = 0.99f
+      };
+
+      miscButton.Click += MiscButton_Click;
+
       Components = new List<Component>()
       {
         background,
@@ -255,12 +264,47 @@ namespace TopDown.Controls.BuildMenu
         housingButton,
         labourButton,
         artsButton,
+        miscButton
       };
 
       foreach (var component in Components)
         component.LoadContent(content);
 
       _buildSubOptions = new List<Button>();
+    }
+
+    private void MiscButton_Click(object sender, EventArgs e)
+    {
+      var path = new BuildMenuSubItem(_subButtonTexture, _font)
+      {
+        Text = "Path",
+        Layer = 0.99f,
+        ResourceCost = new Models.Resources()
+        {
+          Food = 0,
+          Gold = 0,
+          Wood = 0,
+          Stone = 1,
+        },
+      };
+
+      path.Click += Path_Click;
+
+      _buildSubOptions = new List<Button>()
+      {
+        path,
+      };
+
+      foreach (var component in _buildSubOptions)
+        component.LoadContent(_content);
+    }
+
+    private void Path_Click(object sender, EventArgs e)
+    {
+      _gameState.AddComponent(new Buildings.Path(_gameState, new SmallHouseTemplate())
+      {
+        BuildingState = Buildings.BuildingStates.Placing,
+      });
     }
 
     public override void UnloadContent()

@@ -27,32 +27,32 @@ namespace TopDown.Buildings
 
   public class Building : Component
   {
-    private float _buildTimer;
+    protected float _buildTimer;
 
-    private Sprite _builtSprite;
+    protected Sprite _builtSprite;
 
-    private GameScreen _gameState;
+    protected GameScreen _gameState;
 
-    private float _hitTimer;
+    protected float _hitTimer;
 
-    private const float _maxBuildTimer = 2.5f;
+    protected const float _maxBuildTimer = 2.5f;
 
-    private const float _maxHitTimer = 0.3f;
+    protected const float _maxHitTimer = 0.3f;
 
-    private List<Sprite> _particles;
+    protected List<Sprite> _particles;
 
-    private Sprite _placedSprite;
+    protected Sprite _placedSprite;
 
-    private SoundEffect _soundEffect;
+    protected SoundEffect _soundEffect;
 
     /// <summary>
     /// An instance of the _soundEffect so that when we call 'Play', it will only play if finished.
     /// </summary>
-    private SoundEffectInstance _soundEffectInstance;
+    protected SoundEffectInstance _soundEffectInstance;
 
-    private BuildingTemplate _template;
+    protected BuildingTemplate _template;
 
-    private Texture2D _woodChipTexture;
+    protected Texture2D _woodChipTexture;
 
     public BuildingStates BuildingState
     {
@@ -89,8 +89,8 @@ namespace TopDown.Buildings
               new Rectangle((int)Position.X, (int)Position.Y, width - xDiff, 1), // Top
               new Rectangle((int)Position.X, (int)Position.Y, 1, height - yDiff), // Left
               new Rectangle((int)Position.X + (width - 1) - xDiff, (int)Position.Y, 1, height - yDiff), // Right
-              new Rectangle((int)Position.X, (int)Position.Y + height - yDiff, 21, 1), // bottom left
-              new Rectangle((int)Position.X + 61, (int)Position.Y + height - yDiff, 131, 1), // bottom right
+              new Rectangle((int)Position.X, (int)Position.Y + height - yDiff - 1, 21, 1), // bottom left
+              new Rectangle((int)Position.X + 61, (int)Position.Y + height - yDiff - 1, 131, 1), // bottom right
             };
 
             collisionRectangles.AddRange(Components.SelectMany(c => c.CollisionRectangles).ToList());
@@ -104,7 +104,7 @@ namespace TopDown.Buildings
 
     public Color Color { get; set; }
 
-    public Sprite CurrentSprite
+    public virtual Sprite CurrentSprite
     {
       get
       {
@@ -148,7 +148,7 @@ namespace TopDown.Buildings
       }
     }
 
-    public float Layer
+    public override float Layer
     {
       get
       {
@@ -161,9 +161,11 @@ namespace TopDown.Buildings
       get { return CurrentSprite.Position; }
       set
       {
-        //_buildingSprite.Position = value;
-        _builtSprite.Position = value;
-        _placedSprite.Position = value;
+        if (_builtSprite != null)
+          _builtSprite.Position = value;
+
+        if (_placedSprite != null)
+          _placedSprite.Position = value;
       }
     }
 
@@ -295,8 +297,8 @@ namespace TopDown.Buildings
             component.Draw(gameTime, spriteBatch);
           }
 
-          //foreach (var rec in CollisionRectangles)
-          //  spriteBatch.Draw(_t, rec, Color.Red);
+          foreach (var rec in CollisionRectangles)
+            spriteBatch.Draw(_t, rec, Color.Red);
           break;
 
         default:
@@ -304,9 +306,9 @@ namespace TopDown.Buildings
       }
     }
 
-    private Texture2D _t;
+    protected Texture2D _t;
 
-    private void GenerateParticle(float lifeTimer)
+    protected void GenerateParticle(float lifeTimer)
     {
       var position = new Vector2(
         GameEngine.Random.Next((int)Position.X, (int)Position.X + Rectangle.Width),
