@@ -56,6 +56,8 @@ namespace TopDown.States
 
     public static Controls.Mouse Mouse;
 
+    public PathBuilder SelectedPathBuilder { get; set; }
+
     public TopDown.Sprites.Player Player { get; private set; }
 
     public Models.Resources Resources { get; set; }
@@ -64,12 +66,22 @@ namespace TopDown.States
 
     public States State { get; set; }
 
-    public void AddComponent(Building building)
+    public void AddComponent(Building component)
     {
-      SelectedBuilding = building;
-      building.LoadContent(_content);
+      SelectedBuilding = component;
 
-      _gameComponents.Add(building);
+      component.LoadContent(_content);
+
+      _gameComponents.Add(component);
+    }
+
+    public void AddComponent(PathBuilder component)
+    {
+      SelectedPathBuilder = component;
+
+      component.LoadContent(_content);
+
+      _gameComponents.Add(component);
     }
 
     private void BuildMenuUpdate(GameTime gameTime)
@@ -113,6 +125,7 @@ namespace TopDown.States
 
       _buildMenu = new BuildMenuWindow(this);
       ItemMenu = new ItemMenu(this);
+      //ItemMenu.LoadContent(_content);
 
       _camera = new Camera();
 
@@ -139,6 +152,7 @@ namespace TopDown.States
       _gameComponents = new List<Component>()
       {
         Player,
+        //new PathBuilder(),
       };
 
       var map = TmxMap.Load("Content/Maps/Level01.tmx");
@@ -226,7 +240,6 @@ namespace TopDown.States
         new ResourceView(Resources),
         _buildMenu,
         ItemMenu,
-        new PathBuilder(),
       };
 
       foreach (var component in _gameComponents)
@@ -323,18 +336,28 @@ namespace TopDown.States
           if (Keyboard.IsKeyPressed(Keys.B))
           {
             State = States.BuildMenu;
+
+            if(SelectedBuilding != null)
             SelectedBuilding.IsRemoved = true;
+
+            if (SelectedPathBuilder != null)
+              SelectedPathBuilder.IsRemoved = true;
           }
 
           if (Keyboard.IsKeyPressed(Keys.Escape))
           {
             State = States.Playing;
-            SelectedBuilding.IsRemoved = true;
+
+            if (SelectedBuilding != null)
+              SelectedBuilding.IsRemoved = true;
+
+            if (SelectedPathBuilder != null)
+              SelectedPathBuilder.IsRemoved = true;
           }
 
           break;
         case States.ItemMenu:
-          
+
           foreach (var component in _guiComponents)
             component.Update(gameTime);
 
@@ -354,14 +377,26 @@ namespace TopDown.States
           if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
           {
             State = States.BuildMenu;
-            SelectedBuilding.IsRemoved = true;
+
+            if (SelectedBuilding != null)
+              SelectedBuilding.IsRemoved = true;
+
+            if (SelectedPathBuilder != null)
+              SelectedPathBuilder.IsRemoved = true;
+
             ItemMenu.Reset();
           }
 
           if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
           {
             State = States.Playing;
-            SelectedBuilding.IsRemoved = true;
+
+            if (SelectedBuilding != null)
+              SelectedBuilding.IsRemoved = true;
+
+            if (SelectedPathBuilder != null)
+              SelectedPathBuilder.IsRemoved = true;
+
             ItemMenu.Reset();
           }
 
@@ -387,7 +422,13 @@ namespace TopDown.States
           if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
           {
             State = States.ItemMenu;
-            SelectedBuilding.Components.Last().IsRemoved = true;
+            
+            if (SelectedBuilding != null)
+              SelectedBuilding.Components.Last().IsRemoved = true;
+
+            if (SelectedPathBuilder != null)
+              SelectedPathBuilder.Components.ForEach(c => c.IsRemoved = true);
+
             ItemMenu.Reset();
           }
 

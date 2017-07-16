@@ -33,6 +33,8 @@ namespace TopDown.Controls.BuildMenu
 
     public bool IsHovering { get; set; }
 
+    public BuildMenuSubItem Parent { get; set; }
+
     public Color PenColor { get; set; }
 
     public ItemMenuOptionStates CurrentState { get; set; }

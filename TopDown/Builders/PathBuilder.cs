@@ -18,6 +18,7 @@ namespace TopDown.Builders
   {
     Selecting,
     Placing,
+    Finished,
   }
 
   public class PathBuilder : Component
@@ -36,9 +37,9 @@ namespace TopDown.Builders
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      foreach (var component in _newComponents)
+      foreach (var path in _pathPositions)
       {
-        component.Draw(gameTime, spriteBatch);
+        spriteBatch.Draw(_texture, path, Color.White);
       }
     }
 
@@ -51,60 +52,56 @@ namespace TopDown.Builders
       _texture = content.Load<Texture2D>("Sprites/Paths/StonePath");
     }
 
+    public PathBuilder(GameScreen gameScreen)
+    {
+      _gameScreen = gameScreen;
+    }
+
     public override void UnloadContent()
     {
 
     }
-
-    private MouseState _currentMouse;
-    private MouseState _previousMouse;
-
-    private Vector2? _startPathPosition;
+    
+    private Vector2 _currentMousePosition;
+    private Vector2 _previousMousePosition;
 
     private Texture2D _texture;
 
+    private List<Vector2> _pathPositions = new List<Vector2>();
+    private GameScreen _gameScreen;
+
     public override void Update(GameTime gameTime)
     {
-      _previousMouse = _currentMouse;
-      _currentMouse = Mouse.GetState();
-
-      var mousePosition = new Vector2(
-            (float)Math.Floor((decimal)GameScreen.Mouse.Position.X / 32) * 32,
-            (float)Math.Floor((decimal)GameScreen.Mouse.Position.Y / 32) * 32);
-
-      if (_currentMouse.LeftButton == ButtonState.Released)
-        _startPathPosition = null;
-
-      if (_previousMouse.LeftButton == ButtonState.Released && _currentMouse.LeftButton == ButtonState.Pressed)
+      switch (State)
       {
-        _startPathPosition = mousePosition;
+        case PathBuilderStates.Selecting:
+          break;
+        case PathBuilderStates.Placing:
+
+          PlacingPath();
+
+          break;
+        default:
+          break;
       }
+    }
 
-      if (_startPathPosition == null)
-        return;
+    private void PlacingPath()
+    {
+      _previousMousePosition = _currentMousePosition;
 
-      if (Vector2.Distance(mousePosition, _startPathPosition.Value) > 100)
+      _currentMousePosition = new Vector2(
+            (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
+            (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
+
+      if (GameScreen.Mouse.LeftDown)
       {
-        var x1 = mousePosition.X / 32;
-        var y1 = mousePosition.Y / 32;
-        var x2 = _startPathPosition.Value.X / 32;
-        var y2 = _startPathPosition.Value.Y / 32;
-
-        var minX = (int)Math.Min(x1, x2);
-        var minY = (int)Math.Min(y1, y2);
-
-        Pathfinder pf = new Pathfinder(minX, minY, 100, 100);
-        var t = pf.FindPath(_startPathPosition.Value, mousePosition);
-
-        _newComponents = new List<Sprite>();
-        foreach (var sprite in t)
-        {
-          _newComponents.Add(new Sprite(_texture)
-          {
-            Position = (sprite * 32),  
-          });
-        }
-
+        if (!_pathPositions.Contains(_currentMousePosition))
+          _pathPositions.Add(_currentMousePosition);
+      }
+      else if (GameScreen.Mouse.RightDown)
+      {
+        _pathPositions.Remove(_currentMousePosition);
       }
     }
   }

@@ -23,6 +23,8 @@ namespace Engine
 
     public virtual float Layer { get; set; }
 
+    public virtual Rectangle Rectangle { get; }
+
     public abstract void CheckCollision(Component component);
 
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);

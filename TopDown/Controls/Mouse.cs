@@ -106,6 +106,14 @@ namespace TopDown.Controls
       }
     }
 
+    public bool RightDown
+    {
+      get
+      {
+        return _currentMouse.RightButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed;
+      }
+    }
+
     public override void CheckCollision(Component component)
     {
 

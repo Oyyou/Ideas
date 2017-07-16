@@ -12,12 +12,14 @@ using Microsoft.Xna.Framework.Input;
 using Engine.Controls;
 using TopDown.States;
 using TopDown.Buildings.Templates;
+using TopDown.Builders;
+using TopDown.Buildings;
 
 namespace TopDown.Controls.BuildMenu
 {
   public class BuildMenuWindow : Component
   {
-    private List<Button> _buildSubOptions;
+    private List<BuildMenuSubItem> _buildSubOptions;
 
     private GameScreen _gameState;
 
@@ -35,12 +37,13 @@ namespace TopDown.Controls.BuildMenu
 
     private void ArtsButton_Click(object sender, EventArgs e)
     {
-      _buildSubOptions = new List<Button>()
+      _buildSubOptions = new List<BuildMenuSubItem>()
       {
         new BuildMenuSubItem(_subButtonTexture, _font)
         {
           Text = "Library",
           Layer =  0.99f,
+          GameScreenSetValue = States.States.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 30,
@@ -84,6 +87,55 @@ namespace TopDown.Controls.BuildMenu
       spriteBatch.DrawString(_font, "Build", _fontPosition, Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.99f);
     }
 
+    private void Item_Click(object sender, EventArgs e)
+    {
+      var itemOption = sender as ItemMenuOption;
+
+      if (_gameState.State == States.States.PlacingItems)
+      {
+        if (itemOption.CurrentState == ItemMenuOptionStates.Clicked)
+        {
+          if(_gameState.SelectedBuilding != null)
+          _gameState.SelectedBuilding.Components.Last().IsRemoved = true;
+
+          if (_gameState.SelectedPathBuilder != null)
+            _gameState.SelectedPathBuilder.Components.Last().IsRemoved = true;
+
+          itemOption.CurrentState = ItemMenuOptionStates.Clickable;
+          _gameState.State = States.States.ItemMenu;
+
+          foreach (var item in itemOption.Parent.Items)
+          {
+            item.CanClick = true;
+          }
+        }
+
+        return;
+      }
+
+      if (itemOption.Furniture == null)
+        throw new Exception($"Furniture hasn't been set for '{itemOption.Text}' option.");
+
+      Component component = null;
+
+      if (_gameState.SelectedBuilding != null)
+        component = _gameState.SelectedBuilding;
+      else if (_gameState.SelectedPathBuilder != null)
+        component = _gameState.SelectedPathBuilder;
+
+      itemOption.Furniture.Building = component;
+      itemOption.Furniture.Layer = component.Layer + 0.01f;
+
+      component.Components.Add((Furniture)itemOption.Furniture.Clone());
+
+      _gameState.ItemMenu.CurrentButton = itemOption;
+      //CurrentButton = itemOption;
+      _gameState.State = States.States.PlacingItems;
+
+      foreach (var item in itemOption.Parent.Items)
+        item.CanClick = false;
+    }
+
     private void HousingButton_Click(object sender, EventArgs e)
     {
       var smallHouse = new BuildMenuSubItem(_subButtonTexture, _font)
@@ -99,15 +151,50 @@ namespace TopDown.Controls.BuildMenu
         },
       };
 
+      var bed = new ItemMenuOption(_mainButtonTexture, _font)
+      {
+        Text = "Bed",
+        Parent = smallHouse,
+        //Layer = _background.Layer + 0.01f,
+        Furniture = new Furniture(_content.Load<Texture2D>("Furniture/Bed"), _gameState)
+        {
+          State = FurnatureStates.Placing,
+          Position = GameScreen.Mouse.PositionWithCamera,
+        },
+      };
+
+      bed.Click += Item_Click;
+
+      var toilet = new ItemMenuOption(_mainButtonTexture, _font)
+      {
+        Text = "Toilet",
+        Parent = smallHouse,
+       // Layer = _background.Layer + 0.01f,
+        Furniture = new Furniture(_content.Load<Texture2D>("Furniture/Toilet"), _gameState)
+        {
+          State = FurnatureStates.Placing,
+          Position = GameScreen.Mouse.PositionWithCamera,
+        },
+      };
+
+      toilet.Click += Item_Click;
+
+      smallHouse.Items = new List<ItemMenuOption>()
+      {
+        bed,
+        toilet,
+      };
+
       smallHouse.Click += SmallHouse_Click;
 
-      _buildSubOptions = new List<Button>()
+      _buildSubOptions = new List<BuildMenuSubItem>()
       {
         smallHouse,
         new BuildMenuSubItem(_subButtonTexture, _font)
         {
           Text = "Large House",
           Layer =  0.99f,
+          GameScreenSetValue = States.States.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 15,
@@ -132,12 +219,13 @@ namespace TopDown.Controls.BuildMenu
 
     private void LabourButton_Click(object sender, EventArgs e)
     {
-      _buildSubOptions = new List<Button>()
+      _buildSubOptions = new List<BuildMenuSubItem>()
       {
         new BuildMenuSubItem(_subButtonTexture, _font)
         {
           Text = "Blacksmith",
           Layer =  0.99f,
+          GameScreenSetValue = States.States.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 15,
@@ -150,6 +238,7 @@ namespace TopDown.Controls.BuildMenu
         {
           Text = "Farm",
           Layer =  0.99f,
+          GameScreenSetValue = States.States.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 15,
@@ -162,6 +251,7 @@ namespace TopDown.Controls.BuildMenu
         {
           Text = "Lumber Mill",
           Layer =  0.99f,
+          GameScreenSetValue = States.States.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 15,
@@ -174,6 +264,7 @@ namespace TopDown.Controls.BuildMenu
         {
           Text = "Mine",
           Layer =  0.99f,
+          GameScreenSetValue = States.States.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 15,
@@ -187,6 +278,8 @@ namespace TopDown.Controls.BuildMenu
       foreach (var component in _buildSubOptions)
         component.LoadContent(_content);
     }
+
+
 
     public override void LoadContent(ContentManager content)
     {
@@ -270,7 +363,7 @@ namespace TopDown.Controls.BuildMenu
       foreach (var component in Components)
         component.LoadContent(content);
 
-      _buildSubOptions = new List<Button>();
+      _buildSubOptions = new List<BuildMenuSubItem>();
     }
 
     private void MiscButton_Click(object sender, EventArgs e)
@@ -279,6 +372,7 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Path",
         Layer = 0.99f,
+        GameScreenSetValue = States.States.ItemMenu,
         ResourceCost = new Models.Resources()
         {
           Food = 0,
@@ -290,7 +384,26 @@ namespace TopDown.Controls.BuildMenu
 
       path.Click += Path_Click;
 
-      _buildSubOptions = new List<Button>()
+      var stonePath = new ItemMenuOption(_mainButtonTexture, _font)
+      {
+        Text = "Stone",
+        Parent = path,
+        //Layer = _background.Layer + 0.01f,
+        Furniture = new Furniture(_content.Load<Texture2D>("Sprites/Paths/StonePath"), _gameState)
+        {
+          State = FurnatureStates.Placing,
+          Position = GameScreen.Mouse.PositionWithCamera,
+        },
+      };
+
+      stonePath.Click += Item_Click;
+
+      path.Items = new List<ItemMenuOption>()
+      {
+        stonePath,
+      };
+
+      _buildSubOptions = new List<BuildMenuSubItem>()
       {
         path,
       };
@@ -299,11 +412,16 @@ namespace TopDown.Controls.BuildMenu
         component.LoadContent(_content);
     }
 
+    private void StonePath_Click(object sender, EventArgs e)
+    {
+      var item = sender as ItemMenuOption;
+    }
+
     private void Path_Click(object sender, EventArgs e)
     {
-      _gameState.AddComponent(new Buildings.Path(_gameState, new SmallHouseTemplate())
+      _gameState.AddComponent(new PathBuilder(_gameState)
       {
-        BuildingState = Buildings.BuildingStates.Placing,
+        State = PathBuilderStates.Selecting,
       });
     }
 
@@ -348,7 +466,9 @@ namespace TopDown.Controls.BuildMenu
         component.Update(gameTime);
 
         if (component.IsClicked)
-          _gameState.State = States.States.PlacingBuilding;
+        {
+          _gameState.ItemMenu.Open(component);
+        }
       }
     }
   }

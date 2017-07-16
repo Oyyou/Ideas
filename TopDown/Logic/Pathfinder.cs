@@ -103,7 +103,7 @@ namespace TopDown.Logic
       var startX = this.x - 1;
       var startY = this.y - 1;
       var endX = this.x + levelWidth + 1;
-      var endY = this.x + levelHeight + 1;
+      var endY = this.y + levelHeight + 1;
 
       //For each of the tiles in our map, we
       // will create a search node for it.
@@ -162,7 +162,7 @@ namespace TopDown.Logic
 
             // We need to make sure this neighbour is part of the level.
             if (position.X < x || position.X > this.x + levelWidth ||
-                position.Y < y || position.Y > this.x + levelHeight)
+                position.Y < y || position.Y > this.y + levelHeight)
             {
               continue;
             }
@@ -197,7 +197,7 @@ namespace TopDown.Logic
       var startX = this.x - 1;
       var startY = this.y - 1;
       var endX = this.x + levelWidth + 1;
-      var endY = this.x + levelHeight + 1;
+      var endY = this.y + levelHeight + 1;
 
       //For each of the tiles in our map, we
       // will create a search node for it.

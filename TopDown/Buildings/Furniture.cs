@@ -25,7 +25,7 @@ namespace TopDown.Buildings
 
     private bool _updated;
 
-    public Building Building { get; set; }
+    public Component Building { get; set; }
 
     public FurnatureStates State { get; set; }
 

@@ -11,12 +11,16 @@ namespace TopDown.Controls.BuildMenu
 {
   public class BuildMenuSubItem : Button
   {
+    public States.States GameScreenSetValue { get; set; }
+
+    public List<ItemMenuOption> Items { get; set; }
+
     public Models.Resources ResourceCost;
 
     public BuildMenuSubItem(Texture2D texture, SpriteFont font)
       : base(texture, font)
     {
-
+      Items = new List<ItemMenuOption>();
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

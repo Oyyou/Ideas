@@ -19,6 +19,8 @@ namespace TopDown.Controls.BuildMenu
   {
     private Sprite _background;
 
+    private ContentManager _content;
+
     private List<ItemMenuOption> _items;
 
     private GameScreen _gameState;
@@ -26,6 +28,19 @@ namespace TopDown.Controls.BuildMenu
     private Vector2 _position;
 
     public ItemMenuOption CurrentButton;
+
+    private void Cancel_Click(object sender, EventArgs e)
+    {
+      _gameState.State = States.States.BuildMenu;
+
+      if (_gameState.SelectedBuilding != null)
+        _gameState.SelectedBuilding.IsRemoved = true;
+
+      if (_gameState.SelectedPathBuilder != null)
+        _gameState.SelectedPathBuilder.IsRemoved = true;
+
+      this.Reset();
+    }
 
     public override void CheckCollision(Component component)
     {
@@ -35,8 +50,18 @@ namespace TopDown.Controls.BuildMenu
     private void Done_Click(object sender, EventArgs e)
     {
       _gameState.State = States.States.Playing;
-      _gameState.SelectedBuilding.State = BuildingStates.Building;
-      _gameState.SelectedBuilding = null;
+
+      if (_gameState.SelectedBuilding != null)
+      {
+        _gameState.SelectedBuilding.State = BuildingStates.Building;
+        _gameState.SelectedBuilding = null;
+      }
+      
+      if(_gameState.SelectedPathBuilder != null)
+      {
+        _gameState.SelectedPathBuilder.State = Builders.PathBuilderStates.Finished;
+        _gameState.SelectedPathBuilder = null;
+      }
 
       Reset();
     }
@@ -53,42 +78,6 @@ namespace TopDown.Controls.BuildMenu
         item.Draw(gameTime, spriteBatch);
     }
 
-    private void Item_Click(object sender, EventArgs e)
-    {
-      var itemOption = sender as ItemMenuOption;
-
-      if (_gameState.State == States.States.PlacingItems)
-      {
-        if (itemOption.CurrentState == ItemMenuOptionStates.Clicked)
-        {
-          _gameState.SelectedBuilding.Components.Last().IsRemoved = true;
-          itemOption.CurrentState = ItemMenuOptionStates.Clickable;
-          _gameState.State = States.States.ItemMenu;
-
-          foreach (var item in _items)
-          {
-            item.CanClick = true;
-          }
-        }
-
-        return;
-      }
-
-      if (itemOption.Furniture == null)
-        throw new Exception($"Furniture hasn't been set for '{itemOption.Text}' option.");
-
-      itemOption.Furniture.Building = _gameState.SelectedBuilding;
-      itemOption.Furniture.Layer = _gameState.SelectedBuilding.Layer + 0.01f;
-
-      _gameState.SelectedBuilding.Components.Add((Furniture)itemOption.Furniture.Clone());
-
-      CurrentButton = itemOption;
-      _gameState.State = States.States.PlacingItems;
-
-      foreach (var item in _items)
-        item.CanClick = false;
-    }
-
     public ItemMenu(GameScreen gameState)
     {
       _gameState = gameState;
@@ -96,6 +85,8 @@ namespace TopDown.Controls.BuildMenu
 
     public override void LoadContent(ContentManager content)
     {
+      _content = content;
+
       _position = new Vector2(25, 25);
 
       _background = new Sprite(content.Load<Texture2D>("Controls/ItemMenu"))
@@ -106,71 +97,11 @@ namespace TopDown.Controls.BuildMenu
 
       _background.LoadContent(content);
 
-      var buttonTexture = content.Load<Texture2D>("Controls/BuildMenuMainOptionButton");
+      _buttonTexture = content.Load<Texture2D>("Controls/BuildMenuMainOptionButton");
 
-      var font = content.Load<SpriteFont>("Fonts/Font");
+      _font = content.Load<SpriteFont>("Fonts/Font");
 
-      var bed = new ItemMenuOption(buttonTexture, font)
-      {
-        Text = "Bed",
-        Layer = _background.Layer + 0.01f,
-        Furniture = new Furniture(content.Load<Texture2D>("Furniture/Bed"), _gameState)
-        {
-          State = FurnatureStates.Placing,
-          Position = GameScreen.Mouse.PositionWithCamera,
-        },
-      };
 
-      bed.Click += Item_Click;
-
-      var toilet = new ItemMenuOption(buttonTexture, font)
-      {
-        Text = "Toilet",
-        Layer = _background.Layer + 0.01f,
-        Furniture = new Furniture(content.Load<Texture2D>("Furniture/Toilet"), _gameState)
-        {
-          State = FurnatureStates.Placing,
-          Position = GameScreen.Mouse.PositionWithCamera,
-        },
-      };
-
-      toilet.Click += Item_Click;
-
-      var done = new ItemMenuOption(buttonTexture, font)
-      {
-        Text = "Done",
-        Layer = _background.Layer + 0.01f,
-      };
-
-      done.Click += Done_Click;
-
-      _items = new List<ItemMenuOption>()
-      {
-        bed,
-        toilet,
-        new ItemMenuOption(buttonTexture, font)
-        {
-          Text = "Bath",
-          Layer = _background.Layer + 0.01f,
-        },
-        new ItemMenuOption(buttonTexture, font)
-        {
-          Text = "Fridge",
-          Layer = _background.Layer + 0.01f,
-        },
-        done,
-      };
-
-      var y = _position.Y + 5;
-
-      foreach (var item in _items)
-      {
-        item.LoadContent(content);
-
-        item.Position = new Vector2(_position.X + 5, y);
-
-        y += item.Rectangle.Height + 5;
-      }
     }
 
     public void Reset()
@@ -216,6 +147,50 @@ namespace TopDown.Controls.BuildMenu
       foreach (var item in _items)
       {
         item.Update(gameTime);
+      }
+    }
+
+    private Texture2D _buttonTexture;
+
+    private SpriteFont _font;
+
+    public void Open(BuildMenuSubItem component)
+    {
+      _items = new List<ItemMenuOption>();
+
+      _gameState.State = component.GameScreenSetValue;
+
+      // I've added the 'ToList' to remove the reference from the original
+      _items = component.Items.ToList();
+
+      var done = new ItemMenuOption(_buttonTexture, _font)
+      {
+        Text = "Done",
+      };
+
+      done.Click += Done_Click;
+
+      var cancel = new ItemMenuOption(_buttonTexture, _font)
+      {
+        Text = "Cancel",
+      };
+
+      cancel.Click += Cancel_Click;
+
+      _items.Add(done);
+      _items.Add(cancel);
+            
+      var y = _position.Y + 5;
+
+      foreach (var item in _items)
+      {
+        item.LoadContent(_content);
+
+        item.Layer = _background.Layer + 0.01f;
+
+        item.Position = new Vector2(_position.X + 5, y);
+
+        y += item.Rectangle.Height + 5;
       }
     }
   }

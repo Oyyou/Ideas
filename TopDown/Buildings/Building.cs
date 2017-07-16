@@ -169,7 +169,7 @@ namespace TopDown.Buildings
       }
     }
 
-    public Rectangle Rectangle
+    public override Rectangle Rectangle
     {
       get
       {
@@ -368,7 +368,7 @@ namespace TopDown.Buildings
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
 
-          bool canPlace = true;
+          bool canPlace = true; 
 
           CurrentSprite.Color = Color.White;
 
