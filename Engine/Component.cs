@@ -15,6 +15,8 @@ namespace Engine
 
     public List<Component> Components;
 
+    public bool IsCollidable { get; set; }
+
     public bool IsEnabled { get; set; }
 
     public bool IsRemoved { get; set; }
@@ -23,7 +25,9 @@ namespace Engine
 
     public virtual float Layer { get; set; }
 
-    public virtual Rectangle Rectangle { get; }
+    public virtual Rectangle Rectangle { get; set; }
+
+    public virtual Vector2 Position { get; set; }
 
     public abstract void CheckCollision(Component component);
 

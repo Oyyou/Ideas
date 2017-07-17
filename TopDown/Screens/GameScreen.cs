@@ -66,22 +66,25 @@ namespace TopDown.States
 
     public States State { get; set; }
 
-    public void AddComponent(Building component)
+    public void AddComponent(Building building)
     {
-      SelectedBuilding = component;
+      SelectedBuilding = building;
 
+      AddComponent(component: building);
+    }
+
+    public void AddComponent(Component component)
+    {
       component.LoadContent(_content);
 
       _gameComponents.Add(component);
     }
 
-    public void AddComponent(PathBuilder component)
+    public void AddComponent(PathBuilder pathBuilder)
     {
-      SelectedPathBuilder = component;
+      SelectedPathBuilder = pathBuilder;
 
-      component.LoadContent(_content);
-
-      _gameComponents.Add(component);
+      AddComponent(component: pathBuilder);
     }
 
     private void BuildMenuUpdate(GameTime gameTime)
@@ -337,8 +340,8 @@ namespace TopDown.States
           {
             State = States.BuildMenu;
 
-            if(SelectedBuilding != null)
-            SelectedBuilding.IsRemoved = true;
+            if (SelectedBuilding != null)
+              SelectedBuilding.IsRemoved = true;
 
             if (SelectedPathBuilder != null)
               SelectedPathBuilder.IsRemoved = true;
@@ -422,7 +425,7 @@ namespace TopDown.States
           if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
           {
             State = States.ItemMenu;
-            
+
             if (SelectedBuilding != null)
               SelectedBuilding.Components.Last().IsRemoved = true;
 

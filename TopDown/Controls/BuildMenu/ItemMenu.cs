@@ -59,7 +59,14 @@ namespace TopDown.Controls.BuildMenu
       
       if(_gameState.SelectedPathBuilder != null)
       {
-        _gameState.SelectedPathBuilder.State = Builders.PathBuilderStates.Finished;
+        _gameState.SelectedPathBuilder.Furniture.Last().IsRemoved = true;
+
+        foreach (var component in _gameState.SelectedPathBuilder.Furniture)
+        {
+          _gameState.AddComponent(component);
+        }
+
+        _gameState.SelectedPathBuilder.IsRemoved = true;
         _gameState.SelectedPathBuilder = null;
       }
 

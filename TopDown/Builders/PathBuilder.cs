@@ -11,6 +11,7 @@ using Engine.Sprites;
 using TopDown.States;
 using Microsoft.Xna.Framework.Input;
 using TopDown.Logic;
+using TopDown.Buildings;
 
 namespace TopDown.Builders
 {
@@ -18,15 +19,13 @@ namespace TopDown.Builders
   {
     Selecting,
     Placing,
-    Finished,
   }
 
   public class PathBuilder : Component
   {
-    /// <summary>
-    /// The components we're placing
-    /// </summary>
-    private List<Sprite> _newComponents;
+    public List<Furniture> Furniture { get; set; }
+
+    public Furniture Path { get; set; }
 
     public PathBuilderStates State { get; set; }
 
@@ -37,9 +36,17 @@ namespace TopDown.Builders
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      foreach (var path in _pathPositions)
+      switch (State)
       {
-        spriteBatch.Draw(_texture, path, Color.White);
+        case PathBuilderStates.Selecting:
+        case PathBuilderStates.Placing:
+
+          Path?.Draw(gameTime, spriteBatch);
+
+          foreach (var component in Furniture)
+            component.Draw(gameTime, spriteBatch);
+
+          break;
       }
     }
 
@@ -47,7 +54,7 @@ namespace TopDown.Builders
     {
       Components = new List<Component>();
 
-      _newComponents = new List<Sprite>();
+      Furniture = new List<Buildings.Furniture>();
 
       _texture = content.Load<Texture2D>("Sprites/Paths/StonePath");
     }
@@ -74,14 +81,10 @@ namespace TopDown.Builders
     {
       switch (State)
       {
-        case PathBuilderStates.Selecting:
-          break;
         case PathBuilderStates.Placing:
 
           PlacingPath();
 
-          break;
-        default:
           break;
       }
     }
@@ -94,14 +97,26 @@ namespace TopDown.Builders
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
 
+      Path.Position = _currentMousePosition;
+
       if (GameScreen.Mouse.LeftDown)
       {
         if (!_pathPositions.Contains(_currentMousePosition))
+        {
           _pathPositions.Add(_currentMousePosition);
+
+          var sprite = Path.Clone() as Furniture;
+
+          sprite.State = FurnatureStates.Placed;
+
+          Furniture.Add(sprite);
+        }
       }
       else if (GameScreen.Mouse.RightDown)
       {
         _pathPositions.Remove(_currentMousePosition);
+
+        Furniture.Remove(Furniture.Where(c => c.Position == _currentMousePosition).FirstOrDefault());
       }
     }
   }

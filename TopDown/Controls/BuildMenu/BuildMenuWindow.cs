@@ -99,7 +99,13 @@ namespace TopDown.Controls.BuildMenu
           _gameState.SelectedBuilding.Components.Last().IsRemoved = true;
 
           if (_gameState.SelectedPathBuilder != null)
-            _gameState.SelectedPathBuilder.Components.Last().IsRemoved = true;
+          {
+            _gameState.SelectedPathBuilder.Path = null;
+            _gameState.SelectedPathBuilder.State = PathBuilderStates.Selecting;
+            _gameState.SelectedPathBuilder.Furniture.Last().IsRemoved = true;
+          }
+
+          // 
 
           itemOption.CurrentState = ItemMenuOptionStates.Clickable;
           _gameState.State = States.States.ItemMenu;
@@ -116,17 +122,21 @@ namespace TopDown.Controls.BuildMenu
       if (itemOption.Furniture == null)
         throw new Exception($"Furniture hasn't been set for '{itemOption.Text}' option.");
 
-      Component component = null;
-
       if (_gameState.SelectedBuilding != null)
-        component = _gameState.SelectedBuilding;
+      {
+        itemOption.Furniture.Building = _gameState.SelectedBuilding;
+        itemOption.Furniture.Layer = _gameState.SelectedBuilding.Layer + 0.01f;
+
+        _gameState.SelectedBuilding.Components.Add((Furniture)itemOption.Furniture.Clone());
+      }
       else if (_gameState.SelectedPathBuilder != null)
-        component = _gameState.SelectedPathBuilder;
+      {
+        itemOption.Furniture.Building = _gameState.SelectedPathBuilder;
+        itemOption.Furniture.Layer = _gameState.SelectedPathBuilder.Layer + 0.01f;
 
-      itemOption.Furniture.Building = component;
-      itemOption.Furniture.Layer = component.Layer + 0.01f;
-
-      component.Components.Add((Furniture)itemOption.Furniture.Clone());
+        _gameState.SelectedPathBuilder.Path = (Furniture)itemOption.Furniture.Clone();
+        _gameState.SelectedPathBuilder.State = PathBuilderStates.Placing;
+      }
 
       _gameState.ItemMenu.CurrentButton = itemOption;
       //CurrentButton = itemOption;
@@ -142,6 +152,7 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Small House",
         Layer = 0.99f,
+        GameScreenSetValue = States.States.PlacingBuilding,
         ResourceCost = new Models.Resources()
         {
           Food = 5,
@@ -391,6 +402,7 @@ namespace TopDown.Controls.BuildMenu
         //Layer = _background.Layer + 0.01f,
         Furniture = new Furniture(_content.Load<Texture2D>("Sprites/Paths/StonePath"), _gameState)
         {
+          IsCollidable = false,
           State = FurnatureStates.Placing,
           Position = GameScreen.Mouse.PositionWithCamera,
         },

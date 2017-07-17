@@ -11,15 +11,13 @@ using Engine.Managers;
 
 namespace Engine.Sprites
 {
-  public class Sprite : Component
+  public class Sprite : Component, ICloneable
   {
     protected AnimationManager _animationManager;
 
     protected Dictionary<string, Animation> _animations;
 
     private float _layer;
-
-    private float _rotation;
 
     private Rectangle _sourceRectangle;
 
@@ -58,7 +56,7 @@ namespace Engine.Sprites
 
     public Vector2 Origin { get; set; }
 
-    public Vector2 Position
+    public override Vector2 Position
     {
       get { return new Vector2(Rectangle.X, Rectangle.Y); }
       set
@@ -69,8 +67,6 @@ namespace Engine.Sprites
           _animationManager.Position = value;
       }
     }
-
-    public Rectangle Rectangle;
 
     public float Rotation;
 
@@ -104,6 +100,9 @@ namespace Engine.Sprites
     public override void CheckCollision(Component component)
     {
       if (component.CollisionRectangles == null)
+        return;
+
+      if (!component.IsCollidable)
         return;
 
       foreach (var rectangle in component.CollisionRectangles)
@@ -158,6 +157,8 @@ namespace Engine.Sprites
       Origin = new Vector2(0, 0);
 
       IsVisible = true;
+
+      IsCollidable = true;
     }
 
     protected bool IsTouchingLeft(Sprite sprite)
@@ -326,6 +327,11 @@ namespace Engine.Sprites
 
       foreach (var sprite in Components)
         sprite.Update(gameTime);
+    }
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
     }
   }
 }
