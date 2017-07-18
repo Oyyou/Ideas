@@ -54,6 +54,8 @@ namespace TopDown.States
 
     public static Controls.Keyboard Keyboard;
 
+    public static MessageBox MessageBox;
+
     public static Controls.Mouse Mouse;
 
     public PathBuilder SelectedPathBuilder { get; set; }
@@ -133,6 +135,11 @@ namespace TopDown.States
       _camera = new Camera();
 
       Keyboard = new Controls.Keyboard();
+
+      MessageBox = new MessageBox(_content.Load<Texture2D>("Controls/MessageBox"), _content.Load<SpriteFont>("Fonts/Font"))
+      {
+        Layer = 0.999f,
+      };
 
       Mouse = new TopDown.Controls.Mouse(_camera);
 
@@ -239,6 +246,7 @@ namespace TopDown.States
       {
         Keyboard,
         Mouse,
+        MessageBox,
         new Toolbar(this),
         new ResourceView(Resources),
         _buildMenu,
@@ -277,6 +285,9 @@ namespace TopDown.States
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
         State = States.BuildMenu;
+
+      if (Keyboard.IsKeyPressed(Keys.Enter))
+        MessageBox.Show("You just pressed Enter. Well done :)");
     }
 
     public override void PostUpdate(GameTime gameTime)

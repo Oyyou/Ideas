@@ -52,6 +52,7 @@
     <Compile Include="Controls\ItemMenu\ItemMenu.cs" />
     <Compile Include="Controls\ItemMenu\ItemMenuButton.cs" />
     <Compile Include="Controls\Keyboard.cs" />
+    <Compile Include="Controls\MessageBox.cs" />
     <Compile Include="Controls\Mouse.cs" />
     <Compile Include="Controls\ResourceView.cs" />
     <Compile Include="Controls\Toolbar.cs" />

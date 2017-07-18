@@ -95,6 +95,8 @@ namespace TopDown.Controls.ItemMenu
 
     public override void LoadContent(ContentManager content)
     {
+      Components = new List<Component>();
+
       _content = content;
 
       _position = new Vector2(25, 25);
