@@ -12,7 +12,7 @@ namespace Engine.Controls
 {
   public class Button : Component
   {
-    protected Color _colour
+    protected virtual Color _colour
     {
       get
       {
@@ -40,13 +40,11 @@ namespace Engine.Controls
 
     public bool IsClicked { get; set; }
 
-    public bool IsHovering { get; private set; }
+    public bool IsHovering { get; protected set; }
 
     public bool IsSelected { get; set; }
 
-    public float Layer { get; set; }
-
-    public Vector2 Position
+    public override Vector2 Position
     {
       get { return new Vector2(Rectangle.X, Rectangle.Y); }
       set
@@ -55,7 +53,7 @@ namespace Engine.Controls
       }
     }
 
-    public Rectangle Rectangle { get; private set; }
+    public override Rectangle Rectangle { get; set; }
 
     public string Text { get; set; }
 
@@ -108,6 +106,11 @@ namespace Engine.Controls
 
     }
 
+    protected virtual void OnClick()
+    {
+      Click?.Invoke(this, new EventArgs());
+    }
+
     public override void UnloadContent()
     {
       _texture.Dispose();
@@ -133,7 +136,7 @@ namespace Engine.Controls
         {
           //IsSelected = true;
           IsClicked = true;
-          Click?.Invoke(this, new EventArgs());
+          OnClick();
         }
       }
     }

@@ -12,22 +12,25 @@ using TopDown.States;
 using Microsoft.Xna.Framework.Input;
 using Engine.Controls;
 using TopDown.Buildings;
+using TopDown.Controls.BuildMenu;
 
-namespace TopDown.Controls.BuildMenu
+namespace TopDown.Controls.ItemMenu
 {
   public class ItemMenu : Component
   {
     private Sprite _background;
 
+    private Texture2D _buttonTexture;
+
     private ContentManager _content;
 
-    private List<ItemMenuOption> _items;
+    private SpriteFont _font;
 
     private GameScreen _gameState;
 
     private Vector2 _position;
 
-    public ItemMenuOption CurrentButton;
+    public ItemMenuButton CurrentButton;
 
     private void Cancel_Click(object sender, EventArgs e)
     {
@@ -81,7 +84,7 @@ namespace TopDown.Controls.BuildMenu
 
       _background.Draw(gameTime, spriteBatch);
 
-      foreach (var item in _items)
+      foreach (var item in Components)
         item.Draw(gameTime, spriteBatch);
     }
 
@@ -113,10 +116,10 @@ namespace TopDown.Controls.BuildMenu
 
     public void Reset()
     {
-      foreach (var item in _items)
+      foreach (var component in Components)
       {
-        item.CanClick = true;
-        item.CurrentState = ItemMenuOptionStates.Clickable;
+        ((ItemMenuButton)component).CanClick = true;
+        ((ItemMenuButton)component).CurrentState = ItemMenuButtonStates.Clickable;
       }
     }
 
@@ -124,7 +127,7 @@ namespace TopDown.Controls.BuildMenu
     {
       _background.UnloadContent();
 
-      foreach (var item in _items)
+      foreach (var item in Components)
         item.UnloadContent();
     }
 
@@ -136,60 +139,55 @@ namespace TopDown.Controls.BuildMenu
 
       _background.Update(gameTime);
 
-      foreach (var item in _items)
+      foreach (var component in Components)
       {
-        if (item.PreviousState == ItemMenuOptionStates.Clicked &&
-          item.CurrentState == ItemMenuOptionStates.Placed)
+        if (((ItemMenuButton)component).PreviousState == ItemMenuButtonStates.Clicked &&
+          ((ItemMenuButton)component).CurrentState == ItemMenuButtonStates.Placed)
         {
-          foreach (var i in _items)
+          foreach (var c in Components)
           {
-            if (i == item)
+            if (c == component)
               continue;
 
-            i.CanClick = true;
+            ((ItemMenuButton)c).CanClick = true;
           }
         }
       }
 
-      foreach (var item in _items)
+      foreach (var item in Components)
       {
         item.Update(gameTime);
       }
     }
 
-    private Texture2D _buttonTexture;
-
-    private SpriteFont _font;
-
-    public void Open(BuildMenuSubItem component)
+    public void Open(BuildMenuSubButton component)
     {
-      _items = new List<ItemMenuOption>();
+      Components = new List<Component>();
 
       _gameState.State = component.GameScreenSetValue;
 
-      // I've added the 'ToList' to remove the reference from the original
-      _items = component.Items.ToList();
+      Components = component.Items.Select(c => c as Component).ToList();
 
-      var done = new ItemMenuOption(_buttonTexture, _font)
+      var done = new ItemMenuButton(_buttonTexture, _font)
       {
         Text = "Done",
       };
 
       done.Click += Done_Click;
 
-      var cancel = new ItemMenuOption(_buttonTexture, _font)
+      var cancel = new ItemMenuButton(_buttonTexture, _font)
       {
         Text = "Cancel",
       };
 
       cancel.Click += Cancel_Click;
 
-      _items.Add(done);
-      _items.Add(cancel);
+      Components.Add(done);
+      Components.Add(cancel);
             
       var y = _position.Y + 5;
 
-      foreach (var item in _items)
+      foreach (var item in Components)
       {
         item.LoadContent(_content);
 

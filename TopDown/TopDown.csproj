@@ -44,15 +44,13 @@
     <Compile Include="Builders\PathBuilder.cs" />
     <Compile Include="Buildings\Building.cs" />
     <Compile Include="Buildings\Furniture.cs" />
-    <Compile Include="Buildings\Path.cs" />
     <Compile Include="Buildings\SmallHouse.cs" />
     <Compile Include="Buildings\Templates\BuildingTemplate.cs" />
     <Compile Include="Buildings\Templates\SmallHouseTemplate.cs" />
-    <Compile Include="Controls\BuildMenu\BuildMenuMainItem.cs" />
-    <Compile Include="Controls\BuildMenu\BuildMenuSubItem.cs" />
+    <Compile Include="Controls\BuildMenu\BuildMenuSubButton.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuWindow.cs" />
-    <Compile Include="Controls\BuildMenu\ItemMenu.cs" />
-    <Compile Include="Controls\BuildMenu\ItemMenuOption.cs" />
+    <Compile Include="Controls\ItemMenu\ItemMenu.cs" />
+    <Compile Include="Controls\ItemMenu\ItemMenuButton.cs" />
     <Compile Include="Controls\Keyboard.cs" />
     <Compile Include="Controls\Mouse.cs" />
     <Compile Include="Controls\ResourceView.cs" />
@@ -65,13 +63,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Rock.cs" />
-    <Compile Include="Sprites\Fences\BottomRightCornerFence.cs" />
-    <Compile Include="Sprites\Fences\BottomLeftCornerFence.cs" />
-    <Compile Include="Sprites\Fences\TopRightCornerFence.cs" />
-    <Compile Include="Sprites\Fences\TopLeftCornerFence.cs" />
-    <Compile Include="Sprites\Fences\HorizontalFence.cs" />
-    <Compile Include="Sprites\Fences\CornerFence.cs" />
-    <Compile Include="Sprites\Fences\VerticalFence.cs" />
     <Compile Include="Sprites\Player.cs" />
     <Compile Include="Screens\GameScreen.cs" />
     <Compile Include="Screens\MenuScreen.cs" />
@@ -84,6 +75,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Content\Notes.txt" />
     <Content Include="Icon.ico" />
   </ItemGroup>

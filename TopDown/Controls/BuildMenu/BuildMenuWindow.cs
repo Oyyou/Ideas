@@ -14,12 +14,13 @@ using TopDown.States;
 using TopDown.Buildings.Templates;
 using TopDown.Builders;
 using TopDown.Buildings;
+using TopDown.Controls.ItemMenu;
 
 namespace TopDown.Controls.BuildMenu
 {
   public class BuildMenuWindow : Component
   {
-    private List<BuildMenuSubItem> _buildSubOptions;
+    private List<BuildMenuSubButton> _buildSubOptions;
 
     private GameScreen _gameState;
 
@@ -37,9 +38,9 @@ namespace TopDown.Controls.BuildMenu
 
     private void ArtsButton_Click(object sender, EventArgs e)
     {
-      _buildSubOptions = new List<BuildMenuSubItem>()
+      _buildSubOptions = new List<BuildMenuSubButton>()
       {
-        new BuildMenuSubItem(_subButtonTexture, _font)
+        new BuildMenuSubButton(_subButtonTexture, _font)
         {
           Text = "Library",
           Layer =  0.99f,
@@ -89,11 +90,11 @@ namespace TopDown.Controls.BuildMenu
 
     private void Item_Click(object sender, EventArgs e)
     {
-      var itemOption = sender as ItemMenuOption;
+      var itemOption = sender as ItemMenuButton;
 
       if (_gameState.State == States.States.PlacingItems)
       {
-        if (itemOption.CurrentState == ItemMenuOptionStates.Clicked)
+        if (itemOption.CurrentState == ItemMenuButtonStates.Clicked)
         {
           if(_gameState.SelectedBuilding != null)
           _gameState.SelectedBuilding.Components.Last().IsRemoved = true;
@@ -107,7 +108,7 @@ namespace TopDown.Controls.BuildMenu
 
           // 
 
-          itemOption.CurrentState = ItemMenuOptionStates.Clickable;
+          itemOption.CurrentState = ItemMenuButtonStates.Clickable;
           _gameState.State = States.States.ItemMenu;
 
           foreach (var item in itemOption.Parent.Items)
@@ -148,7 +149,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void HousingButton_Click(object sender, EventArgs e)
     {
-      var smallHouse = new BuildMenuSubItem(_subButtonTexture, _font)
+      var smallHouse = new BuildMenuSubButton(_subButtonTexture, _font)
       {
         Text = "Small House",
         Layer = 0.99f,
@@ -162,7 +163,7 @@ namespace TopDown.Controls.BuildMenu
         },
       };
 
-      var bed = new ItemMenuOption(_mainButtonTexture, _font)
+      var bed = new ItemMenuButton(_mainButtonTexture, _font)
       {
         Text = "Bed",
         Parent = smallHouse,
@@ -176,7 +177,7 @@ namespace TopDown.Controls.BuildMenu
 
       bed.Click += Item_Click;
 
-      var toilet = new ItemMenuOption(_mainButtonTexture, _font)
+      var toilet = new ItemMenuButton(_mainButtonTexture, _font)
       {
         Text = "Toilet",
         Parent = smallHouse,
@@ -190,7 +191,7 @@ namespace TopDown.Controls.BuildMenu
 
       toilet.Click += Item_Click;
 
-      smallHouse.Items = new List<ItemMenuOption>()
+      smallHouse.Items = new List<ItemMenuButton>()
       {
         bed,
         toilet,
@@ -198,10 +199,10 @@ namespace TopDown.Controls.BuildMenu
 
       smallHouse.Click += SmallHouse_Click;
 
-      _buildSubOptions = new List<BuildMenuSubItem>()
+      _buildSubOptions = new List<BuildMenuSubButton>()
       {
         smallHouse,
-        new BuildMenuSubItem(_subButtonTexture, _font)
+        new BuildMenuSubButton(_subButtonTexture, _font)
         {
           Text = "Large House",
           Layer =  0.99f,
@@ -230,9 +231,9 @@ namespace TopDown.Controls.BuildMenu
 
     private void LabourButton_Click(object sender, EventArgs e)
     {
-      _buildSubOptions = new List<BuildMenuSubItem>()
+      _buildSubOptions = new List<BuildMenuSubButton>()
       {
-        new BuildMenuSubItem(_subButtonTexture, _font)
+        new BuildMenuSubButton(_subButtonTexture, _font)
         {
           Text = "Blacksmith",
           Layer =  0.99f,
@@ -245,7 +246,7 @@ namespace TopDown.Controls.BuildMenu
             Stone = 40,
           },
         },
-        new BuildMenuSubItem(_subButtonTexture, _font)
+        new BuildMenuSubButton(_subButtonTexture, _font)
         {
           Text = "Farm",
           Layer =  0.99f,
@@ -258,7 +259,7 @@ namespace TopDown.Controls.BuildMenu
             Stone = 40,
           },
         },
-        new BuildMenuSubItem(_subButtonTexture, _font)
+        new BuildMenuSubButton(_subButtonTexture, _font)
         {
           Text = "Lumber Mill",
           Layer =  0.99f,
@@ -271,7 +272,7 @@ namespace TopDown.Controls.BuildMenu
             Stone = 40,
           },
         },
-        new BuildMenuSubItem(_subButtonTexture, _font)
+        new BuildMenuSubButton(_subButtonTexture, _font)
         {
           Text = "Mine",
           Layer =  0.99f,
@@ -374,12 +375,12 @@ namespace TopDown.Controls.BuildMenu
       foreach (var component in Components)
         component.LoadContent(content);
 
-      _buildSubOptions = new List<BuildMenuSubItem>();
+      _buildSubOptions = new List<BuildMenuSubButton>();
     }
 
     private void MiscButton_Click(object sender, EventArgs e)
     {
-      var path = new BuildMenuSubItem(_subButtonTexture, _font)
+      var path = new BuildMenuSubButton(_subButtonTexture, _font)
       {
         Text = "Path",
         Layer = 0.99f,
@@ -395,7 +396,7 @@ namespace TopDown.Controls.BuildMenu
 
       path.Click += Path_Click;
 
-      var stonePath = new ItemMenuOption(_mainButtonTexture, _font)
+      var stonePath = new ItemMenuButton(_mainButtonTexture, _font)
       {
         Text = "Stone",
         Parent = path,
@@ -410,12 +411,12 @@ namespace TopDown.Controls.BuildMenu
 
       stonePath.Click += Item_Click;
 
-      path.Items = new List<ItemMenuOption>()
+      path.Items = new List<ItemMenuButton>()
       {
         stonePath,
       };
 
-      _buildSubOptions = new List<BuildMenuSubItem>()
+      _buildSubOptions = new List<BuildMenuSubButton>()
       {
         path,
       };
@@ -426,7 +427,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void StonePath_Click(object sender, EventArgs e)
     {
-      var item = sender as ItemMenuOption;
+      var item = sender as ItemMenuButton;
     }
 
     private void Path_Click(object sender, EventArgs e)

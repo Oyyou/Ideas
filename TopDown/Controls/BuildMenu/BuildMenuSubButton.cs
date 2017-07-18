@@ -6,21 +6,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using TopDown.Controls.ItemMenu;
 
 namespace TopDown.Controls.BuildMenu
 {
-  public class BuildMenuSubItem : Button
+  public class BuildMenuSubButton : Button
   {
     public States.States GameScreenSetValue { get; set; }
 
-    public List<ItemMenuOption> Items { get; set; }
+    public List<ItemMenuButton> Items { get; set; }
 
     public Models.Resources ResourceCost;
 
-    public BuildMenuSubItem(Texture2D texture, SpriteFont font)
+    public BuildMenuSubButton(Texture2D texture, SpriteFont font)
       : base(texture, font)
     {
-      Items = new List<ItemMenuOption>();
+      Items = new List<ItemMenuButton>();
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

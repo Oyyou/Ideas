@@ -16,10 +16,10 @@ using TopDown.Builders;
 using TopDown.Buildings;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
+using TopDown.Controls.ItemMenu;
 using TopDown.Core;
 using TopDown.Resources;
 using TopDown.Sprites;
-using TopDown.Sprites.Fences;
 
 namespace TopDown.States
 {

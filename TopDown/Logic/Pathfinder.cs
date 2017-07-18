@@ -4,53 +4,54 @@ using System.Collections.Generic;
 
 namespace TopDown.Logic
 {
-  public class SearchNode
-  {
-    /// <summary>
-    /// Location on the map
-    /// </summary>
-    public Vector2 Position;
-    /// <summary>
-    /// If true, this tile can be walked on.
-    /// </summary>
-    public bool Walkable;
-
-    /// <summary>
-    /// This contains references to the for nodes surrounding 
-    /// this tile (Up, Down, Left, Right).
-    /// </summary>
-    public SearchNode[] Neighbors;
-    /// <summary>
-    /// A reference to the node that transfered this node to
-    /// the open list. This will be used to trace our path back
-    /// from the goal node to the start node.
-    /// </summary>
-    public SearchNode Parent;
-
-    /// <summary>
-    /// Provides an easy way to check if this node
-    /// is in the open list.
-    /// </summary>
-    public bool InOpenList;
-    /// <summary>
-    /// Provides an easy way to check if this node
-    /// is in the closed list.
-    /// </summary>
-    public bool InClosedList;
-
-    /// <summary>
-    /// The approximate distance from the start node to the
-    /// goal node if the path goes through this node. (F)
-    /// </summary>
-    public float DistanceToGoal;
-    /// <summary>
-    /// Distance traveled from the spawn point. (G)
-    /// </summary>
-    public float DistanceTraveled;
-  }
-
   public class Pathfinder
   {
+    internal class SearchNode
+    {
+      /// <summary>
+      /// Location on the map
+      /// </summary>
+      public Vector2 Position;
+      /// <summary>
+      /// If true, this tile can be walked on.
+      /// </summary>
+      public bool Walkable;
+
+      /// <summary>
+      /// This contains references to the for nodes surrounding 
+      /// this tile (Up, Down, Left, Right).
+      /// </summary>
+      public SearchNode[] Neighbors;
+      /// <summary>
+      /// A reference to the node that transfered this node to
+      /// the open list. This will be used to trace our path back
+      /// from the goal node to the start node.
+      /// </summary>
+      public SearchNode Parent;
+
+      /// <summary>
+      /// Provides an easy way to check if this node
+      /// is in the open list.
+      /// </summary>
+      public bool InOpenList;
+      /// <summary>
+      /// Provides an easy way to check if this node
+      /// is in the closed list.
+      /// </summary>
+      public bool InClosedList;
+
+      /// <summary>
+      /// The approximate distance from the start node to the
+      /// goal node if the path goes through this node. (F)
+      /// </summary>
+      public float DistanceToGoal;
+      /// <summary>
+      /// Distance traveled from the spawn point. (G)
+      /// </summary>
+      public float DistanceTraveled;
+    }
+
+
     // Stores an array of the walkable search nodes.
     //private SearchNode[,] searchNodes;
     private Dictionary<Tuple<int, int>, SearchNode> _searchNodes;
