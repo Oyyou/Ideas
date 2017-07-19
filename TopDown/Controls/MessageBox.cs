@@ -18,6 +18,8 @@ namespace TopDown.Controls
 
     private float _timer;
 
+    private const float _timerMax = 3.0f;
+
     private string _text;
 
     public override Vector2 Position
@@ -66,10 +68,13 @@ namespace TopDown.Controls
       _font = font;
     }
 
-    public void Show(string text)
+    public void Show(string text, bool fadeOut = true)
     {
       _text = text;
 
+      _timer = _timerMax;
+
+      if(fadeOut)
       _timer = 0;
 
       IsVisible = true;
@@ -87,7 +92,7 @@ namespace TopDown.Controls
 
       _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-      if (_timer > 3.0f)
+      if (_timer > _timerMax)
       {
         _timer = 0.0f;
         IsVisible = false;

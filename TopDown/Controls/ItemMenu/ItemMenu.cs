@@ -37,10 +37,16 @@ namespace TopDown.Controls.ItemMenu
       _gameState.State = States.States.BuildMenu;
 
       if (_gameState.SelectedBuilding != null)
+      {
         _gameState.SelectedBuilding.IsRemoved = true;
+        _gameState.SelectedBuilding = null;
+      }
 
       if (_gameState.SelectedPathBuilder != null)
+      {
         _gameState.SelectedPathBuilder.IsRemoved = true;
+        _gameState.SelectedPathBuilder = null;
+      }
 
       this.Reset();
     }

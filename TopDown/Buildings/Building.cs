@@ -89,8 +89,8 @@ namespace TopDown.Buildings
               new Rectangle((int)Position.X, (int)Position.Y, width - xDiff, 1), // Top
               new Rectangle((int)Position.X, (int)Position.Y, 1, height - yDiff), // Left
               new Rectangle((int)Position.X + (width - 1) - xDiff, (int)Position.Y, 1, height - yDiff), // Right
-              new Rectangle((int)Position.X, (int)Position.Y + height - yDiff - 1, 21, 1), // bottom left
-              new Rectangle((int)Position.X + 61, (int)Position.Y + height - yDiff - 1, 131, 1), // bottom right
+              new Rectangle((int)Position.X, (int)Position.Y + height - yDiff - 1, 16, 1), // bottom left
+              new Rectangle((int)Position.X + 64, (int)Position.Y + height - yDiff - 1, width - 64 - xDiff, 1), // bottom right
             };
 
             collisionRectangles.AddRange(Components.SelectMany(c => c.CollisionRectangles).ToList());
@@ -246,6 +246,8 @@ namespace TopDown.Buildings
       _template = template;
 
       _particles = new List<Sprite>();
+
+      IsCollidable = true;
     }
 
     public override void CheckCollision(Component component)
@@ -297,8 +299,8 @@ namespace TopDown.Buildings
             component.Draw(gameTime, spriteBatch);
           }
 
-          foreach (var rec in CollisionRectangles)
-            spriteBatch.Draw(_t, rec, Color.Red);
+          //foreach (var rec in CollisionRectangles)
+          //  spriteBatch.Draw(texture: _t, destinationRectangle: rec, color: Color.Red, layerDepth: 1f);
           break;
 
         default:
@@ -368,19 +370,46 @@ namespace TopDown.Buildings
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
 
-          bool canPlace = true; 
+          bool canPlace = false;
 
           CurrentSprite.Color = Color.White;
 
-          foreach (var component in _gameState.CollidableComponents)
+          var doorLocation = new Vector2(Rectangle.X + 32, Rectangle.Bottom);
+
+          foreach (var component in _gameState.PathComponents)
           {
-            if (component.CollisionRectangles.Any(c => c.Intersects(this.Rectangle)))
+            if (component.Rectangle.Intersects(this.Rectangle))
             {
               canPlace = false;
-              CurrentSprite.Color = Color.Red;
+              GameScreen.MessageBox.Show("Trying to build over path", false);
               break;
             }
+
+            if (component.Position == doorLocation)
+            {
+              canPlace = true;
+              continue;
+            }
           }
+
+          if(!canPlace && !GameScreen.MessageBox.IsVisible)
+            GameScreen.MessageBox.Show("Door needs to connect to path", false);
+
+          if (canPlace)
+          {
+            foreach (var component in _gameState.CollidableComponents)
+            {
+              if (component.CollisionRectangles.Any(c => c.Intersects(this.Rectangle)))
+              {
+                canPlace = false;
+                GameScreen.MessageBox.Show("Trying to build over object", false);
+                break;
+              }
+            }
+          }
+
+          if(!canPlace)
+            CurrentSprite.Color = Color.Red;
 
           if (GameScreen.Mouse.LeftClicked && canPlace)
           {

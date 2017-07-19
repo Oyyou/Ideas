@@ -37,6 +37,8 @@ namespace TopDown.Buildings
     public Furniture(Texture2D texture, GameScreen gameState) : base(texture)
     {
       _gameState = gameState;
+
+      IsCollidable = true;
     }
 
     public override void Update(GameTime gameTime)

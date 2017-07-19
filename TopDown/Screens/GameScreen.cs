@@ -60,6 +60,14 @@ namespace TopDown.States
 
     public PathBuilder SelectedPathBuilder { get; set; }
 
+    public List<Component> PathComponents
+    {
+      get
+      {
+        return _gameComponents.Where(c => c is Furniture).ToList();
+      }
+    }
+
     public TopDown.Sprites.Player Player { get; private set; }
 
     public Models.Resources Resources { get; set; }
@@ -352,10 +360,16 @@ namespace TopDown.States
             State = States.BuildMenu;
 
             if (SelectedBuilding != null)
+            {
               SelectedBuilding.IsRemoved = true;
+              SelectedBuilding = null;
+            }
 
             if (SelectedPathBuilder != null)
+            {
               SelectedPathBuilder.IsRemoved = true;
+              SelectedPathBuilder = null;
+            }
           }
 
           if (Keyboard.IsKeyPressed(Keys.Escape))
@@ -363,10 +377,16 @@ namespace TopDown.States
             State = States.Playing;
 
             if (SelectedBuilding != null)
+            {
               SelectedBuilding.IsRemoved = true;
+              SelectedBuilding = null;
+            }
 
             if (SelectedPathBuilder != null)
+            {
               SelectedPathBuilder.IsRemoved = true;
+              SelectedPathBuilder = null;
+            }
           }
 
           break;
@@ -393,10 +413,16 @@ namespace TopDown.States
             State = States.BuildMenu;
 
             if (SelectedBuilding != null)
+            {
               SelectedBuilding.IsRemoved = true;
+              SelectedBuilding = null;
+            }
 
             if (SelectedPathBuilder != null)
+            {
               SelectedPathBuilder.IsRemoved = true;
+              SelectedPathBuilder = null;
+            }
 
             ItemMenu.Reset();
           }
@@ -406,10 +432,16 @@ namespace TopDown.States
             State = States.Playing;
 
             if (SelectedBuilding != null)
+            {
               SelectedBuilding.IsRemoved = true;
+              SelectedBuilding = null;
+            }
 
             if (SelectedPathBuilder != null)
+            {
               SelectedPathBuilder.IsRemoved = true;
+              SelectedPathBuilder = null;
+            }
 
             ItemMenu.Reset();
           }
@@ -441,7 +473,11 @@ namespace TopDown.States
               SelectedBuilding.Components.Last().IsRemoved = true;
 
             if (SelectedPathBuilder != null)
+            {
+              SelectedPathBuilder.State = PathBuilderStates.Selecting;
               SelectedPathBuilder.Components.ForEach(c => c.IsRemoved = true);
+              SelectedPathBuilder.Path = null;
+            }
 
             ItemMenu.Reset();
           }
