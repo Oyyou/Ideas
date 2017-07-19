@@ -103,6 +103,17 @@ namespace TopDown.Buildings
 
     public const float DefaultLayer = 0.8f;
 
+    public virtual List<Vector2> DoorLocations
+    {
+      get
+      {
+        return new List<Vector2>()
+        {
+          new Vector2(Rectangle.X + 32, Rectangle.Bottom),
+        };
+      }
+    }
+
     public Rectangle InsideRectangle
     {
       get
@@ -238,6 +249,11 @@ namespace TopDown.Buildings
         case BuildingStates.Placing:
           CurrentSprite.Draw(gameTime, spriteBatch);
 
+          foreach (var doorLocation in DoorLocations)
+          {
+            spriteBatch.Draw(_t, new Rectangle(doorLocation.ToPoint(), new Point(32, 32)), Color.Red);
+          }
+
           break;
 
         case BuildingStates.Placed:
@@ -271,7 +287,7 @@ namespace TopDown.Buildings
 
         case BuildingStates.Built_Out:
           _placedSprite.Position = new Vector2(Position.X + (_template.OutExtraWidth / 2), Position.Y + _template.OutExtraHeight);
-          _placedSprite.Layer =  _builtSprite.Layer - 0.002f;
+          _placedSprite.Layer = _builtSprite.Layer - 0.002f;
           _placedSprite.Draw(gameTime, spriteBatch);
 
           _builtSprite.Draw(gameTime, spriteBatch);
@@ -314,7 +330,7 @@ namespace TopDown.Buildings
 
     public override void LoadContent(ContentManager content)
     {
-      _t = content.Load<Texture2D>("Buildings/SmallHouse/Out");
+      _t = content.Load<Texture2D>("Pixel");
 
       _builtSprite = new Sprite(_template.TextureOut)
       {
@@ -358,8 +374,6 @@ namespace TopDown.Buildings
 
           CurrentSprite.Color = Color.White;
 
-          var doorLocation = new Vector2(Rectangle.X + 32, Rectangle.Bottom);
-
           foreach (var component in _gameState.PathComponents)
           {
             if (component.Rectangle.Intersects(this.Rectangle))
@@ -369,14 +383,14 @@ namespace TopDown.Buildings
               break;
             }
 
-            if (component.Position == doorLocation)
+            if (DoorLocations.Any(c => c == component.Position))
             {
               canPlace = true;
               continue;
             }
           }
 
-          if(!canPlace && !GameScreen.MessageBox.IsVisible)
+          if (!canPlace && !GameScreen.MessageBox.IsVisible)
             GameScreen.MessageBox.Show("Door needs to connect to path", false);
 
           if (canPlace)
@@ -392,7 +406,7 @@ namespace TopDown.Buildings
             }
           }
 
-          if(!canPlace)
+          if (!canPlace)
             CurrentSprite.Color = Color.Red;
 
           if (GameScreen.Mouse.LeftClicked && canPlace)
@@ -420,7 +434,8 @@ namespace TopDown.Buildings
           foreach (var component in Components)
             component.Update(gameTime);
 
-          if (_gameState.Player.IsIn(this.InsideRectangle))
+          if (_gameState.Player.IsIn(this.InsideRectangle) ||
+            (_gameState.SelectedPathBuilder != null && _gameState.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
           {
             Position = new Vector2(Position.X + (_template.OutExtraWidth / 2), Position.Y + _template.OutExtraHeight);
             State = BuildingStates.Built_In;
@@ -440,7 +455,8 @@ namespace TopDown.Buildings
           foreach (var component in Components)
             component.Update(gameTime);
 
-          if (!_gameState.Player.IsIn(this.InsideRectangle))
+          if (!_gameState.Player.IsIn(this.InsideRectangle) &&
+            !(_gameState.SelectedPathBuilder != null && _gameState.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
           {
             // Set Position
             Position = new Vector2(Position.X - (_template.OutExtraWidth / 2), Position.Y - _template.OutExtraHeight);

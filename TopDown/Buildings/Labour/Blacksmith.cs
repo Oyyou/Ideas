@@ -47,7 +47,7 @@ namespace TopDown.Buildings.Labour
               new Rectangle((int)Position.X, (int)Position.Y, 1, 96), // Left
               new Rectangle((int)Position.X + (width - 1) - xDiff, (int)Position.Y, 1, height - yDiff), // Right
               new Rectangle((int)Position.X + 49, (int)Position.Y + 95, 48, 1), // bottom left
-              new Rectangle((int)Position.X + 96, (int)Position.Y + 96, 1, 64), 
+              new Rectangle((int)Position.X + 96, (int)Position.Y + 96, 1, 64),
               new Rectangle((int)Position.X + 96, (int)Position.Y + height - yDiff - 1, 96, 1), // bottom right
             };
 
@@ -57,6 +57,21 @@ namespace TopDown.Buildings.Labour
 
             break;
         }
+      }
+    }
+
+    public override List<Vector2> DoorLocations
+    {
+      get
+      {
+        return new List<Vector2>()
+        {
+          new Vector2(Rectangle.X - 32, Rectangle.Y + 96),
+          new Vector2(Rectangle.X - 32, Rectangle.Y + 128),
+          new Vector2(Rectangle.X , Rectangle.Bottom),
+          new Vector2(Rectangle.X + 32, Rectangle.Bottom),
+          new Vector2(Rectangle.X + 64, Rectangle.Bottom),
+        };
       }
     }
 
