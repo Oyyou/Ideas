@@ -15,6 +15,8 @@ using TopDown.Buildings.Templates;
 using TopDown.Builders;
 using TopDown.Buildings;
 using TopDown.Controls.ItemMenu;
+using TopDown.Buildings.Housing;
+using TopDown.Buildings.Labour;
 
 namespace TopDown.Controls.BuildMenu
 {
@@ -44,7 +46,7 @@ namespace TopDown.Controls.BuildMenu
         {
           Text = "Library",
           Layer =  0.99f,
-          GameScreenSetValue = States.States.PlacingBuilding,
+          GameScreenSetValue = States.GameStates.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 30,
@@ -71,12 +73,12 @@ namespace TopDown.Controls.BuildMenu
 
     private void CloseButton_Click(object sender, EventArgs e)
     {
-      _gameState.State = States.States.Playing;
+      _gameState.State = States.GameStates.Playing;
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      if (_gameState.State != States.States.BuildMenu)
+      if (_gameState.State != States.GameStates.BuildMenu)
         return;
 
       foreach (var component in Components)
@@ -92,12 +94,12 @@ namespace TopDown.Controls.BuildMenu
     {
       var itemOption = sender as ItemMenuButton;
 
-      if (_gameState.State == States.States.PlacingItems)
+      if (_gameState.State == States.GameStates.PlacingItems)
       {
         if (itemOption.CurrentState == ItemMenuButtonStates.Clicked)
         {
-          if(_gameState.SelectedBuilding != null)
-          _gameState.SelectedBuilding.Components.Last().IsRemoved = true;
+          if (_gameState.SelectedBuilding != null)
+            _gameState.SelectedBuilding.Components.Last().IsRemoved = true;
 
           if (_gameState.SelectedPathBuilder != null)
           {
@@ -109,7 +111,7 @@ namespace TopDown.Controls.BuildMenu
           // 
 
           itemOption.CurrentState = ItemMenuButtonStates.Clickable;
-          _gameState.State = States.States.ItemMenu;
+          _gameState.State = States.GameStates.ItemMenu;
 
           foreach (var item in itemOption.Parent.Items)
           {
@@ -141,7 +143,7 @@ namespace TopDown.Controls.BuildMenu
 
       _gameState.ItemMenu.CurrentButton = itemOption;
       //CurrentButton = itemOption;
-      _gameState.State = States.States.PlacingItems;
+      _gameState.State = States.GameStates.PlacingItems;
 
       foreach (var item in itemOption.Parent.Items)
         item.CanClick = false;
@@ -153,7 +155,7 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Small House",
         Layer = 0.99f,
-        GameScreenSetValue = States.States.PlacingBuilding,
+        GameScreenSetValue = States.GameStates.PlacingBuilding,
         ResourceCost = new Models.Resources()
         {
           Food = 5,
@@ -181,7 +183,7 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Toilet",
         Parent = smallHouse,
-       // Layer = _background.Layer + 0.01f,
+        // Layer = _background.Layer + 0.01f,
         Furniture = new Furniture(_content.Load<Texture2D>("Furniture/Toilet"), _gameState)
         {
           State = FurnatureStates.Placing,
@@ -206,7 +208,7 @@ namespace TopDown.Controls.BuildMenu
         {
           Text = "Large House",
           Layer =  0.99f,
-          GameScreenSetValue = States.States.PlacingBuilding,
+          GameScreenSetValue = States.GameStates.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 15,
@@ -223,7 +225,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void SmallHouse_Click(object sender, EventArgs e)
     {
-      _gameState.AddComponent(new Buildings.SmallHouse(_gameState, new SmallHouseTemplate())
+      _gameState.AddComponent(new SmallHouse(_gameState, new SmallHouseTemplate(_content))
       {
         BuildingState = Buildings.BuildingStates.Placing,
       });
@@ -231,26 +233,49 @@ namespace TopDown.Controls.BuildMenu
 
     private void LabourButton_Click(object sender, EventArgs e)
     {
+      var blacksmith = new BuildMenuSubButton(_subButtonTexture, _font)
+      {
+        Text = "Blacksmith",
+        Layer = 0.99f,
+        GameScreenSetValue = States.GameStates.PlacingBuilding,
+        ResourceCost = new Models.Resources()
+        {
+          Food = 15,
+          Gold = 10,
+          Wood = 30,
+          Stone = 40,
+        },
+      };
+
+      blacksmith.Click += Blacksmith_Click;
+
+      var anvil = new ItemMenuButton(_mainButtonTexture, _font)
+      {
+        Text = "Anvil",
+        Parent = blacksmith,
+        //Layer = _background.Layer + 0.01f,
+        Furniture = new Furniture(_content.Load<Texture2D>("Furniture/Anvil"), _gameState)
+        {
+          State = FurnatureStates.Placing,
+          Position = GameScreen.Mouse.PositionWithCamera,
+        },
+      };
+
+      anvil.Click += Item_Click;
+
+      blacksmith.Items = new List<ItemMenuButton>()
+      {
+        anvil,
+      };
+
       _buildSubOptions = new List<BuildMenuSubButton>()
       {
-        new BuildMenuSubButton(_subButtonTexture, _font)
-        {
-          Text = "Blacksmith",
-          Layer =  0.99f,
-          GameScreenSetValue = States.States.PlacingBuilding,
-          ResourceCost = new Models.Resources()
-          {
-            Food = 15,
-            Gold = 10,
-            Wood = 30,
-            Stone = 40,
-          },
-        },
+        blacksmith,
         new BuildMenuSubButton(_subButtonTexture, _font)
         {
           Text = "Farm",
           Layer =  0.99f,
-          GameScreenSetValue = States.States.PlacingBuilding,
+          GameScreenSetValue = States.GameStates.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 15,
@@ -263,7 +288,7 @@ namespace TopDown.Controls.BuildMenu
         {
           Text = "Lumber Mill",
           Layer =  0.99f,
-          GameScreenSetValue = States.States.PlacingBuilding,
+          GameScreenSetValue = States.GameStates.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 15,
@@ -276,7 +301,7 @@ namespace TopDown.Controls.BuildMenu
         {
           Text = "Mine",
           Layer =  0.99f,
-          GameScreenSetValue = States.States.PlacingBuilding,
+          GameScreenSetValue = States.GameStates.PlacingBuilding,
           ResourceCost = new Models.Resources()
           {
             Food = 15,
@@ -291,7 +316,13 @@ namespace TopDown.Controls.BuildMenu
         component.LoadContent(_content);
     }
 
-
+    private void Blacksmith_Click(object sender, EventArgs e)
+    {
+      _gameState.AddComponent(new Blacksmith(_gameState, new BlacksmithTemplate(_content))
+      {
+        BuildingState = Buildings.BuildingStates.Placing,
+      });
+    }
 
     public override void LoadContent(ContentManager content)
     {
@@ -384,7 +415,7 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Path",
         Layer = 0.99f,
-        GameScreenSetValue = States.States.ItemMenu,
+        GameScreenSetValue = States.GameStates.ItemMenu,
         ResourceCost = new Models.Resources()
         {
           Food = 0,
@@ -453,7 +484,7 @@ namespace TopDown.Controls.BuildMenu
 
     public override void Update(GameTime gameTime)
     {
-      if (_gameState.State != States.States.BuildMenu)
+      if (_gameState.State != States.GameStates.BuildMenu)
         return;
 
       foreach (var component in Components)

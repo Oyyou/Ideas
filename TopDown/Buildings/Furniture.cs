@@ -64,7 +64,7 @@ namespace TopDown.Buildings
             if (GameScreen.Mouse.LeftClicked)
             {
               State = FurnatureStates.Placed;
-              _gameState.State = States.States.ItemMenu;
+              _gameState.State = States.GameStates.ItemMenu;
               _gameState.ItemMenu.CurrentButton.CurrentState = Controls.ItemMenu.ItemMenuButtonStates.Placed;
             }
           }

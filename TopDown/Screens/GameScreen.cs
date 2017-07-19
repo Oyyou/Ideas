@@ -23,7 +23,7 @@ using TopDown.Sprites;
 
 namespace TopDown.States
 {
-  public enum States
+  public enum GameStates
   {
     Playing,
     BuildMenu,
@@ -74,7 +74,7 @@ namespace TopDown.States
 
     public Building SelectedBuilding { get; set; }
 
-    public States State { get; set; }
+    public GameStates State { get; set; }
 
     public void AddComponent(Building building)
     {
@@ -105,7 +105,7 @@ namespace TopDown.States
       if (Keyboard.IsKeyPressed(Keys.B) ||
           Keyboard.IsKeyPressed(Keys.Escape))
       {
-        State = States.Playing;
+        State = GameStates.Playing;
       }
     }
 
@@ -134,7 +134,7 @@ namespace TopDown.States
     {
       base.LoadContent(gameModel);
 
-      State = States.Playing;
+      State = GameStates.Playing;
 
       _buildMenu = new BuildMenuWindow(this);
       ItemMenu = new ItemMenu(this);
@@ -292,7 +292,7 @@ namespace TopDown.States
       _camera.Follow(((Sprite)_gameComponents[0]).Position);
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
-        State = States.BuildMenu;
+        State = GameStates.BuildMenu;
 
       if (Keyboard.IsKeyPressed(Keys.Enter))
         MessageBox.Show("You just pressed Enter. Well done :)");
@@ -327,17 +327,17 @@ namespace TopDown.States
     {
       switch (State)
       {
-        case States.Playing:
+        case GameStates.Playing:
 
           PlayingUpdate(gameTime);
 
           break;
-        case States.BuildMenu:
+        case GameStates.BuildMenu:
 
           BuildMenuUpdate(gameTime);
 
           break;
-        case States.PlacingBuilding:
+        case GameStates.PlacingBuilding:
 
           foreach (var component in _guiComponents)
             component.Update(gameTime);
@@ -357,7 +357,7 @@ namespace TopDown.States
 
           if (Keyboard.IsKeyPressed(Keys.B))
           {
-            State = States.BuildMenu;
+            State = GameStates.BuildMenu;
 
             if (SelectedBuilding != null)
             {
@@ -374,7 +374,7 @@ namespace TopDown.States
 
           if (Keyboard.IsKeyPressed(Keys.Escape))
           {
-            State = States.Playing;
+            State = GameStates.Playing;
 
             if (SelectedBuilding != null)
             {
@@ -390,7 +390,7 @@ namespace TopDown.States
           }
 
           break;
-        case States.ItemMenu:
+        case GameStates.ItemMenu:
 
           foreach (var component in _guiComponents)
             component.Update(gameTime);
@@ -410,7 +410,7 @@ namespace TopDown.States
 
           if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
           {
-            State = States.BuildMenu;
+            State = GameStates.BuildMenu;
 
             if (SelectedBuilding != null)
             {
@@ -429,7 +429,7 @@ namespace TopDown.States
 
           if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
           {
-            State = States.Playing;
+            State = GameStates.Playing;
 
             if (SelectedBuilding != null)
             {
@@ -447,7 +447,7 @@ namespace TopDown.States
           }
 
           break;
-        case States.PlacingItems:
+        case GameStates.PlacingItems:
 
           foreach (var component in _guiComponents)
             component.Update(gameTime);
@@ -467,7 +467,7 @@ namespace TopDown.States
 
           if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
           {
-            State = States.ItemMenu;
+            State = GameStates.ItemMenu;
 
             if (SelectedBuilding != null)
               SelectedBuilding.Components.Last().IsRemoved = true;

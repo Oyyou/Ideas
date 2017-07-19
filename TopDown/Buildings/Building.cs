@@ -54,7 +54,7 @@ namespace TopDown.Buildings
 
     protected Texture2D _woodChipTexture;
 
-    public BuildingStates BuildingState
+    public virtual BuildingStates BuildingState
     {
       get { return State; }
       set
@@ -70,33 +70,9 @@ namespace TopDown.Buildings
         switch (State)
         {
           case BuildingStates.Placing:
-            CollisionRectangles = new List<Rectangle>();
-            break;
           case BuildingStates.Placed:
           case BuildingStates.Building:
-            CollisionRectangles = new List<Rectangle>()
-            {
-              new Rectangle((int)Position.X, (int)Position.Y, width, height),
-            };
-            break;
-          case BuildingStates.Built_Out:
-
-            var yDiff = _template.OutExtraHeight;
-            var xDiff = _template.OutExtraWidth;
-
-            var collisionRectangles = new List<Rectangle>()
-            {
-              new Rectangle((int)Position.X, (int)Position.Y, width - xDiff, 1), // Top
-              new Rectangle((int)Position.X, (int)Position.Y, 1, height - yDiff), // Left
-              new Rectangle((int)Position.X + (width - 1) - xDiff, (int)Position.Y, 1, height - yDiff), // Right
-              new Rectangle((int)Position.X, (int)Position.Y + height - yDiff - 1, 16, 1), // bottom left
-              new Rectangle((int)Position.X + 64, (int)Position.Y + height - yDiff - 1, width - 64 - xDiff, 1), // bottom right
-            };
-
-            collisionRectangles.AddRange(Components.SelectMany(c => c.CollisionRectangles).ToList());
-
-            CollisionRectangles = collisionRectangles;
-
+            CollisionRectangles = new List<Rectangle>();
             break;
         }
       }
@@ -156,7 +132,7 @@ namespace TopDown.Buildings
       }
     }
 
-    public Vector2 Position
+    public override Vector2 Position
     {
       get { return CurrentSprite.Position; }
       set
@@ -208,7 +184,7 @@ namespace TopDown.Buildings
               if (_buildTimer > _maxBuildTimer)
               {
                 BuildingState = BuildingStates.Built_Out;
-                _gameState.State = States.States.Playing;
+                _gameState.State = States.GameStates.Playing;
 
                 Position = new Vector2(Position.X - (_template.OutExtraWidth / 2), Position.Y - _template.OutExtraHeight);
               }
@@ -257,15 +233,15 @@ namespace TopDown.Buildings
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      CurrentSprite.Draw(gameTime, spriteBatch);
-
       switch (BuildingState)
       {
         case BuildingStates.Placing:
+          CurrentSprite.Draw(gameTime, spriteBatch);
 
           break;
 
         case BuildingStates.Placed:
+          CurrentSprite.Draw(gameTime, spriteBatch);
 
           foreach (var component in Components)
             component.Draw(gameTime, spriteBatch);
@@ -273,6 +249,7 @@ namespace TopDown.Buildings
           break;
 
         case BuildingStates.Building:
+          CurrentSprite.Draw(gameTime, spriteBatch);
 
           foreach (var particle in _particles)
             particle.Draw(gameTime, spriteBatch);
@@ -280,6 +257,7 @@ namespace TopDown.Buildings
           break;
 
         case BuildingStates.Built_In:
+          CurrentSprite.Draw(gameTime, spriteBatch);
 
           foreach (var component in Components)
           {
@@ -292,6 +270,12 @@ namespace TopDown.Buildings
           break;
 
         case BuildingStates.Built_Out:
+          _placedSprite.Position = new Vector2(Position.X + (_template.OutExtraWidth / 2), Position.Y + _template.OutExtraHeight);
+          _placedSprite.Layer =  _builtSprite.Layer - 0.002f;
+          _placedSprite.Draw(gameTime, spriteBatch);
+
+          _builtSprite.Draw(gameTime, spriteBatch);
+
 
           foreach (var component in Components)
           {
@@ -332,12 +316,12 @@ namespace TopDown.Buildings
     {
       _t = content.Load<Texture2D>("Buildings/SmallHouse/Out");
 
-      _builtSprite = new Sprite(content.Load<Texture2D>("Buildings/SmallHouse/Out"))
+      _builtSprite = new Sprite(_template.TextureOut)
       {
         Layer = DefaultLayer,
       };
 
-      _placedSprite = new Sprite(content.Load<Texture2D>("Buildings/SmallHouse/In"))
+      _placedSprite = new Sprite(_template.TextureIn)
       {
         Layer = DefaultLayer,
       };
@@ -414,7 +398,7 @@ namespace TopDown.Buildings
           if (GameScreen.Mouse.LeftClicked && canPlace)
           {
             BuildingState = BuildingStates.Placed;
-            _gameState.State = States.States.ItemMenu;
+            _gameState.State = States.GameStates.ItemMenu;
           }
 
           break;

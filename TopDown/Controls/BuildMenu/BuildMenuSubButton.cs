@@ -12,7 +12,7 @@ namespace TopDown.Controls.BuildMenu
 {
   public class BuildMenuSubButton : Button
   {
-    public States.States GameScreenSetValue { get; set; }
+    public States.GameStates GameScreenSetValue { get; set; }
 
     public List<ItemMenuButton> Items { get; set; }
 

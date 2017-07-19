@@ -34,7 +34,7 @@ namespace TopDown.Controls.ItemMenu
 
     private void Cancel_Click(object sender, EventArgs e)
     {
-      _gameState.State = States.States.BuildMenu;
+      _gameState.State = States.GameStates.BuildMenu;
 
       if (_gameState.SelectedBuilding != null)
       {
@@ -58,7 +58,7 @@ namespace TopDown.Controls.ItemMenu
 
     private void Done_Click(object sender, EventArgs e)
     {
-      _gameState.State = States.States.Playing;
+      _gameState.State = States.GameStates.Playing;
 
       if (_gameState.SelectedBuilding != null)
       {
@@ -84,8 +84,8 @@ namespace TopDown.Controls.ItemMenu
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      if (_gameState.State != States.States.PlacingItems &&
-        _gameState.State != States.States.ItemMenu)
+      if (_gameState.State != States.GameStates.PlacingItems &&
+        _gameState.State != States.GameStates.ItemMenu)
         return;
 
       _background.Draw(gameTime, spriteBatch);
@@ -141,8 +141,8 @@ namespace TopDown.Controls.ItemMenu
 
     public override void Update(GameTime gameTime)
     {
-      if (_gameState.State != States.States.PlacingItems &&
-        _gameState.State != States.States.ItemMenu)
+      if (_gameState.State != States.GameStates.PlacingItems &&
+        _gameState.State != States.GameStates.ItemMenu)
         return;
 
       _background.Update(gameTime);
