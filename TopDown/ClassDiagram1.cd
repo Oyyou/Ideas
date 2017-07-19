@@ -10,7 +10,7 @@
   <Class Name="TopDown.Buildings.Building" Collapsed="true">
     <Position X="11.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>BAQAEBEAARAQAgCiAAAAAAAIAgAgwACkgFAAhAAAAhQ=</HashCode>
+      <HashCode>AIQAEBEAARAwQgACAAAAAAAIAgAwwAChgEAAhAAAQgQ=</HashCode>
       <FileName>Buildings\Building.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -21,20 +21,6 @@
       <FileName>Buildings\Furniture.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="TopDown.Buildings.Templates.BuildingTemplate" Collapsed="true">
-    <Position X="8.25" Y="4.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>CAAQAAAAABAAAEAAAAAgAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Buildings\Templates\BuildingTemplate.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="TopDown.Buildings.Templates.SmallHouseTemplate" Collapsed="true">
-    <Position X="7" Y="5.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Buildings\Templates\SmallHouseTemplate.cs</FileName>
-    </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.BuildMenu.BuildMenuSubButton" Collapsed="true">
     <Position X="3.75" Y="3.25" Width="1.5" />
@@ -258,22 +244,15 @@
   <Class Name="TopDown.Buildings.Housing.SmallHouse" Collapsed="true">
     <Position X="10.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <HashCode>AIAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
       <FileName>Buildings\Housing\SmallHouse.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Buildings.Labour.Blacksmith" Collapsed="true">
     <Position X="12.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <HashCode>AIAAAAAAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAAAAAAA=</HashCode>
       <FileName>Buildings\Labour\Blacksmith.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="TopDown.Buildings.Templates.BlacksmithTemplate" Collapsed="true">
-    <Position X="9.25" Y="5.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Buildings\Templates\BlacksmithTemplate.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.MessageBox" Collapsed="true">

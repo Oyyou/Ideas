@@ -12,7 +12,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using TopDown.FX;
 using Engine.Sprites;
-using TopDown.Buildings.Templates;
 
 namespace TopDown.Buildings
 {
@@ -29,7 +28,7 @@ namespace TopDown.Buildings
   {
     protected float _buildTimer;
 
-    protected Sprite _builtSprite;
+    protected Sprite _spriteOutside;
 
     protected GameScreen _gameState;
 
@@ -39,9 +38,13 @@ namespace TopDown.Buildings
 
     protected const float _maxHitTimer = 0.3f;
 
+    protected virtual int _outsideExtraHeight { get; }
+
+    protected virtual int _outsideExtraWidth { get; }
+
     protected List<Sprite> _particles;
 
-    protected Sprite _placedSprite;
+    protected Sprite _spriteInside;
 
     protected SoundEffect _soundEffect;
 
@@ -50,7 +53,9 @@ namespace TopDown.Buildings
     /// </summary>
     protected SoundEffectInstance _soundEffectInstance;
 
-    protected BuildingTemplate _template;
+    protected Texture2D _textureInside;
+
+    protected Texture2D _textureOutside;
 
     protected Texture2D _woodChipTexture;
 
@@ -63,9 +68,6 @@ namespace TopDown.Buildings
           return;
 
         State = value;
-
-        var height = CurrentSprite.Rectangle.Height;
-        var width = CurrentSprite.Rectangle.Width;
 
         switch (State)
         {
@@ -80,79 +82,19 @@ namespace TopDown.Buildings
 
     public Color Color { get; set; }
 
-    public virtual Sprite CurrentSprite
-    {
-      get
-      {
-        switch (BuildingState)
-        {
-          case BuildingStates.Placing:
-          case BuildingStates.Building:
-          case BuildingStates.Placed:
-          case BuildingStates.Built_In:
-            return _placedSprite;
-
-          case BuildingStates.Built_Out:
-            return _builtSprite;
-
-          default:
-            throw new Exception("Unknown state: " + BuildingState);
-        }
-      }
-    }
-
     public const float DefaultLayer = 0.8f;
 
+    /// <summary>
+    /// Locations in which there has to be at least one path so we can place the building.
+    /// </summary>
     public virtual List<Vector2> DoorLocations
     {
       get
       {
         return new List<Vector2>()
         {
-          new Vector2(Rectangle.X + 32, Rectangle.Bottom),
+          new Vector2(_spriteInside.Rectangle.X + 32, _spriteInside.Rectangle.Bottom),
         };
-      }
-    }
-
-    public Rectangle InsideRectangle
-    {
-      get
-      {
-        switch (State)
-        {
-          case BuildingStates.Placing:
-          case BuildingStates.Built_In:
-          case BuildingStates.Placed:
-          case BuildingStates.Building:
-            return Rectangle;
-
-          case BuildingStates.Built_Out:
-            return new Rectangle(Rectangle.X + (_template.OutExtraWidth / 2), Rectangle.Y + _template.OutExtraHeight, Rectangle.Width - _template.OutExtraWidth, Rectangle.Height - _template.OutExtraHeight);
-
-        }
-
-        return Rectangle;
-      }
-    }
-
-    public override float Layer
-    {
-      get
-      {
-        return CurrentSprite.Layer;
-      }
-    }
-
-    public override Vector2 Position
-    {
-      get { return CurrentSprite.Position; }
-      set
-      {
-        if (_builtSprite != null)
-          _builtSprite.Position = value;
-
-        if (_placedSprite != null)
-          _placedSprite.Position = value;
       }
     }
 
@@ -160,7 +102,12 @@ namespace TopDown.Buildings
     {
       get
       {
-        return new Rectangle((int)Position.X, (int)Position.Y, CurrentSprite.Rectangle.Width, CurrentSprite.Rectangle.Height);
+        return _spriteInside.Rectangle;
+      }
+
+      set
+      {
+        base.Rectangle = value;
       }
     }
 
@@ -171,9 +118,9 @@ namespace TopDown.Buildings
       if (GameScreen.Mouse.MouseState != Controls.MouseStates.Building)
         return;
 
-      if (GameScreen.Mouse.RectangleWithCamera.Intersects(this.Rectangle))
+      if (GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
       {
-        if (Vector2.Distance(this.Position + new Vector2(Rectangle.Width / 2, Rectangle.Height / 2), _gameState.Player.Position) < 150)
+        if (Vector2.Distance(_spriteInside.Position + new Vector2(_spriteInside.Rectangle.Width / 2, _spriteInside.Rectangle.Height / 2), _gameState.Player.Position) < 150)
         {
           Color = Color.Yellow;
 
@@ -196,8 +143,6 @@ namespace TopDown.Buildings
               {
                 BuildingState = BuildingStates.Built_Out;
                 _gameState.State = States.GameStates.Playing;
-
-                Position = new Vector2(Position.X - (_template.OutExtraWidth / 2), Position.Y - _template.OutExtraHeight);
               }
 
               _hitTimer = 0f;
@@ -220,17 +165,22 @@ namespace TopDown.Buildings
       }
 
       foreach (var component in Components)
+      {
+        component.Layer = _spriteInside.Layer + 0.001f;
         component.Update(gameTime);
+      }
 
       foreach (var component in _particles)
         component.Update(gameTime);
     }
 
-    public Building(GameScreen gameState, BuildingTemplate template)
+    public Building(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside)
     {
       _gameState = gameState;
 
-      _template = template;
+      _textureInside = textureInside;
+
+      _textureOutside = textureOutside;
 
       _particles = new List<Sprite>();
 
@@ -247,7 +197,7 @@ namespace TopDown.Buildings
       switch (BuildingState)
       {
         case BuildingStates.Placing:
-          CurrentSprite.Draw(gameTime, spriteBatch);
+          _spriteInside.Draw(gameTime, spriteBatch);
 
           foreach (var doorLocation in DoorLocations)
           {
@@ -257,7 +207,7 @@ namespace TopDown.Buildings
           break;
 
         case BuildingStates.Placed:
-          CurrentSprite.Draw(gameTime, spriteBatch);
+          _spriteInside.Draw(gameTime, spriteBatch);
 
           foreach (var component in Components)
             component.Draw(gameTime, spriteBatch);
@@ -265,39 +215,36 @@ namespace TopDown.Buildings
           break;
 
         case BuildingStates.Building:
-          CurrentSprite.Draw(gameTime, spriteBatch);
+          _spriteInside.Draw(gameTime, spriteBatch);
 
           foreach (var particle in _particles)
             particle.Draw(gameTime, spriteBatch);
 
+          //foreach (var rec in CollisionRectangles)
+          //  spriteBatch.Draw(texture: _t, destinationRectangle: rec, color: Color.Red, layerDepth: 1f);
+
           break;
 
         case BuildingStates.Built_In:
-          CurrentSprite.Draw(gameTime, spriteBatch);
+          _spriteInside.Draw(gameTime, spriteBatch);
 
           foreach (var component in Components)
-          {
-            component.Layer = CurrentSprite.Layer + 0.001f;
             component.Draw(gameTime, spriteBatch);
-          }
 
           //foreach (var rec in CollisionRectangles)
           //  spriteBatch.Draw(_t, rec, Color.Red);
           break;
 
         case BuildingStates.Built_Out:
-          _placedSprite.Position = new Vector2(Position.X + (_template.OutExtraWidth / 2), Position.Y + _template.OutExtraHeight);
-          _placedSprite.Layer = _builtSprite.Layer - 0.002f;
-          _placedSprite.Draw(gameTime, spriteBatch);
 
-          _builtSprite.Draw(gameTime, spriteBatch);
+          _spriteInside.Layer = _spriteOutside.Layer - 0.001f;
+          _spriteInside.Draw(gameTime, spriteBatch);
+
+          _spriteOutside.Draw(gameTime, spriteBatch);
 
 
           foreach (var component in Components)
-          {
-            component.Layer = CurrentSprite.Layer - 0.001f;
             component.Draw(gameTime, spriteBatch);
-          }
 
           //foreach (var rec in CollisionRectangles)
           //  spriteBatch.Draw(texture: _t, destinationRectangle: rec, color: Color.Red, layerDepth: 1f);
@@ -313,15 +260,15 @@ namespace TopDown.Buildings
     protected void GenerateParticle(float lifeTimer)
     {
       var position = new Vector2(
-        GameEngine.Random.Next((int)Position.X, (int)Position.X + Rectangle.Width),
-        GameEngine.Random.Next((int)Position.Y, (int)Position.Y + Rectangle.Height)
+        GameEngine.Random.Next(_spriteInside.Rectangle.Left, _spriteInside.Rectangle.Right),
+        GameEngine.Random.Next(_spriteInside.Rectangle.Top, _spriteInside.Rectangle.Bottom)
       );
 
       _particles.Add(
         new Particle(_woodChipTexture)
         {
           Position = position,
-          Layer = DefaultLayer + 0.01f,
+          Layer = _spriteInside.Layer + 0.01f,
           LifeTimer = lifeTimer,
           Rotation = MathHelper.ToRadians(GameEngine.Random.Next(0, 360)),
         }
@@ -332,12 +279,12 @@ namespace TopDown.Buildings
     {
       _t = content.Load<Texture2D>("Pixel");
 
-      _builtSprite = new Sprite(_template.TextureOut)
+      _spriteOutside = new Sprite(_textureOutside)
       {
         Layer = DefaultLayer,
       };
 
-      _placedSprite = new Sprite(_template.TextureIn)
+      _spriteInside = new Sprite(_textureInside)
       {
         Layer = DefaultLayer,
       };
@@ -352,8 +299,8 @@ namespace TopDown.Buildings
 
     public override void UnloadContent()
     {
-      _builtSprite?.UnloadContent();
-      _placedSprite?.UnloadContent();
+      _spriteOutside?.UnloadContent();
+      _spriteInside?.UnloadContent();
       _soundEffect?.Dispose();
 
       foreach (var component in Components)
@@ -366,17 +313,17 @@ namespace TopDown.Buildings
       {
         case BuildingStates.Placing:
 
-          Position = new Vector2(
+          _spriteInside.Position = new Vector2(
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
 
           bool canPlace = false;
 
-          CurrentSprite.Color = Color.White;
+          _spriteInside.Color = Color.White;
 
           foreach (var component in _gameState.PathComponents)
           {
-            if (component.Rectangle.Intersects(this.Rectangle))
+            if (component.Rectangle.Intersects(_spriteInside.Rectangle))
             {
               canPlace = false;
               GameScreen.MessageBox.Show("Trying to build over path", false);
@@ -407,10 +354,11 @@ namespace TopDown.Buildings
           }
 
           if (!canPlace)
-            CurrentSprite.Color = Color.Red;
+            _spriteInside.Color = Color.Red;
 
           if (GameScreen.Mouse.LeftClicked && canPlace)
           {
+            _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
             BuildingState = BuildingStates.Placed;
             _gameState.State = States.GameStates.ItemMenu;
           }
@@ -419,7 +367,10 @@ namespace TopDown.Buildings
         case BuildingStates.Placed:
 
           foreach (var component in Components)
+          {
+            component.Layer = _spriteInside.Layer + 0.001f;
             component.Update(gameTime);
+          }
 
 
           break;
@@ -432,19 +383,21 @@ namespace TopDown.Buildings
           _particles.Clear();
 
           foreach (var component in Components)
+          {
+            component.Layer = _spriteOutside.Layer - 0.001f;
             component.Update(gameTime);
+          }
 
-          if (_gameState.Player.IsIn(this.InsideRectangle) ||
+          if (_gameState.Player.IsIn(_spriteInside.Rectangle) ||
             (_gameState.SelectedPathBuilder != null && _gameState.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
           {
-            Position = new Vector2(Position.X + (_template.OutExtraWidth / 2), Position.Y + _template.OutExtraHeight);
             State = BuildingStates.Built_In;
           }
 
-          if (_gameState.Player.Rectangle.Y <= InsideRectangle.Y + 60)
-            CurrentSprite.Layer = _gameState.Player.Layer + 0.001f;
-          else
-            CurrentSprite.Layer = Building.DefaultLayer;
+          //if (_gameState.Player.Rectangle.Y <= InsideRectangle.Y + 60)
+          //  _spriteOutside.Layer = _gameState.Player.Layer + 0.001f;
+          //else
+          //  _spriteOutside.Layer = Building.DefaultLayer;
 
           break;
 
@@ -452,18 +405,21 @@ namespace TopDown.Buildings
 
           _particles.Clear();
 
-          foreach (var component in Components)
-            component.Update(gameTime);
+          _spriteInside.Layer = Building.DefaultLayer;
 
-          if (!_gameState.Player.IsIn(this.InsideRectangle) &&
+          foreach (var component in Components)
+          {
+            component.Layer = _spriteInside.Layer + 0.001f;
+            component.Update(gameTime);
+          }
+
+          if (!_gameState.Player.IsIn(_spriteInside.Rectangle) &&
             !(_gameState.SelectedPathBuilder != null && _gameState.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
           {
             // Set Position
-            Position = new Vector2(Position.X - (_template.OutExtraWidth / 2), Position.Y - _template.OutExtraHeight);
+            //Position = new Vector2(Position.X - (_template.OutExtraWidth / 2), Position.Y - _template.OutExtraHeight);
             State = BuildingStates.Built_Out;
           }
-
-          CurrentSprite.Layer = Building.DefaultLayer;
 
           break;
 

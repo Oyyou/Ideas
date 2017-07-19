@@ -1,16 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TopDown.Buildings.Templates;
 using TopDown.States;
 
 namespace TopDown.Buildings.Labour
 {
   public class Blacksmith : Building
   {
+    protected override int _outsideExtraHeight => 64;
+
+    protected override int _outsideExtraWidth => 40;
+
     public override BuildingStates BuildingState
     {
       get { return State; }
@@ -21,9 +25,6 @@ namespace TopDown.Buildings.Labour
 
         State = value;
 
-        var height = CurrentSprite.Rectangle.Height;
-        var width = CurrentSprite.Rectangle.Width;
-
         switch (State)
         {
           case BuildingStates.Placing:
@@ -33,22 +34,25 @@ namespace TopDown.Buildings.Labour
           case BuildingStates.Building:
             CollisionRectangles = new List<Rectangle>()
             {
-              new Rectangle((int)Position.X, (int)Position.Y, width, height),
+              _spriteInside.Rectangle,
             };
             break;
           case BuildingStates.Built_Out:
 
-            var yDiff = _template.OutExtraHeight;
-            var xDiff = _template.OutExtraWidth;
+            var height = _spriteInside.Rectangle.Height;
+            var width = _spriteInside.Rectangle.Width;
+
+            var x = (int)_spriteInside.Position.X;
+            var y = (int)_spriteInside.Position.Y;
 
             var collisionRectangles = new List<Rectangle>()
             {
-              new Rectangle((int)Position.X, (int)Position.Y, width - xDiff, 1), // Top
-              new Rectangle((int)Position.X, (int)Position.Y, 1, 96), // Left
-              new Rectangle((int)Position.X + (width - 1) - xDiff, (int)Position.Y, 1, height - yDiff), // Right
-              new Rectangle((int)Position.X + 49, (int)Position.Y + 95, 48, 1), // bottom left
-              new Rectangle((int)Position.X + 96, (int)Position.Y + 96, 1, 64),
-              new Rectangle((int)Position.X + 96, (int)Position.Y + height - yDiff - 1, 96, 1), // bottom right
+              new Rectangle(x, y, width, 1), // Top
+              new Rectangle(x, y, 1, 96), // Left
+              new Rectangle(x + (width - 1), y, 1, height), // Right
+              new Rectangle(x + 49, y + 95, 48, 1), // bottom left
+              new Rectangle(x + 96, y + 96, 1, 64),
+              new Rectangle(x + 96, y + height - 1, 96, 1), // bottom right
             };
 
             collisionRectangles.AddRange(Components.SelectMany(c => c.CollisionRectangles).ToList());
@@ -66,16 +70,16 @@ namespace TopDown.Buildings.Labour
       {
         return new List<Vector2>()
         {
-          new Vector2(Rectangle.X - 32, Rectangle.Y + 96),
-          new Vector2(Rectangle.X - 32, Rectangle.Y + 128),
-          new Vector2(Rectangle.X , Rectangle.Bottom),
-          new Vector2(Rectangle.X + 32, Rectangle.Bottom),
-          new Vector2(Rectangle.X + 64, Rectangle.Bottom),
+          new Vector2(_spriteInside.Rectangle.X - 32, _spriteInside.Rectangle.Y + 96),
+          new Vector2(_spriteInside.Rectangle.X - 32, _spriteInside.Rectangle.Y + 128),
+          new Vector2(_spriteInside.Rectangle.X , _spriteInside.Rectangle.Bottom),
+          new Vector2(_spriteInside.Rectangle.X + 32, _spriteInside.Rectangle.Bottom),
+          new Vector2(_spriteInside.Rectangle.X + 64, _spriteInside.Rectangle.Bottom),
         };
       }
     }
 
-    public Blacksmith(GameScreen gameState, BuildingTemplate template) : base(gameState, template)
+    public Blacksmith(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
     {
     }
   }

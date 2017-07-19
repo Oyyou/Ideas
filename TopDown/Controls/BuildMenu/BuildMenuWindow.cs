@@ -11,7 +11,6 @@ using Engine.Sprites;
 using Microsoft.Xna.Framework.Input;
 using Engine.Controls;
 using TopDown.States;
-using TopDown.Buildings.Templates;
 using TopDown.Builders;
 using TopDown.Buildings;
 using TopDown.Controls.ItemMenu;
@@ -225,7 +224,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void SmallHouse_Click(object sender, EventArgs e)
     {
-      _gameState.AddComponent(new SmallHouse(_gameState, new SmallHouseTemplate(_content))
+      _gameState.AddComponent(new SmallHouse(_gameState, _content.Load<Texture2D>("Buildings/SmallHouse/In"), _content.Load<Texture2D>("Buildings/SmallHouse/Out"))
       {
         BuildingState = Buildings.BuildingStates.Placing,
       });
@@ -318,7 +317,7 @@ namespace TopDown.Controls.BuildMenu
 
     private void Blacksmith_Click(object sender, EventArgs e)
     {
-      _gameState.AddComponent(new Blacksmith(_gameState, new BlacksmithTemplate(_content))
+      _gameState.AddComponent(new Blacksmith(_gameState, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
       {
         BuildingState = Buildings.BuildingStates.Placing,
       });

@@ -46,9 +46,6 @@
     <Compile Include="Buildings\Furniture.cs" />
     <Compile Include="Buildings\Housing\SmallHouse.cs" />
     <Compile Include="Buildings\Labour\Blacksmith.cs" />
-    <Compile Include="Buildings\Templates\BuildingTemplate.cs" />
-    <Compile Include="Buildings\Templates\BlacksmithTemplate.cs" />
-    <Compile Include="Buildings\Templates\SmallHouseTemplate.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuSubButton.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuWindow.cs" />
     <Compile Include="Controls\ItemMenu\ItemMenu.cs" />
