@@ -18,7 +18,7 @@ namespace TopDown.Sprites
       {
         return new List<Rectangle>()
         {
-          new Rectangle(Rectangle.X, Rectangle.Y + (Rectangle.Height - 32), 32, 32),
+          new Rectangle(Rectangle.X + 4, Rectangle.Bottom - 24, 24, 24),
         };
       }
     }

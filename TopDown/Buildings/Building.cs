@@ -26,7 +26,19 @@ namespace TopDown.Buildings
 
   public class Building : Component
   {
+    protected class DoorLocation
+    {
+      public bool IsValid;
+
+      public Vector2 Position { get; set; }
+    }
+
     protected float _buildTimer;
+
+    /// <summary>
+    /// Locations in which there has to be at least one path so we can place the building.
+    /// </summary>
+    protected List<DoorLocation> _doorLocations;
 
     protected Sprite _spriteOutside;
 
@@ -83,20 +95,6 @@ namespace TopDown.Buildings
     public Color Color { get; set; }
 
     public const float DefaultLayer = 0.8f;
-
-    /// <summary>
-    /// Locations in which there has to be at least one path so we can place the building.
-    /// </summary>
-    public virtual List<Vector2> DoorLocations
-    {
-      get
-      {
-        return new List<Vector2>()
-        {
-          new Vector2(_spriteInside.Rectangle.X + 32, _spriteInside.Rectangle.Bottom),
-        };
-      }
-    }
 
     public override Rectangle Rectangle
     {
@@ -194,14 +192,25 @@ namespace TopDown.Buildings
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      if (!_updated)
+        return;
+
       switch (BuildingState)
       {
         case BuildingStates.Placing:
+
           _spriteInside.Draw(gameTime, spriteBatch);
 
-          foreach (var doorLocation in DoorLocations)
+          foreach (var doorLocation in _doorLocations)
           {
-            spriteBatch.Draw(_t, new Rectangle(doorLocation.ToPoint(), new Point(32, 32)), Color.Red);
+            var color = Color.LightGreen;
+            if (!doorLocation.IsValid)
+              color = Color.Red;
+
+            spriteBatch.Draw(texture: _t,
+              destinationRectangle: new Rectangle(doorLocation.Position.ToPoint(), new Point(32, 32)),
+              color: color,
+              layerDepth: _spriteInside.Layer + 0.01f);
           }
 
           break;
@@ -237,7 +246,6 @@ namespace TopDown.Buildings
 
         case BuildingStates.Built_Out:
 
-          _spriteInside.Layer = _spriteOutside.Layer - 0.001f;
           _spriteInside.Draw(gameTime, spriteBatch);
 
           _spriteOutside.Draw(gameTime, spriteBatch);
@@ -297,6 +305,18 @@ namespace TopDown.Buildings
       Components = new List<Component>();
     }
 
+    protected virtual void SetDoorLocations()
+    {
+      _doorLocations = new List<DoorLocation>()
+      {
+        new DoorLocation()
+        {
+          Position = new Vector2(_spriteInside.Rectangle.X + 32, _spriteInside.Rectangle.Bottom),
+          IsValid = false,
+        },
+      };
+    }
+
     public override void UnloadContent()
     {
       _spriteOutside?.UnloadContent();
@@ -307,8 +327,12 @@ namespace TopDown.Buildings
         component.UnloadContent();
     }
 
+    private bool _updated = false;
+
     public override void Update(GameTime gameTime)
     {
+      _updated = true;
+
       switch (BuildingState)
       {
         case BuildingStates.Placing:
@@ -316,6 +340,8 @@ namespace TopDown.Buildings
           _spriteInside.Position = new Vector2(
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
+
+          SetDoorLocations();
 
           bool canPlace = false;
 
@@ -330,11 +356,14 @@ namespace TopDown.Buildings
               break;
             }
 
-            if (DoorLocations.Any(c => c == component.Position))
+            _doorLocations.ForEach(c =>
             {
-              canPlace = true;
-              continue;
-            }
+              if (c.Position == component.Position)
+              {
+                canPlace = true;
+                c.IsValid = true;
+              }
+            });
           }
 
           if (!canPlace && !GameScreen.MessageBox.IsVisible)
@@ -381,6 +410,8 @@ namespace TopDown.Buildings
         case BuildingStates.Built_Out:
 
           _particles.Clear();
+
+          _spriteInside.Layer = _spriteOutside.Layer - 0.002f;
 
           foreach (var component in Components)
           {

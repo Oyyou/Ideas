@@ -64,23 +64,40 @@ namespace TopDown.Buildings.Labour
       }
     }
 
-    public override List<Vector2> DoorLocations
-    {
-      get
-      {
-        return new List<Vector2>()
-        {
-          new Vector2(_spriteInside.Rectangle.X - 32, _spriteInside.Rectangle.Y + 96),
-          new Vector2(_spriteInside.Rectangle.X - 32, _spriteInside.Rectangle.Y + 128),
-          new Vector2(_spriteInside.Rectangle.X , _spriteInside.Rectangle.Bottom),
-          new Vector2(_spriteInside.Rectangle.X + 32, _spriteInside.Rectangle.Bottom),
-          new Vector2(_spriteInside.Rectangle.X + 64, _spriteInside.Rectangle.Bottom),
-        };
-      }
-    }
-
     public Blacksmith(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
     {
+    }
+
+    protected override void SetDoorLocations()
+    {
+      _doorLocations = new List<DoorLocation>()
+      {
+        new DoorLocation()
+        {
+          Position = new Vector2(_spriteInside.Rectangle.X - 32, _spriteInside.Rectangle.Y + 96),
+          IsValid = false,
+        },
+        new DoorLocation()
+        {
+          Position = new Vector2(_spriteInside.Rectangle.X - 32, _spriteInside.Rectangle.Y + 128),
+          IsValid = false,
+        },
+        new DoorLocation()
+        {
+          Position = new Vector2(_spriteInside.Rectangle.X , _spriteInside.Rectangle.Bottom),
+          IsValid = false,
+        },
+        new DoorLocation()
+        {
+          Position = new Vector2(_spriteInside.Rectangle.X + 32, _spriteInside.Rectangle.Bottom),
+          IsValid = false,
+        },
+        new DoorLocation()
+        {
+          Position = new Vector2(_spriteInside.Rectangle.X + 64, _spriteInside.Rectangle.Bottom),
+          IsValid = false,
+        },
+      };
     }
   }
 }

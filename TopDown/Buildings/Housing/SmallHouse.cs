@@ -66,5 +66,17 @@ namespace TopDown.Buildings.Housing
     public SmallHouse(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
     {
     }
+
+    protected override void SetDoorLocations()
+    {
+      _doorLocations = new List<DoorLocation>()
+      {
+        new DoorLocation()
+        {
+          Position = new Vector2(_spriteInside.Rectangle.X + 32, _spriteInside.Rectangle.Bottom),
+          IsValid = false,
+        },
+      };
+    }
   }
 }
