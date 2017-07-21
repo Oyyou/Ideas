@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using TopDown.States;
 using TopDown.Buildings;
 using TopDown.Controls.BuildMenu;
+using Engine;
 
 namespace TopDown.Controls.ItemMenu
 {
@@ -52,9 +53,9 @@ namespace TopDown.Controls.ItemMenu
 
     public bool CanClick { get; set; }
 
-    public Furniture Furniture { get; set; }
-
     public BuildMenuSubButton Parent { get; set; }
+
+    public Component PlacingObject { get; set; }
 
     public ItemMenuButtonStates CurrentState { get; set; }
 

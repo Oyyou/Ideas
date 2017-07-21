@@ -66,8 +66,6 @@ namespace TopDown.Sprites
     {
       var speed = 1f;
 
-      Velocity = Vector2.Zero;
-
       if (Keyboard.GetState().IsKeyDown(Keys.A))
         Velocity.X = -speed;
       else if (Keyboard.GetState().IsKeyDown(Keys.D))

@@ -15,17 +15,17 @@ namespace TopDown.Buildings.Labour
 
     protected override int _outsideExtraWidth => 40;
 
-    public override BuildingStates BuildingState
+    public override BuildingStates State
     {
-      get { return State; }
+      get { return _state; }
       set
       {
-        if (State == value)
+        if (_state == value)
           return;
 
-        State = value;
+        _state = value;
 
-        switch (State)
+        switch (_state)
         {
           case BuildingStates.Placing:
             CollisionRectangles = new List<Rectangle>();

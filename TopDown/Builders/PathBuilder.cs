@@ -12,6 +12,7 @@ using TopDown.States;
 using Microsoft.Xna.Framework.Input;
 using TopDown.Logic;
 using TopDown.Buildings;
+using TopDown.Sprites;
 
 namespace TopDown.Builders
 {
@@ -23,9 +24,9 @@ namespace TopDown.Builders
 
   public class PathBuilder : Component
   {
-    public List<Furniture> Furniture { get; set; }
+    public List<Path> Paths { get; set; }
 
-    public Furniture Path { get; set; }
+    public Path Path { get; set; }
 
     public PathBuilderStates State { get; set; }
 
@@ -43,7 +44,7 @@ namespace TopDown.Builders
 
           Path?.Draw(gameTime, spriteBatch);
 
-          foreach (var component in Furniture)
+          foreach (var component in Paths)
             component.Draw(gameTime, spriteBatch);
 
           break;
@@ -54,7 +55,7 @@ namespace TopDown.Builders
     {
       Components = new List<Component>();
 
-      Furniture = new List<Buildings.Furniture>();
+      Paths = new List<Path>();
 
       _texture = content.Load<Texture2D>("Sprites/Paths/StonePath");
     }
@@ -105,18 +106,16 @@ namespace TopDown.Builders
         {
           _pathPositions.Add(_currentMousePosition);
 
-          var sprite = Path.Clone() as Furniture;
-
-          sprite.State = FurnatureStates.Placed;
-
-          Furniture.Add(sprite);
+          var sprite = Path.Clone() as Path;
+          
+          Paths.Add(sprite);
         }
       }
       else if (GameScreen.Mouse.RightDown)
       {
         _pathPositions.Remove(_currentMousePosition);
 
-        Furniture.Remove(Furniture.Where(c => c.Position == _currentMousePosition).FirstOrDefault());
+        Paths.Remove(Paths.Where(c => c.Position == _currentMousePosition).FirstOrDefault());
       }
     }
   }

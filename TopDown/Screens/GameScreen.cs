@@ -14,10 +14,12 @@ using System.Text;
 using System.Threading.Tasks;
 using TopDown.Builders;
 using TopDown.Buildings;
+using TopDown.Buildings.Housing;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
 using TopDown.Controls.ItemMenu;
 using TopDown.Core;
+using TopDown.Logic;
 using TopDown.Resources;
 using TopDown.Sprites;
 
@@ -64,9 +66,11 @@ namespace TopDown.States
     {
       get
       {
-        return _gameComponents.Where(c => c is Furniture).ToList();
+        return _gameComponents.Where(c => c is Path).ToList();
       }
     }
+
+    public Pathfinder PathFinder;
 
     public TopDown.Sprites.Player Player { get; private set; }
 
@@ -136,6 +140,8 @@ namespace TopDown.States
 
       State = GameStates.Playing;
 
+      PathFinder = new Pathfinder();
+
       _buildMenu = new BuildMenuWindow(this);
       ItemMenu = new ItemMenu(this);
       //ItemMenu.LoadContent(_content);
@@ -153,18 +159,18 @@ namespace TopDown.States
 
       Resources = new Models.Resources();
 
-      Player = new TopDown.Sprites.Player(
-          new Dictionary<string, Animation>()
-          {
-            { "WalkLeft", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkLeft"), 3) },
-            { "WalkRight", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkRight"), 3) },
-            { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkUp"), 3) },
-            { "WalkDown", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkDown"), 3) },
-          }
-        )
+      var playerAnimations = new Dictionary<string, Animation>()
+      {
+        { "WalkLeft", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkLeft"), 4) },
+        { "WalkRight", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkRight"), 4) },
+        { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkUp"), 4) },
+        { "WalkDown", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkDown"), 4) },
+      };
+
+      Player = new TopDown.Sprites.Player(playerAnimations)
       {
         Layer = 0.9f,
-        Position = new Vector2(32, 32),
+        Position = new Vector2(512, 320),
       };
 
       _gameComponents = new List<Component>()
@@ -177,11 +183,11 @@ namespace TopDown.States
 
       var textures = map.Tileset.Select(c => _content.Load<Texture2D>("Tilemaps/" + c.Name)).ToList();
 
-      var x = 0;
-      var y = 0;
-
       foreach (var layer in map.Layer)
       {
+        var x = 0;
+        var y = 0;
+
         foreach (var data in layer.Data)
         {
           Texture2D texture = null;
@@ -225,6 +231,17 @@ namespace TopDown.States
                 );
                 break;
 
+              case 9:
+                _gameComponents.Add(
+                  new Path(texture)
+                  {
+                    Layer = 0.1f,
+                    Position = position,
+                    SourceRectangle = sourceRectangle,
+                  }
+                );
+                break;
+
               default:
                 _gameComponents.Add(
                   new Sprite(texture)
@@ -247,6 +264,62 @@ namespace TopDown.States
         }
       }
 
+      foreach (var objectGroup in map.ObjectGroups)
+      {
+        switch (objectGroup.Name)
+        {
+          case "Buildings":
+
+            foreach (var collisionObject in objectGroup.CollisionObjects)
+            {
+              switch (collisionObject.Name)
+              {
+                case "SmallHouse":
+
+                  var smallHouse = new SmallHouse(this, _content.Load<Texture2D>("Buildings/SmallHouse/In"), _content.Load<Texture2D>("Buildings/SmallHouse/Out"))
+                  {
+                    Position = new Vector2(collisionObject.X, collisionObject.Y),
+                    State = BuildingStates.Built_Out,
+                  };
+
+                  smallHouse.LoadContent(_content);
+
+                  _gameComponents.Add(smallHouse);
+
+                  break;
+
+                default:
+                  throw new Exception("Unknown building: " + collisionObject.Name);
+
+              }
+            }
+
+            break;
+
+          case "NPCs":
+
+            foreach (var collisionObject in objectGroup.CollisionObjects)
+            {
+              var position = new Vector2(collisionObject.X, collisionObject.Y);
+
+              _gameComponents.Add(new NPC(playerAnimations, this)
+              {
+                Position = position,
+                IsCollidable = false,
+                Layer = 0.9f,
+              });
+            }
+
+            break;
+
+          default:
+            throw new Exception("Unknown group: " + objectGroup.Name);
+        }
+      }
+
+      PathFinder.UpdateMap(PathComponents.Select(c => c.Position).ToList());
+      PathFinder.WriteMap();
+
       var buttonTexture = gameModel.ContentManger.Load<Texture2D>("Controls/Button");
       var buttonFont = gameModel.ContentManger.Load<SpriteFont>("Fonts/Font");
 
@@ -255,7 +328,8 @@ namespace TopDown.States
         Keyboard,
         Mouse,
         MessageBox,
-        new Toolbar(this),
+        new Toolbar_Top(this),
+        new Toolbar_Bottom(this),
         new ResourceView(Resources),
         _buildMenu,
         ItemMenu,

@@ -65,23 +65,25 @@ namespace TopDown.Buildings
     /// </summary>
     protected SoundEffectInstance _soundEffectInstance;
 
+    protected BuildingStates _state;
+
     protected Texture2D _textureInside;
 
     protected Texture2D _textureOutside;
 
     protected Texture2D _woodChipTexture;
 
-    public virtual BuildingStates BuildingState
+    public virtual BuildingStates State
     {
-      get { return State; }
+      get { return _state; }
       set
       {
-        if (State == value)
+        if (_state == value)
           return;
 
-        State = value;
+        _state = value;
 
-        switch (State)
+        switch (_state)
         {
           case BuildingStates.Placing:
           case BuildingStates.Placed:
@@ -96,6 +98,16 @@ namespace TopDown.Buildings
 
     public const float DefaultLayer = 0.8f;
 
+    public override Vector2 Position
+    {
+      get { return _spriteOutside.Position; }
+      set
+      {
+        _spriteInside.Position = value;
+        _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+      }
+    }
+
     public override Rectangle Rectangle
     {
       get
@@ -108,8 +120,6 @@ namespace TopDown.Buildings
         base.Rectangle = value;
       }
     }
-
-    public BuildingStates State;
 
     public void Build(GameTime gameTime)
     {
@@ -139,7 +149,7 @@ namespace TopDown.Buildings
 
               if (_buildTimer > _maxBuildTimer)
               {
-                BuildingState = BuildingStates.Built_Out;
+                State = BuildingStates.Built_Out;
                 _gameState.State = States.GameStates.Playing;
               }
 
@@ -183,6 +193,16 @@ namespace TopDown.Buildings
       _particles = new List<Sprite>();
 
       IsCollidable = true;
+
+      _spriteOutside = new Sprite(_textureOutside)
+      {
+        Layer = DefaultLayer,
+      };
+
+      _spriteInside = new Sprite(_textureInside)
+      {
+        Layer = DefaultLayer,
+      };
     }
 
     public override void CheckCollision(Component component)
@@ -195,7 +215,7 @@ namespace TopDown.Buildings
       if (!_updated)
         return;
 
-      switch (BuildingState)
+      switch (State)
       {
         case BuildingStates.Placing:
 
@@ -287,16 +307,6 @@ namespace TopDown.Buildings
     {
       _t = content.Load<Texture2D>("Pixel");
 
-      _spriteOutside = new Sprite(_textureOutside)
-      {
-        Layer = DefaultLayer,
-      };
-
-      _spriteInside = new Sprite(_textureInside)
-      {
-        Layer = DefaultLayer,
-      };
-
       _soundEffect = content.Load<SoundEffect>("Sounds/Sawing");
       _soundEffectInstance = _soundEffect.CreateInstance();
 
@@ -333,7 +343,7 @@ namespace TopDown.Buildings
     {
       _updated = true;
 
-      switch (BuildingState)
+      switch (State)
       {
         case BuildingStates.Placing:
 
@@ -388,7 +398,7 @@ namespace TopDown.Buildings
           if (GameScreen.Mouse.LeftClicked && canPlace)
           {
             _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
-            BuildingState = BuildingStates.Placed;
+            State = BuildingStates.Placed;
             _gameState.State = States.GameStates.ItemMenu;
           }
 
@@ -422,7 +432,7 @@ namespace TopDown.Buildings
           if (_gameState.Player.IsIn(_spriteInside.Rectangle) ||
             (_gameState.SelectedPathBuilder != null && _gameState.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
           {
-            State = BuildingStates.Built_In;
+            _state = BuildingStates.Built_In;
           }
 
           //if (_gameState.Player.Rectangle.Y <= InsideRectangle.Y + 60)
@@ -449,7 +459,7 @@ namespace TopDown.Buildings
           {
             // Set Position
             //Position = new Vector2(Position.X - (_template.OutExtraWidth / 2), Position.Y - _template.OutExtraHeight);
-            State = BuildingStates.Built_Out;
+            _state = BuildingStates.Built_Out;
           }
 
           break;

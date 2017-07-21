@@ -77,13 +77,14 @@ namespace TopDown.Controls
       }
     }
 
-    public Rectangle Rectangle
+    public override Rectangle Rectangle
     {
       get
       {
         return new Rectangle(_currentMouse.Position, new Point(1, 1));
       }
     }
+
     public Rectangle RectangleWithCamera
     {
       get

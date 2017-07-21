@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TopDown.Buildings
 {
-  public enum FurnatureStates
+  public enum PlacableObjectStates
   {
     Placing,
     Placed,
@@ -27,7 +27,7 @@ namespace TopDown.Buildings
 
     public Component Building { get; set; }
 
-    public FurnatureStates State { get; set; }
+    public PlacableObjectStates State { get; set; }
 
     public override void LoadContent(ContentManager content)
     {
@@ -47,7 +47,7 @@ namespace TopDown.Buildings
 
       switch (State)
       {
-        case FurnatureStates.Placing:
+        case PlacableObjectStates.Placing:
 
           if (!_updated)
           {
@@ -63,7 +63,7 @@ namespace TopDown.Buildings
           {
             if (GameScreen.Mouse.LeftClicked)
             {
-              State = FurnatureStates.Placed;
+              State = PlacableObjectStates.Placed;
               _gameState.State = States.GameStates.ItemMenu;
               _gameState.ItemMenu.CurrentButton.CurrentState = Controls.ItemMenu.ItemMenuButtonStates.Placed;
             }
@@ -74,7 +74,7 @@ namespace TopDown.Buildings
           }
 
           break;
-        case FurnatureStates.Placed:
+        case PlacableObjectStates.Placed:
 
           break;
         default:
@@ -88,11 +88,6 @@ namespace TopDown.Buildings
         this.Rectangle.Top >= Building.Rectangle.Top &&
         this.Rectangle.Right <= Building.Rectangle.Right &&
         this.Rectangle.Bottom <= Building.Rectangle.Bottom;
-    }
-
-    public object Clone()
-    {
-      return this.MemberwiseClone();
     }
   }
 }

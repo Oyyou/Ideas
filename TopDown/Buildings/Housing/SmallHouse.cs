@@ -15,17 +15,17 @@ namespace TopDown.Buildings.Housing
 
     protected override int _outsideExtraWidth => 40;
 
-    public override BuildingStates BuildingState
+    public override BuildingStates State
     {
-      get { return State; }
+      get { return _state; }
       set
       {
-        if (State == value)
+        if (_state == value)
           return;
 
-        State = value;
+        _state = value;
 
-        switch (State)
+        switch (_state)
         {
           case BuildingStates.Placing:
             CollisionRectangles = new List<Rectangle>();
@@ -54,7 +54,8 @@ namespace TopDown.Buildings.Housing
               new Rectangle(x + 64, y + height - 1, width - 64, 1), // bottom right
             };
 
-            collisionRectangles.AddRange(Components.SelectMany(c => c.CollisionRectangles).ToList());
+            if (Components != null)
+              collisionRectangles.AddRange(Components.SelectMany(c => c.CollisionRectangles).ToList());
 
             CollisionRectangles = collisionRectangles;
 

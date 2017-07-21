@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TopDown.Controls
 {
-  public class Toolbar : Component
+  public class Toolbar_Top : Component
   {
     private List<Button> _icons;
 
@@ -29,50 +29,44 @@ namespace TopDown.Controls
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      if (_gameState.State != GameStates.Playing)
+        return;
+
       _toolbarSprite.Draw(gameTime, spriteBatch);
 
       foreach (var icon in _icons)
         icon.Draw(gameTime, spriteBatch);
     }
 
-    private void FistButton_Click(object sender, EventArgs e)
-    {
-      GameScreen.Mouse.MouseState = MouseStates.Building;
-    }
-
     public override void LoadContent(ContentManager content)
     {
-      _toolbarSprite = new Sprite(content.Load<Texture2D>("Controls/Toolbar"));
-      _toolbarSprite.Position = new Vector2((GameEngine.ScreenWidth / 2) - (_toolbarSprite.Rectangle.Width / 2), GameEngine.ScreenHeight - _toolbarSprite.Rectangle.Height - 20);
+      _toolbarSprite = new Sprite(content.Load<Texture2D>("Controls/Toolbar_Top"));
+      _toolbarSprite.Position = new Vector2((GameEngine.ScreenWidth / 2) - (_toolbarSprite.Rectangle.Width / 2), 20);
 
-      var fistButton = new Button(content.Load<Texture2D>("Controls/Icons/Fist"));
-      fistButton.Click += FistButton_Click;
-
-      var pickaxeButton = new Button(content.Load<Texture2D>("Controls/Icons/Pickaxe"));
-      pickaxeButton.Click += PickaxeButton_Click;
+      var buildButton = new Button(content.Load<Texture2D>("Controls/Icons/Build"));
+      buildButton.Click += BuildButton_Click;
 
       _icons = new List<Button>()
       {
-        fistButton,
-        pickaxeButton,
+        buildButton,
       };
 
-      var x = _toolbarSprite.Position.X + 1;
+      var x = _toolbarSprite.Position.X;
 
       foreach (var icon in _icons)
       {
-        icon.Position = new Vector2(x, _toolbarSprite.Position.Y + 1);
+        icon.Position = new Vector2(x, _toolbarSprite.Position.Y);
 
-        x += 60;
+        x += icon.Rectangle.Width;
       }
     }
 
-    private void PickaxeButton_Click(object sender, EventArgs e)
+    private void BuildButton_Click(object sender, EventArgs e)
     {
-      GameScreen.Mouse.MouseState = MouseStates.Mining;
+      _gameState.State = GameStates.BuildMenu;
     }
 
-    public Toolbar(GameScreen gameState)
+    public Toolbar_Top(GameScreen gameState)
     {
       _gameState = gameState;
     }
@@ -84,10 +78,8 @@ namespace TopDown.Controls
 
     public override void Update(GameTime gameTime)
     {
-      if (GameScreen.Keyboard.IsKeyPressed(Keys.D1))
-        GameScreen.Mouse.MouseState = MouseStates.Building;
-      else if (GameScreen.Keyboard.IsKeyPressed(Keys.D2))
-        GameScreen.Mouse.MouseState = MouseStates.Mining;
+      if(_gameState.State != GameStates.Playing)
+        return;
 
       _toolbarSprite.Update(gameTime);
 

@@ -68,9 +68,9 @@ namespace TopDown.Controls.ItemMenu
       
       if(_gameState.SelectedPathBuilder != null)
       {
-        _gameState.SelectedPathBuilder.Furniture.Last().IsRemoved = true;
+        _gameState.SelectedPathBuilder.Paths.Last().IsRemoved = true;
 
-        foreach (var component in _gameState.SelectedPathBuilder.Furniture)
+        foreach (var component in _gameState.SelectedPathBuilder.Paths)
         {
           _gameState.AddComponent(component);
         }
@@ -78,6 +78,8 @@ namespace TopDown.Controls.ItemMenu
         _gameState.SelectedPathBuilder.IsRemoved = true;
         _gameState.SelectedPathBuilder = null;
       }
+
+      _gameState.PathFinder.UpdateMap(_gameState.PathComponents.Select(c => c.Position).ToList());
 
       Reset();
     }

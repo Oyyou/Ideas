@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TopDown.Logic
 {
@@ -51,37 +52,58 @@ namespace TopDown.Logic
       public float DistanceTraveled;
     }
 
-
-    // Stores an array of the walkable search nodes.
-    //private SearchNode[,] searchNodes;
     private Dictionary<Tuple<int, int>, SearchNode> _searchNodes;
 
-    private int x;
+    private int _endX
+    {
+      get
+      {
+        var t = _pathPositions.OrderByDescending(c => c.X);
 
-    private int y;
+        return (int)t.FirstOrDefault().X;
+      }
+    }
 
-    // The width of the map.
-    private int levelWidth;
-    // The height of the map.
-    private int levelHeight;
+    private int _endY
+    {
+      get
+      {
+        var t = _pathPositions.OrderByDescending(c => c.Y);
+
+        return (int)t.FirstOrDefault().Y;
+      }
+    }
+
+    private int _startX
+    {
+      get
+      {
+        var t = _pathPositions.OrderBy(c => c.X);
+
+        return (int)t.FirstOrDefault().X;
+      }
+    }
+
+    private int _startY
+    {
+      get
+      {
+        var t = _pathPositions.OrderBy(c => c.Y);
+
+        return (int)t.FirstOrDefault().Y;
+      }
+    }
+
+    private List<Vector2> _pathPositions;
 
     // Holds search nodes that are avaliable to search.
     private List<SearchNode> openList = new List<SearchNode>();
     // Holds the nodes that have already been searched.
     private List<SearchNode> closedList = new List<SearchNode>();
 
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    public Pathfinder(int x, int y, int width, int height)
+    public Pathfinder()
     {
-      this.y = y;
-      this.x = x;
 
-      levelWidth = width;
-      levelHeight = height;
-
-      InitializeSearchNodes();
     }
 
     /// <summary>
@@ -101,23 +123,18 @@ namespace TopDown.Logic
       //searchNodes = new SearchNode[levelWidth, levelHeight];
       _searchNodes = new Dictionary<Tuple<int, int>, SearchNode>();
 
-      var startX = this.x - 1;
-      var startY = this.y - 1;
-      var endX = this.x + levelWidth + 1;
-      var endY = this.y + levelHeight + 1;
-
       //For each of the tiles in our map, we
       // will create a search node for it.
-      for (int x = startX; x < endX; x++)
+      for (int x = _startX; x <= _endX; x++)
       {
-        for (int y = startY; y < endY; y++)
+        for (int y = _startY; y <= _endY; y++)
         {
           //Create a search node to represent this tile.
           SearchNode node = new SearchNode();
           node.Position = new Vector2(x, y);
 
           // Can only walk on the empty and floor tiles
-          node.Walkable = true;
+          node.Walkable = _pathPositions.Contains(node.Position);
 
           // We only want to store nodes
           // that can be walked on.
@@ -132,12 +149,13 @@ namespace TopDown.Logic
 
       // Now for each of the search nodes, we will
       // connect it to each of its neighbours.
-      for (int x = startX; x < endX; x++)
+      for (int x = _startX; x <= _endX; x++)
       {
-        for (int y = startY; y < endY; y++)
+        for (int y = _startY; y <= _endY; y++)
         {
           //SearchNode node = searchNodes[x, y];
-          var node = _searchNodes[new Tuple<int, int>(x, y)];
+          var key = new Tuple<int, int>((int)x, (int)y);
+          var node = _searchNodes.ContainsKey(key) ? _searchNodes[key] : null;
 
           // We only want to look at the nodes that 
           // our enemies can walk on.
@@ -162,14 +180,15 @@ namespace TopDown.Logic
             Vector2 position = neighbors[i];
 
             // We need to make sure this neighbour is part of the level.
-            if (position.X < x || position.X > this.x + levelWidth ||
-                position.Y < y || position.Y > this.y + levelHeight)
+            if (position.X < _startX || position.X > _endX ||
+                position.Y < _startY || position.Y > _endY)
             {
               continue;
             }
 
             //SearchNode neighbor = searchNodes[(int)position.X, (int)position.Y];
-            var neighbor = _searchNodes[new Tuple<int, int>((int)position.X, (int)position.Y)];
+            var neighborKey = new Tuple<int, int>((int)position.X, (int)position.Y);
+            var neighbor = _searchNodes.ContainsKey(neighborKey) ? _searchNodes[neighborKey] : null;
 
             // We will only bother keeping a reference 
             // to the nodes that can be walked on.
@@ -195,19 +214,15 @@ namespace TopDown.Logic
       openList.Clear();
       closedList.Clear();
 
-      var startX = this.x - 1;
-      var startY = this.y - 1;
-      var endX = this.x + levelWidth + 1;
-      var endY = this.y + levelHeight + 1;
-
       //For each of the tiles in our map, we
       // will create a search node for it.
-      for (int x = startX; x < endX; x++)
+      for (int x = _startX; x <= _endX; x++)
       {
-        for (int y = startY; y < endY; y++)
+        for (int y = _startY; y <= _endY; y++)
         {
           //SearchNode node = searchNodes[x, y];
-          var node = _searchNodes[new Tuple<int, int>(x, y)];
+          var key = new Tuple<int, int>((int)x, (int)y);
+          var node = _searchNodes.ContainsKey(key) ? _searchNodes[key] : null;
 
           if (node == null)
           {
@@ -221,7 +236,6 @@ namespace TopDown.Logic
           node.DistanceToGoal = float.MaxValue;
         }
       }
-
     }
 
     /// <summary>
@@ -233,27 +247,6 @@ namespace TopDown.Logic
       closedList.Add(endNode);
 
       SearchNode parentTile = endNode.Parent;
-
-      //using (System.IO.StreamWriter writer = new System.IO.StreamWriter(@"D:\derp.txt"))
-      //{
-      //  for (int y = 0; y < levelHeight; y++)
-      //  {
-      //    for (int x = 0; x < levelWidth; x++)
-      //    {
-      //      var searchNode = searchNodes[x, y];
-
-      //      if (searchNode != null)
-      //      {
-      //        writer.Write("1");
-      //      }
-      //      else
-      //      {
-      //        writer.Write("0");
-      //      }
-      //    }
-      //    writer.WriteLine();
-      //  }
-      //}
 
       // Trace back through the nodes using the parent fields
       // to find the best path.
@@ -268,11 +261,11 @@ namespace TopDown.Logic
       // Reverse the path and transform into world space.
       for (int i = closedList.Count - 1; i >= 0; i--)
       {
-        finalPath.Add(new Vector2(closedList[i].Position.X,// * Tile.WIDTH,
-                                  closedList[i].Position.Y));// * Tile.HEIGHT));
+        finalPath.Add(new Vector2(closedList[i].Position.X,
+                                  closedList[i].Position.Y));
       }
 
-      return finalPath;
+      return finalPath.Select(c => c * 32).ToList();
     }
 
     /// <summary>
@@ -444,7 +437,7 @@ namespace TopDown.Logic
           float distanceTraveled = currentNode.DistanceTraveled + 1;
 
           // An estimate of the distance from this node to the end node.
-          float heuristic = Heuristic(neighbor.Position / 32, endPoint / 32);
+          float heuristic = Heuristic(neighbor.Position, endPoint / 32);
 
           //////////////////////////////////////////////////
           // iii) If the neighbouring node is not in either the Open 
@@ -494,6 +487,29 @@ namespace TopDown.Logic
 
       // No path could be found.
       return new List<Vector2>();
+    }
+
+    public void WriteMap()
+    {
+      for (int y = _startY; y <= _endY; y++)
+      {
+        for (int x = _startX; x <= _endX; x++)
+        {
+          if (_pathPositions.Contains(new Vector2(x, y)))
+            Console.Write("0");
+          else
+            Console.Write("1");
+        }
+
+        Console.WriteLine();
+      }
+    }
+
+    public void UpdateMap(List<Vector2> pathPositions)
+    {
+      _pathPositions = pathPositions.Select(c => c / 32).ToList();
+
+      InitializeSearchNodes();
     }
   }
 }

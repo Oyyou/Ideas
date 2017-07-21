@@ -17,6 +17,8 @@ namespace Engine.Sprites
 
     protected Dictionary<string, Animation> _animations;
 
+    private Color _color;
+
     private float _layer;
 
     private Rectangle _sourceRectangle;
@@ -38,7 +40,17 @@ namespace Engine.Sprites
       }
     }
 
-    public Color Color { get; set; }
+    public Color Color
+    {
+      get { return _color; }
+      set
+      {
+        _color = value;
+
+        if (_animationManager != null)
+          _animationManager.Color = _color;
+      }
+    }
 
     public override float Layer
     {
@@ -129,6 +141,9 @@ namespace Engine.Sprites
       Position += Velocity;
 
       if (_texture != null)
+      {
+        var layer = Layer + Position.Y / 100000;
+
         spriteBatch.Draw(_texture,
           Rectangle,
           SourceRectangle,
@@ -136,7 +151,8 @@ namespace Engine.Sprites
           Rotation,
           Origin,
           SpriteEffect,
-          Layer);
+          MathHelper.Clamp(layer, 0f, 1f));
+      }
 
       if (_animationManager != null)
       {
@@ -146,6 +162,8 @@ namespace Engine.Sprites
 
       foreach (var sprite in Components)
         sprite.Draw(gameTime, spriteBatch);
+
+      Velocity = Vector2.Zero;
     }
 
     private void Initialise()
@@ -327,11 +345,6 @@ namespace Engine.Sprites
 
       foreach (var sprite in Components)
         sprite.Update(gameTime);
-    }
-
-    public object Clone()
-    {
-      return this.MemberwiseClone();
     }
   }
 }

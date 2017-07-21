@@ -18,6 +18,8 @@ namespace Engine.Managers
 
     public Animation Animation { get; private set; }
 
+    public Color Color { get; set; }
+
     public int CurrentFrame { get; private set; }
 
     public int FrameHeight
@@ -29,10 +31,6 @@ namespace Engine.Managers
     {
       get { return Animation.FrameWidth; }
     }
-
-    public float Layer { get; set; }
-
-    public Vector2 Position { get; set; }
 
     public int PreviousFrame { get; private set; }
 
@@ -54,6 +52,8 @@ namespace Engine.Managers
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      var layer = Layer + Position.Y / 100000;
+
       spriteBatch.Draw(
         Animation.Texture,
         Position,
@@ -62,12 +62,12 @@ namespace Engine.Managers
           0,
           Animation.FrameWidth,
           Animation.FrameHeight),
-        Color.White,
+        Color,
         0f,
         new Vector2(0, 0),
         1f,
         SpriteEffect,
-        Layer);
+        MathHelper.Clamp(layer, 0f, 1f));
 
       _updated = false;
     }

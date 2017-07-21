@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Engine
 {
-  public abstract class Component
+  public abstract class Component : ICloneable
   {
     public virtual List<Rectangle> CollisionRectangles { get; protected set; }
 
@@ -53,5 +53,10 @@ namespace Engine
     public abstract void UnloadContent();
 
     public abstract void Update(GameTime gameTime);
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
+    }
   }
 }

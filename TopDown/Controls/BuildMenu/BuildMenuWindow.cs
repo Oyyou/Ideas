@@ -16,6 +16,7 @@ using TopDown.Buildings;
 using TopDown.Controls.ItemMenu;
 using TopDown.Buildings.Housing;
 using TopDown.Buildings.Labour;
+using TopDown.Sprites;
 
 namespace TopDown.Controls.BuildMenu
 {
@@ -104,7 +105,7 @@ namespace TopDown.Controls.BuildMenu
           {
             _gameState.SelectedPathBuilder.Path = null;
             _gameState.SelectedPathBuilder.State = PathBuilderStates.Selecting;
-            _gameState.SelectedPathBuilder.Furniture.Last().IsRemoved = true;
+            _gameState.SelectedPathBuilder.Paths.Last().IsRemoved = true;
           }
 
           // 
@@ -121,22 +122,19 @@ namespace TopDown.Controls.BuildMenu
         return;
       }
 
-      if (itemOption.Furniture == null)
-        throw new Exception($"Furniture hasn't been set for '{itemOption.Text}' option.");
+      //if (itemOption.Components == null)
+      //  throw new Exception($"No items to add for the '{itemOption.Text}' option.");
 
       if (_gameState.SelectedBuilding != null)
       {
-        itemOption.Furniture.Building = _gameState.SelectedBuilding;
-        itemOption.Furniture.Layer = _gameState.SelectedBuilding.Layer + 0.01f;
+        ((Furniture)itemOption.PlacingObject).Building = _gameState.SelectedBuilding;
+        itemOption.PlacingObject.Layer = _gameState.SelectedBuilding.Layer + 0.01f;
 
-        _gameState.SelectedBuilding.Components.Add((Furniture)itemOption.Furniture.Clone());
+        _gameState.SelectedBuilding.Components.Add((Furniture)itemOption.PlacingObject.Clone());
       }
       else if (_gameState.SelectedPathBuilder != null)
       {
-        itemOption.Furniture.Building = _gameState.SelectedPathBuilder;
-        itemOption.Furniture.Layer = _gameState.SelectedPathBuilder.Layer + 0.01f;
-
-        _gameState.SelectedPathBuilder.Path = (Furniture)itemOption.Furniture.Clone();
+        _gameState.SelectedPathBuilder.Path = (Path)itemOption.PlacingObject;
         _gameState.SelectedPathBuilder.State = PathBuilderStates.Placing;
       }
 
@@ -168,10 +166,9 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Bed",
         Parent = smallHouse,
-        //Layer = _background.Layer + 0.01f,
-        Furniture = new Furniture(_content.Load<Texture2D>("Furniture/Bed"), _gameState)
+        PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Bed"), _gameState)
         {
-          State = FurnatureStates.Placing,
+          State = PlacableObjectStates.Placing,
           Position = GameScreen.Mouse.PositionWithCamera,
         },
       };
@@ -182,10 +179,9 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Toilet",
         Parent = smallHouse,
-        // Layer = _background.Layer + 0.01f,
-        Furniture = new Furniture(_content.Load<Texture2D>("Furniture/Toilet"), _gameState)
+        PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Toilet"), _gameState)
         {
-          State = FurnatureStates.Placing,
+          State = PlacableObjectStates.Placing,
           Position = GameScreen.Mouse.PositionWithCamera,
         },
       };
@@ -226,7 +222,7 @@ namespace TopDown.Controls.BuildMenu
     {
       _gameState.AddComponent(new SmallHouse(_gameState, _content.Load<Texture2D>("Buildings/SmallHouse/In"), _content.Load<Texture2D>("Buildings/SmallHouse/Out"))
       {
-        BuildingState = Buildings.BuildingStates.Placing,
+        State = Buildings.BuildingStates.Placing,
       });
     }
 
@@ -253,9 +249,9 @@ namespace TopDown.Controls.BuildMenu
         Text = "Anvil",
         Parent = blacksmith,
         //Layer = _background.Layer + 0.01f,
-        Furniture = new Furniture(_content.Load<Texture2D>("Furniture/Anvil"), _gameState)
+        PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Anvil"), _gameState)
         {
-          State = FurnatureStates.Placing,
+          State = PlacableObjectStates.Placing,
           Position = GameScreen.Mouse.PositionWithCamera,
         },
       };
@@ -319,7 +315,7 @@ namespace TopDown.Controls.BuildMenu
     {
       _gameState.AddComponent(new Blacksmith(_gameState, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
       {
-        BuildingState = Buildings.BuildingStates.Placing,
+        State = Buildings.BuildingStates.Placing,
       });
     }
 
@@ -430,11 +426,9 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Stone",
         Parent = path,
-        //Layer = _background.Layer + 0.01f,
-        Furniture = new Furniture(_content.Load<Texture2D>("Sprites/Paths/StonePath"), _gameState)
+        PlacingObject = new Path(_content.Load<Texture2D>("Sprites/Paths/StonePath"))
         {
           IsCollidable = false,
-          State = FurnatureStates.Placing,
           Position = GameScreen.Mouse.PositionWithCamera,
         },
       };
