@@ -11,7 +11,7 @@ using Engine.Sprites;
 using TopDown.States;
 using Microsoft.Xna.Framework.Input;
 
-namespace TopDown.Buildings
+namespace TopDown.Furnitures
 {
   public enum PlacableObjectStates
   {
@@ -64,8 +64,24 @@ namespace TopDown.Buildings
             if (GameScreen.Mouse.LeftClicked)
             {
               State = PlacableObjectStates.Placed;
-              _gameState.State = States.GameStates.ItemMenu;
-              _gameState.ItemMenu.CurrentButton.CurrentState = Controls.ItemMenu.ItemMenuButtonStates.Placed;
+
+              _gameState.ItemMenu.CurrentButton.Amount--;
+
+              if (_gameState.ItemMenu.CurrentButton.Amount > 0)
+              {
+                _gameState.ItemMenu.CurrentButton.CurrentState = Controls.ItemMenu.ItemMenuButtonStates.Clicked;
+
+                var newFurniture = (Furniture)this.Clone();
+                newFurniture.State = PlacableObjectStates.Placing;
+
+                _gameState.SelectedBuilding.Components.Add(newFurniture);
+                _gameState.State = States.GameStates.PlacingItems;
+              }
+              else
+              {
+                _gameState.ItemMenu.CurrentButton.CurrentState = Controls.ItemMenu.ItemMenuButtonStates.Placed;
+                _gameState.State = States.GameStates.ItemMenu;
+              }
             }
           }
           else

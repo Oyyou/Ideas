@@ -498,7 +498,7 @@ namespace TopDown.States
               SelectedPathBuilder = null;
             }
 
-            ItemMenu.Reset();
+            ItemMenu.FullReset();
           }
 
           if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
@@ -517,7 +517,7 @@ namespace TopDown.States
               SelectedPathBuilder = null;
             }
 
-            ItemMenu.Reset();
+            ItemMenu.FullReset();
           }
 
           break;
@@ -553,7 +553,7 @@ namespace TopDown.States
               SelectedPathBuilder.Path = null;
             }
 
-            ItemMenu.Reset();
+            ItemMenu.CurrentButton.CurrentState = ItemMenuButtonStates.Clickable;
           }
 
           break;

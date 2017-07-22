@@ -17,6 +17,7 @@ using TopDown.Controls.ItemMenu;
 using TopDown.Buildings.Housing;
 using TopDown.Buildings.Labour;
 using TopDown.Sprites;
+using TopDown.Furnitures;
 
 namespace TopDown.Controls.BuildMenu
 {
@@ -148,6 +149,18 @@ namespace TopDown.Controls.BuildMenu
 
     private void HousingButton_Click(object sender, EventArgs e)
     {
+      _buildSubOptions = new List<BuildMenuSubButton>()
+      {
+        GetSmallHouse(),
+        GetTavern(),
+      };
+
+      foreach (var component in _buildSubOptions)
+        component.LoadContent(_content);
+    }
+
+    private BuildMenuSubButton GetSmallHouse()
+    {
       var smallHouse = new BuildMenuSubButton(_subButtonTexture, _font)
       {
         Text = "Small House",
@@ -196,26 +209,89 @@ namespace TopDown.Controls.BuildMenu
 
       smallHouse.Click += SmallHouse_Click;
 
-      _buildSubOptions = new List<BuildMenuSubButton>()
+      return smallHouse;
+    }
+
+    private BuildMenuSubButton GetTavern()
+    {
+      var tavern = new BuildMenuSubButton(_subButtonTexture, _font)
       {
-        smallHouse,
-        new BuildMenuSubButton(_subButtonTexture, _font)
+        Text = "Tavern",
+        Layer = 0.99f,
+        GameScreenSetValue = States.GameStates.PlacingBuilding,
+        ResourceCost = new Models.Resources()
         {
-          Text = "Large House",
-          Layer =  0.99f,
-          GameScreenSetValue = States.GameStates.PlacingBuilding,
-          ResourceCost = new Models.Resources()
-          {
-            Food = 15,
-            Gold = 10,
-            Wood = 30,
-            Stone = 40,
-          },
+          Food = 5,
+          Gold = 1,
+          Wood = 10,
+          Stone = 10,
         },
       };
 
-      foreach (var component in _buildSubOptions)
-        component.LoadContent(_content);
+      var bar = new ItemMenuButton(_mainButtonTexture, _font)
+      {
+        Amount = 1,
+        Text = "Bar",
+        Parent = tavern,
+        PlacingObject = new Bar(_content.Load<Texture2D>("Furniture/Bar"), _gameState)
+        {
+          State = PlacableObjectStates.Placing,
+          Position = GameScreen.Mouse.PositionWithCamera,
+        },
+        CollisionRectangles = new List<Rectangle>()
+        {
+          new Rectangle()
+        },
+      };
+
+      bar.Click += Item_Click;
+
+      var stool = new ItemMenuButton(_mainButtonTexture, _font)
+      {
+        Amount = 9,
+        Text = "Stool",
+        Parent = tavern,
+        PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Stool"), _gameState)
+        {
+          State = PlacableObjectStates.Placing,
+          Position = GameScreen.Mouse.PositionWithCamera,
+        },
+      };
+
+      stool.Click += Item_Click;
+
+      var booth = new ItemMenuButton(_mainButtonTexture, _font)
+      {
+        Amount = 2,
+        Text = "Booth",
+        Parent = tavern,
+        PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Booth"), _gameState)
+        {
+          State = PlacableObjectStates.Placing,
+          Position = GameScreen.Mouse.PositionWithCamera,
+        },
+      };
+
+      booth.Click += Item_Click;
+
+      tavern.Items = new List<ItemMenuButton>()
+      {
+        bar,
+        stool,
+        booth,
+      };
+
+      tavern.Click += Tavern_Click;
+
+      return tavern;
+    }
+
+    private void Tavern_Click(object sender, EventArgs e)
+    {
+      _gameState.AddComponent(new Tavern(_gameState, _content.Load<Texture2D>("Buildings/Tavern/In"), _content.Load<Texture2D>("Buildings/Tavern/Out"))
+      {
+        State = Buildings.BuildingStates.Placing,
+      });
     }
 
     private void SmallHouse_Click(object sender, EventArgs e)

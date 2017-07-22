@@ -52,7 +52,7 @@ namespace Engine.Managers
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      var layer = Layer + Position.Y / 100000;
+      var layer = Layer;// + Position.Y / 100000;
 
       spriteBatch.Draw(
         Animation.Texture,

@@ -12,6 +12,20 @@ namespace TopDown.FX
 {
   public class Particle : Sprite
   {
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      var layer = Layer + Position.Y / 100000;
+
+      spriteBatch.Draw(_texture,
+        Rectangle,
+        SourceRectangle,
+        Color,
+        Rotation,
+        Origin,
+        SpriteEffect,
+        MathHelper.Clamp(layer, 0f, 1f));
+    }
+
     public Particle(Texture2D texture) : base(texture)
     {
       var xSpeed = (float)GameEngine.Random.NextDouble() * (2 - -2) + -2;

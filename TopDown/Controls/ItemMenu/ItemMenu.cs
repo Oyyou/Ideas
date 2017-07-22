@@ -48,7 +48,7 @@ namespace TopDown.Controls.ItemMenu
         _gameState.SelectedPathBuilder = null;
       }
 
-      this.Reset();
+      this.FullReset();
     }
 
     public override void CheckCollision(Component component)
@@ -81,7 +81,7 @@ namespace TopDown.Controls.ItemMenu
 
       _gameState.PathFinder.UpdateMap(_gameState.PathComponents.Select(c => c.Position).ToList());
 
-      Reset();
+      FullReset();
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -124,12 +124,22 @@ namespace TopDown.Controls.ItemMenu
 
     }
 
-    public void Reset()
+    public void PartialReset()
     {
       foreach (var component in Components)
       {
         ((ItemMenuButton)component).CanClick = true;
         ((ItemMenuButton)component).CurrentState = ItemMenuButtonStates.Clickable;
+      }
+    }
+
+    public void FullReset()
+    {
+      PartialReset();
+
+      foreach (var component in Components)
+      {
+        ((ItemMenuButton)component).Amount = ((ItemMenuButton)component).StartAmount.Value;
       }
     }
 
@@ -151,16 +161,17 @@ namespace TopDown.Controls.ItemMenu
 
       foreach (var component in Components)
       {
-        if (((ItemMenuButton)component).PreviousState == ItemMenuButtonStates.Clicked &&
-          ((ItemMenuButton)component).CurrentState == ItemMenuButtonStates.Placed)
+        if ((((ItemMenuButton)component).PreviousState == ItemMenuButtonStates.Clicked &&
+          ((ItemMenuButton)component).CurrentState == ItemMenuButtonStates.Placed) ||
+          ((ItemMenuButton)component).Amount > 0)
         {
-          foreach (var c in Components)
-          {
-            if (c == component)
-              continue;
+          //foreach (var c in Components)
+          //{
+          //  if (c == component)
+          //    continue;
 
-            ((ItemMenuButton)c).CanClick = true;
-          }
+            ((ItemMenuButton)component).CanClick = true;
+          //}
         }
       }
 

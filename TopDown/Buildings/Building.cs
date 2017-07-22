@@ -405,7 +405,7 @@ namespace TopDown.Buildings
           break;
         case BuildingStates.Placed:
 
-          foreach (var component in Components)
+          foreach (var component in Components.ToArray())
           {
             component.Layer = _spriteInside.Layer + 0.001f;
             component.Update(gameTime);

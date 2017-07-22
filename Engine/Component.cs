@@ -11,7 +11,7 @@ namespace Engine
 {
   public abstract class Component : ICloneable
   {
-    public virtual List<Rectangle> CollisionRectangles { get; protected set; }
+    public virtual List<Rectangle> CollisionRectangles { get; set; }
 
     public List<Component> Components;
 

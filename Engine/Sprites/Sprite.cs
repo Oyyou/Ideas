@@ -25,7 +25,7 @@ namespace Engine.Sprites
 
     private SpriteEffects _spriteEffect;
 
-    private Texture2D _texture;
+    protected Texture2D _texture;
 
     private float _timer;
 
@@ -142,7 +142,7 @@ namespace Engine.Sprites
 
       if (_texture != null)
       {
-        var layer = Layer + Position.Y / 100000;
+        var layer = Layer;// + Position.Y / 100000;
 
         spriteBatch.Draw(_texture,
           Rectangle,

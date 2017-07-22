@@ -92,13 +92,18 @@ namespace Engine.Controls
     {
       spriteBatch.Draw(_texture, Rectangle, null, _colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
 
-      if (!string.IsNullOrEmpty(Text) && _font != null)
-      {
-        float x = (Rectangle.X + (Rectangle.Width / 2)) - (_font.MeasureString(Text).X / 2);
-        float y = (Rectangle.Y + (Rectangle.Height / 2)) - (_font.MeasureString(Text).Y / 2);
+      DrawText(spriteBatch);
+    }
 
-        spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
-      }
+    protected virtual void DrawText(SpriteBatch spriteBatch)
+    {
+      if (string.IsNullOrEmpty(Text) || _font == null)
+        return;
+
+      float x = (Rectangle.X + (Rectangle.Width / 2)) - (_font.MeasureString(Text).X / 2);
+      float y = (Rectangle.Y + (Rectangle.Height / 2)) - (_font.MeasureString(Text).Y / 2);
+
+      spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
     }
 
     public override void LoadContent(ContentManager content)

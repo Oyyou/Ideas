@@ -43,8 +43,10 @@
   <ItemGroup>
     <Compile Include="Builders\PathBuilder.cs" />
     <Compile Include="Buildings\Building.cs" />
-    <Compile Include="Buildings\Furniture.cs" />
+    <Compile Include="Furnitures\Bar.cs" />
+    <Compile Include="Furnitures\Furniture.cs" />
     <Compile Include="Buildings\Housing\SmallHouse.cs" />
+    <Compile Include="Buildings\Housing\Tavern.cs" />
     <Compile Include="Buildings\Labour\Blacksmith.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuSubButton.cs" />
     <Compile Include="Controls\BuildMenu\BuildMenuWindow.cs" />
@@ -92,6 +94,7 @@
       <Name>Engine</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
