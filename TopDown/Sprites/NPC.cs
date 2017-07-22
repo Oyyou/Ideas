@@ -27,7 +27,17 @@ namespace TopDown.Sprites
       }
     }
 
-    public override Vector2 Position { get => base.Position + new Vector2(0, 24); set => base.Position = value - new Vector2(0, 24); }
+    public override Vector2 Position
+    {
+      get
+      {
+        return base.Position + new Vector2(0, 24);
+      }
+      set
+      {
+        base.Position = value - new Vector2(0, 24);
+      }
+    }
 
     public NPC(Dictionary<string, Animation> animations, GameScreen gameScreen) : base(animations)
     {

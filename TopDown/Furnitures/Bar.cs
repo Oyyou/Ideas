@@ -15,11 +15,14 @@ namespace TopDown.Furnitures
     {
       get
       {
+        var x = (int)Position.X;
+        var y = (int)Position.Y;
+
         return new List<Rectangle>()
         {
-          new Rectangle(0, 0, 128, 32),
-          new Rectangle(0, 64, 192, 32),
-          new Rectangle(192, 0, 32, 64),
+          new Rectangle(x, y, 128, 32),
+          new Rectangle(x, y + 64, 192, 32),
+          new Rectangle(x + 160, y, 32, 64),
         };
       }
     }

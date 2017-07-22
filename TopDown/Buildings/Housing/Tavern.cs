@@ -51,7 +51,7 @@ namespace TopDown.Buildings.Housing
               new Rectangle(x, y, width, 1), // Top
               new Rectangle(x, y, 1, height), // Left
               new Rectangle(x + (width - 1), y, 1, height), // Right
-              new Rectangle(x, y + height - 1, 16, 1), // bottom left
+              new Rectangle(x, y + height - 1, 32, 1), // bottom left
               new Rectangle(x + 64, y + height - 1, width - 64, 1), // bottom right
             };
 
