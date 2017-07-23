@@ -85,7 +85,6 @@ namespace TopDown.Sprites
         var value = random.Next(0, _gameScreen.PathComponents.Count);
 
         _walkingPath = _gameScreen.PathFinder.FindPath(Position, _gameScreen.PathComponents[value].Position);
-        _gameScreen.PathFinder.WriteMap();
       }
 
       var targetPosition = _walkingPath.Count > 0 ? _walkingPath.FirstOrDefault() : Position;

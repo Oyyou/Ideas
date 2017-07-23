@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="Builders\PathBuilder.cs" />
     <Compile Include="Buildings\Building.cs" />
+    <Compile Include="Controls\JobMenu\JobMenuWindow.cs" />
+    <Compile Include="Controls\MenuWindow.cs" />
     <Compile Include="Furnitures\Bar.cs" />
     <Compile Include="Furnitures\Furniture.cs" />
     <Compile Include="Buildings\Housing\SmallHouse.cs" />

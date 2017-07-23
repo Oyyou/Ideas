@@ -18,9 +18,14 @@ namespace TopDown.Controls
   {
     private List<Button> _icons;
 
-    private GameScreen _gameState;
+    private GameScreen _gameScreen;
 
     private Sprite _toolbarSprite;
+
+    private void BuildButton_Click(object sender, EventArgs e)
+    {
+      _gameScreen.State = GameStates.BuildMenu;
+    }
 
     public override void CheckCollision(Component component)
     {
@@ -29,13 +34,18 @@ namespace TopDown.Controls
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      if (_gameState.State != GameStates.Playing)
+      if (_gameScreen.State != GameStates.Playing)
         return;
 
       _toolbarSprite.Draw(gameTime, spriteBatch);
 
       foreach (var icon in _icons)
         icon.Draw(gameTime, spriteBatch);
+    }
+
+    private void JobsButton_Click(object sender, EventArgs e)
+    {
+      _gameScreen.State = GameStates.JobMenu;
     }
 
     public override void LoadContent(ContentManager content)
@@ -46,9 +56,13 @@ namespace TopDown.Controls
       var buildButton = new Button(content.Load<Texture2D>("Controls/Icons/Build"));
       buildButton.Click += BuildButton_Click;
 
+      var jobsButton = new Button(content.Load<Texture2D>("Controls/Icons/Jobs"));
+      jobsButton.Click += JobsButton_Click;
+
       _icons = new List<Button>()
       {
         buildButton,
+        jobsButton,
       };
 
       var x = _toolbarSprite.Position.X;
@@ -61,14 +75,9 @@ namespace TopDown.Controls
       }
     }
 
-    private void BuildButton_Click(object sender, EventArgs e)
+    public Toolbar_Top(GameScreen gameScreen)
     {
-      _gameState.State = GameStates.BuildMenu;
-    }
-
-    public Toolbar_Top(GameScreen gameState)
-    {
-      _gameState = gameState;
+      _gameScreen = gameScreen;
     }
 
     public override void UnloadContent()
@@ -78,7 +87,7 @@ namespace TopDown.Controls
 
     public override void Update(GameTime gameTime)
     {
-      if(_gameState.State != GameStates.Playing)
+      if(_gameScreen.State != GameStates.Playing)
         return;
 
       _toolbarSprite.Update(gameTime);

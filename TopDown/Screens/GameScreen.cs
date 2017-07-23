@@ -18,6 +18,7 @@ using TopDown.Buildings.Housing;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
 using TopDown.Controls.ItemMenu;
+using TopDown.Controls.JobMenu;
 using TopDown.Core;
 using TopDown.Logic;
 using TopDown.Resources;
@@ -32,6 +33,7 @@ namespace TopDown.States
     PlacingBuilding,
     ItemMenu,
     PlacingItems,
+    JobMenu,
   }
 
   public class GameScreen : State
@@ -43,6 +45,8 @@ namespace TopDown.States
     private List<Component> _gameComponents;
 
     private List<Component> _guiComponents;
+
+    private JobMenuWindow _jobMenu;
 
     public List<Component> CollidableComponents
     {
@@ -59,6 +63,14 @@ namespace TopDown.States
     public static MessageBox MessageBox;
 
     public static Controls.Mouse Mouse;
+
+    public IEnumerable<Component> NPCComponents
+    {
+      get
+      {
+        return _gameComponents.Where(c => c is NPC);
+      }
+    }
 
     public PathBuilder SelectedPathBuilder { get; set; }
 
@@ -134,6 +146,80 @@ namespace TopDown.States
       _spriteBatch.End();
     }
 
+    public GameScreen()
+    {
+
+    }
+        
+    private void ItemMenuUpdate(GameTime gameTime)
+    {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
+
+      foreach (var component in _gameComponents)
+        component.Update(gameTime);
+
+      for (int i = 0; i < _gameComponents.Count; i++)
+      {
+        for (int j = i + 1; j < _gameComponents.Count; j++)
+        {
+          _gameComponents[i].CheckCollision(_gameComponents[j]);
+        }
+      }
+
+      _camera.Follow(((Sprite)_gameComponents[0]).Position);
+
+      if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
+      {
+        State = GameStates.BuildMenu;
+
+        if (SelectedBuilding != null)
+        {
+          SelectedBuilding.IsRemoved = true;
+          SelectedBuilding = null;
+        }
+
+        if (SelectedPathBuilder != null)
+        {
+          SelectedPathBuilder.IsRemoved = true;
+          SelectedPathBuilder = null;
+        }
+
+        ItemMenu.FullReset();
+      }
+
+      if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
+      {
+        State = GameStates.Playing;
+
+        if (SelectedBuilding != null)
+        {
+          SelectedBuilding.IsRemoved = true;
+          SelectedBuilding = null;
+        }
+
+        if (SelectedPathBuilder != null)
+        {
+          SelectedPathBuilder.IsRemoved = true;
+          SelectedPathBuilder = null;
+        }
+
+        ItemMenu.FullReset();
+      }
+    }
+
+    private void JobMenuUpdate(GameTime gameTime)
+    {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
+
+      if (Keyboard.IsKeyPressed(Keys.J) ||
+        Keyboard.IsKeyPressed(Keys.Escape))
+      {
+        State = GameStates.Playing;
+      }
+    }
+
     public override void LoadContent(GameModel gameModel)
     {
       base.LoadContent(gameModel);
@@ -143,6 +229,9 @@ namespace TopDown.States
       PathFinder = new Pathfinder();
 
       _buildMenu = new BuildMenuWindow(this);
+
+      _jobMenu = new JobMenuWindow(this);
+
       ItemMenu = new ItemMenu(this);
       //ItemMenu.LoadContent(_content);
 
@@ -318,7 +407,6 @@ namespace TopDown.States
       }
 
       PathFinder.UpdateMap(PathComponents.Select(c => c.Position).ToList());
-      PathFinder.WriteMap();
 
       var buttonTexture = gameModel.ContentManger.Load<Texture2D>("Controls/Button");
       var buttonFont = gameModel.ContentManger.Load<SpriteFont>("Fonts/Font");
@@ -332,6 +420,7 @@ namespace TopDown.States
         new Toolbar_Bottom(this),
         new ResourceView(Resources),
         _buildMenu,
+        _jobMenu,
         ItemMenu,
       };
 
@@ -342,9 +431,93 @@ namespace TopDown.States
         component.LoadContent(_content);
     }
 
-    public GameScreen()
+    private void PlacingBuildingUpdate(GameTime gameTime)
     {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
 
+      foreach (var component in _gameComponents)
+        component.Update(gameTime);
+
+      for (int i = 0; i < _gameComponents.Count; i++)
+      {
+        for (int j = i + 1; j < _gameComponents.Count; j++)
+        {
+          _gameComponents[i].CheckCollision(_gameComponents[j]);
+        }
+      }
+
+      _camera.Follow(((Sprite)_gameComponents[0]).Position);
+
+      if (Keyboard.IsKeyPressed(Keys.B))
+      {
+        State = GameStates.BuildMenu;
+
+        if (SelectedBuilding != null)
+        {
+          SelectedBuilding.IsRemoved = true;
+          SelectedBuilding = null;
+        }
+
+        if (SelectedPathBuilder != null)
+        {
+          SelectedPathBuilder.IsRemoved = true;
+          SelectedPathBuilder = null;
+        }
+      }
+
+      if (Keyboard.IsKeyPressed(Keys.Escape))
+      {
+        State = GameStates.Playing;
+
+        if (SelectedBuilding != null)
+        {
+          SelectedBuilding.IsRemoved = true;
+          SelectedBuilding = null;
+        }
+
+        if (SelectedPathBuilder != null)
+        {
+          SelectedPathBuilder.IsRemoved = true;
+          SelectedPathBuilder = null;
+        }
+      }
+    }
+
+    private void PlacingItemsUpdate(GameTime gameTime)
+    {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
+
+      foreach (var component in _gameComponents)
+        component.Update(gameTime);
+
+      for (int i = 0; i < _gameComponents.Count; i++)
+      {
+        for (int j = i + 1; j < _gameComponents.Count; j++)
+        {
+          _gameComponents[i].CheckCollision(_gameComponents[j]);
+        }
+      }
+
+      _camera.Follow(((Sprite)_gameComponents[0]).Position);
+
+      if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
+      {
+        State = GameStates.ItemMenu;
+
+        if (SelectedBuilding != null)
+          SelectedBuilding.Components.Last().IsRemoved = true;
+
+        if (SelectedPathBuilder != null)
+        {
+          SelectedPathBuilder.State = PathBuilderStates.Selecting;
+          SelectedPathBuilder.Components.ForEach(c => c.IsRemoved = true);
+          SelectedPathBuilder.Path = null;
+        }
+
+        ItemMenu.CurrentButton.CurrentState = ItemMenuButtonStates.Clickable;
+      }
     }
 
     private void PlayingUpdate(GameTime gameTime)
@@ -367,6 +540,9 @@ namespace TopDown.States
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
         State = GameStates.BuildMenu;
+
+      if (GameScreen.Keyboard.IsKeyPressed(Keys.J))
+        State = GameStates.JobMenu;
 
       if (Keyboard.IsKeyPressed(Keys.Enter))
         MessageBox.Show("You just pressed Enter. Well done :)");
@@ -394,6 +570,8 @@ namespace TopDown.States
       foreach (var component in _guiComponents)
         component.UnloadContent();
 
+      _gameComponents.Clear();
+
       _guiComponents.Clear();
     }
 
@@ -413,148 +591,23 @@ namespace TopDown.States
           break;
         case GameStates.PlacingBuilding:
 
-          foreach (var component in _guiComponents)
-            component.Update(gameTime);
-
-          foreach (var component in _gameComponents)
-            component.Update(gameTime);
-
-          for (int i = 0; i < _gameComponents.Count; i++)
-          {
-            for (int j = i + 1; j < _gameComponents.Count; j++)
-            {
-              _gameComponents[i].CheckCollision(_gameComponents[j]);
-            }
-          }
-
-          _camera.Follow(((Sprite)_gameComponents[0]).Position);
-
-          if (Keyboard.IsKeyPressed(Keys.B))
-          {
-            State = GameStates.BuildMenu;
-
-            if (SelectedBuilding != null)
-            {
-              SelectedBuilding.IsRemoved = true;
-              SelectedBuilding = null;
-            }
-
-            if (SelectedPathBuilder != null)
-            {
-              SelectedPathBuilder.IsRemoved = true;
-              SelectedPathBuilder = null;
-            }
-          }
-
-          if (Keyboard.IsKeyPressed(Keys.Escape))
-          {
-            State = GameStates.Playing;
-
-            if (SelectedBuilding != null)
-            {
-              SelectedBuilding.IsRemoved = true;
-              SelectedBuilding = null;
-            }
-
-            if (SelectedPathBuilder != null)
-            {
-              SelectedPathBuilder.IsRemoved = true;
-              SelectedPathBuilder = null;
-            }
-          }
+          PlacingBuildingUpdate(gameTime);
 
           break;
         case GameStates.ItemMenu:
 
-          foreach (var component in _guiComponents)
-            component.Update(gameTime);
-
-          foreach (var component in _gameComponents)
-            component.Update(gameTime);
-
-          for (int i = 0; i < _gameComponents.Count; i++)
-          {
-            for (int j = i + 1; j < _gameComponents.Count; j++)
-            {
-              _gameComponents[i].CheckCollision(_gameComponents[j]);
-            }
-          }
-
-          _camera.Follow(((Sprite)_gameComponents[0]).Position);
-
-          if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
-          {
-            State = GameStates.BuildMenu;
-
-            if (SelectedBuilding != null)
-            {
-              SelectedBuilding.IsRemoved = true;
-              SelectedBuilding = null;
-            }
-
-            if (SelectedPathBuilder != null)
-            {
-              SelectedPathBuilder.IsRemoved = true;
-              SelectedPathBuilder = null;
-            }
-
-            ItemMenu.FullReset();
-          }
-
-          if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
-          {
-            State = GameStates.Playing;
-
-            if (SelectedBuilding != null)
-            {
-              SelectedBuilding.IsRemoved = true;
-              SelectedBuilding = null;
-            }
-
-            if (SelectedPathBuilder != null)
-            {
-              SelectedPathBuilder.IsRemoved = true;
-              SelectedPathBuilder = null;
-            }
-
-            ItemMenu.FullReset();
-          }
+          ItemMenuUpdate(gameTime);
 
           break;
         case GameStates.PlacingItems:
 
-          foreach (var component in _guiComponents)
-            component.Update(gameTime);
+          PlacingItemsUpdate(gameTime);
 
-          foreach (var component in _gameComponents)
-            component.Update(gameTime);
+          break;
 
-          for (int i = 0; i < _gameComponents.Count; i++)
-          {
-            for (int j = i + 1; j < _gameComponents.Count; j++)
-            {
-              _gameComponents[i].CheckCollision(_gameComponents[j]);
-            }
-          }
+        case GameStates.JobMenu:
 
-          _camera.Follow(((Sprite)_gameComponents[0]).Position);
-
-          if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
-          {
-            State = GameStates.ItemMenu;
-
-            if (SelectedBuilding != null)
-              SelectedBuilding.Components.Last().IsRemoved = true;
-
-            if (SelectedPathBuilder != null)
-            {
-              SelectedPathBuilder.State = PathBuilderStates.Selecting;
-              SelectedPathBuilder.Components.ForEach(c => c.IsRemoved = true);
-              SelectedPathBuilder.Path = null;
-            }
-
-            ItemMenu.CurrentButton.CurrentState = ItemMenuButtonStates.Clickable;
-          }
+          JobMenuUpdate(gameTime);
 
           break;
         default:

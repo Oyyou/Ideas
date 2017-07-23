@@ -17,7 +17,15 @@ namespace TopDown.Controls
     private Microsoft.Xna.Framework.Input.KeyboardState _currentKey;
 
     private Microsoft.Xna.Framework.Input.KeyboardState _previousKey;
-    
+
+    public Microsoft.Xna.Framework.Input.Keys[] PressedKeys
+    {
+      get
+      {
+        return _currentKey.GetPressedKeys();
+      }
+    }
+
     public override void CheckCollision(Component component)
     {
 
