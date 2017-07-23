@@ -42,6 +42,8 @@ namespace TopDown.States
 
     private Camera _camera;
 
+    private SpriteFont _font;
+
     private List<Component> _gameComponents;
 
     private List<Component> _guiComponents;
@@ -92,6 +94,8 @@ namespace TopDown.States
 
     public GameStates State { get; set; }
 
+    public DateTime Time { get; set; }
+
     public void AddComponent(Building building)
     {
       SelectedBuilding = building;
@@ -139,6 +143,12 @@ namespace TopDown.States
       _spriteBatch.End();
 
       _spriteBatch.Begin(SpriteSortMode.FrontToBack);
+
+      var time = Time.ToString("hh:mm") + (Time.Hour >= 12 ? " pm" : " am");
+
+      var x = GameEngine.ScreenWidth - _font.MeasureString(time).X - 10;
+
+      _spriteBatch.DrawString(_font, time, new Vector2(x, 5), Color.Red);
 
       foreach (var component in _guiComponents)
         component.Draw(gameTime, _spriteBatch);
@@ -223,6 +233,8 @@ namespace TopDown.States
     public override void LoadContent(GameModel gameModel)
     {
       base.LoadContent(gameModel);
+
+      _font = _content.Load<SpriteFont>("Fonts/Font");
 
       State = GameStates.Playing;
 
@@ -577,6 +589,8 @@ namespace TopDown.States
 
     public override void Update(GameTime gameTime)
     {
+      Time = Time.AddSeconds(1);
+
       switch (State)
       {
         case GameStates.Playing:
