@@ -7,25 +7,37 @@ using System.Threading.Tasks;
 using Engine.Models;
 using Microsoft.Xna.Framework;
 using TopDown.States;
+using Engine;
 
 namespace TopDown.Sprites
 {
   public class NPC : Sprite
   {
+    public static string[] Names = new string[]
+    {
+      "Bob",
+      "Jimmy",
+      "Fred",
+      "Tim",
+      "John",
+    };
+
     private GameScreen _gameScreen;
 
     private List<Vector2> _walkingPath;
 
+    /// <summary>
+    /// We don't need the NPCs to collide with anything
+    /// </summary>
     public override List<Rectangle> CollisionRectangles
     {
       get
       {
-        return new List<Rectangle>()
-        {
-          new Rectangle(Rectangle.X + 4, Rectangle.Bottom - 24, 24, 24),
-        };
+        return new List<Rectangle>();
       }
     }
+
+    public string Name { get; set; }
 
     public override Vector2 Position
     {
@@ -39,11 +51,23 @@ namespace TopDown.Sprites
       }
     }
 
+    public Sprite DisplaySprite { get; private set; }
+
     public NPC(Dictionary<string, Animation> animations, GameScreen gameScreen) : base(animations)
     {
       _gameScreen = gameScreen;
 
       _walkingPath = new List<Vector2>();
+
+      var animation = _animations.First().Value;
+      
+      DisplaySprite = new Sprite(animation.Texture)
+      {
+        SourceRectangle = new Rectangle(0, 0, animation.FrameWidth, animation.FrameHeight),
+        Scale = 0.5f,
+      };
+
+      Name = Names[GameEngine.Random.Next(0, Names.Length)];
     }
 
     protected override void SetAnimation()

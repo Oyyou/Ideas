@@ -40,7 +40,6 @@ namespace TopDown.Controls.BuildMenu
         spriteBatch.DrawString(_font, "Stone: " + ResourceCost.Stone, new Vector2(Rectangle.X + 5, Rectangle.Y + 65), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
         spriteBatch.DrawString(_font, "Gold: " + ResourceCost.Gold, new Vector2(Rectangle.X + (Rectangle.Width / 2) + 5, Rectangle.Y + 65), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
       }
-
     }
   }
 }

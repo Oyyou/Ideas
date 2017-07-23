@@ -21,6 +21,8 @@ namespace Engine.Sprites
 
     private float _layer;
 
+    private float _scale;
+
     private Rectangle _sourceRectangle;
 
     private SpriteEffects _spriteEffect;
@@ -81,6 +83,18 @@ namespace Engine.Sprites
     }
 
     public float Rotation;
+
+    public float Scale
+    {
+      get { return _scale; }
+      set
+      {
+        _scale = value;
+
+        if (_animationManager != null)
+          _animationManager.Scale = _scale;
+      }
+    }
 
     public Rectangle SourceRectangle
     {
@@ -144,12 +158,14 @@ namespace Engine.Sprites
       {
         var layer = Layer;// + Position.Y / 100000;
 
-        spriteBatch.Draw(_texture,
-          Rectangle,
+        spriteBatch.Draw(
+          _texture,
+          Position,
           SourceRectangle,
           Color,
           Rotation,
           Origin,
+          Scale,
           SpriteEffect,
           MathHelper.Clamp(layer, 0f, 1f));
       }
@@ -177,6 +193,8 @@ namespace Engine.Sprites
       IsVisible = true;
 
       IsCollidable = true;
+
+      Scale = 1f;
     }
 
     protected bool IsTouchingLeft(Sprite sprite)

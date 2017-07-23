@@ -34,6 +34,8 @@ namespace Engine.Managers
 
     public int PreviousFrame { get; private set; }
 
+    public float Scale { get; set; }
+
     public SpriteEffects SpriteEffect { get; set; }
 
     public AnimationManager(Animation animation)
@@ -65,7 +67,7 @@ namespace Engine.Managers
         Color,
         0f,
         new Vector2(0, 0),
-        1f,
+        Scale,
         SpriteEffect,
         MathHelper.Clamp(layer, 0f, 1f));
 
