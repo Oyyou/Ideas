@@ -13,6 +13,8 @@ namespace TopDown.Controls.JobMenu
 {
   public class JobMenuSubButton : Button
   {
+    private Button _add;
+
     private NPC _npc;
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -21,11 +23,15 @@ namespace TopDown.Controls.JobMenu
 
       DrawNPCIcon(gameTime, spriteBatch);
 
+      foreach (var component in Components)
+        component.Draw(gameTime, spriteBatch);
+
       if (_font != null)
       {
         spriteBatch.DrawString(_font, _npc.Name, new Vector2(Position.X + 42, Position.Y + 5), Color.Black, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
-        spriteBatch.DrawString(_font, "[Job]", new Vector2(Position.X + 42, Position.Y + 25), Color.Black, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+        spriteBatch.DrawString(_font, _npc.Job, new Vector2(Position.X + 42, Position.Y + 25), Color.Black, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
       }
+
     }
 
     private void DrawNPCIcon(GameTime gameTime, SpriteBatch spriteBatch)
@@ -53,6 +59,26 @@ namespace TopDown.Controls.JobMenu
     public override void LoadContent(ContentManager content)
     {
       base.LoadContent(content);
+
+      var addTexture = content.Load<Texture2D>("Controls/Add");
+
+      _add = new Button(addTexture)
+      {
+        Position = new Vector2(Rectangle.Right - addTexture.Width - 5, Rectangle.Top + 5),
+        Layer = Layer + 0.001f,
+      };
+
+      _add.Click += Add_Click;
+
+      Components.Add(_add);
+
+      foreach (var component in Components)
+        component.LoadContent(content);
+    }
+
+    private void Add_Click(object sender, EventArgs e)
+    {
+      _npc.AssignJob();
     }
   }
 }

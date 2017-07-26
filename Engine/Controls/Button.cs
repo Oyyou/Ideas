@@ -16,7 +16,10 @@ namespace Engine.Controls
     {
       get
       {
-        if (IsSelected)
+        if (!IsEnabled)
+          return Color.Black;
+
+          if (IsSelected)
           return Color.Yellow;
 
         if (IsHovering)
@@ -40,7 +43,7 @@ namespace Engine.Controls
 
     public bool IsClicked { get; set; }
 
-    public bool IsHovering { get; protected set; }
+    public bool IsHovering { get; set; }
 
     public bool IsSelected { get; set; }
 
@@ -68,6 +71,8 @@ namespace Engine.Controls
       PenColor = Color.Black;
 
       IsSelected = false;
+
+      IsEnabled = true;
     }
 
     public Button(Texture2D texture, SpriteFont font)
@@ -81,6 +86,8 @@ namespace Engine.Controls
       PenColor = Color.Black;
 
       IsSelected = false;
+
+      IsEnabled = true;
     }
 
     public override void CheckCollision(Component component)
@@ -91,6 +98,9 @@ namespace Engine.Controls
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.Draw(_texture, Rectangle, null, _colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
+
+      foreach (var component in Components)
+        component.Draw(gameTime, spriteBatch);
 
       DrawText(spriteBatch);
     }
@@ -108,7 +118,7 @@ namespace Engine.Controls
 
     public override void LoadContent(ContentManager content)
     {
-
+      Components = new List<Component>();
     }
 
     protected virtual void OnClick()
@@ -119,10 +129,18 @@ namespace Engine.Controls
     public override void UnloadContent()
     {
       _texture.Dispose();
+
+      foreach (var component in Components)
+        component.UnloadContent();
+
+      Components.Clear();
     }
 
     public override void Update(GameTime gameTime)
     {
+      if (!IsEnabled)
+        return;
+
       Rectangle = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
 
       _previousMouse = _currentMouse;
@@ -139,11 +157,13 @@ namespace Engine.Controls
 
         if (_currentMouse.LeftButton == ButtonState.Released && _previousMouse.LeftButton == ButtonState.Pressed)
         {
-          //IsSelected = true;
           IsClicked = true;
           OnClick();
         }
       }
+
+      foreach (var component in Components)
+        component.Update(gameTime);
     }
   }
 }

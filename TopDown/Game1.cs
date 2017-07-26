@@ -31,6 +31,9 @@ namespace TopDown
     protected override void Initialize()
     {
       //IsMouseVisible = true;
+      //base.IsFixedTimeStep = false;
+
+      //this.graphics.SynchronizeWithVerticalRetrace = false;
 
       ScreenHeight = _graphics.PreferredBackBufferHeight;
 

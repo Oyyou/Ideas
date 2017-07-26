@@ -64,6 +64,8 @@ namespace TopDown.Controls
 
       foreach (var icon in _icons)
       {
+        icon.LoadContent(content);
+
         icon.Position = new Vector2(x, _toolbarSprite.Position.Y + 1);
 
         x += 60;

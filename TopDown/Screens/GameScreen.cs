@@ -4,6 +4,7 @@ using Engine.Models;
 using Engine.Sprites;
 using Engine.States;
 using Engine.TmxSharp;
+using Engine.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 using TopDown.Builders;
 using TopDown.Buildings;
 using TopDown.Buildings.Housing;
+using TopDown.Buildings.Labour;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
 using TopDown.Controls.ItemMenu;
@@ -48,8 +50,6 @@ namespace TopDown.States
 
     private List<Component> _guiComponents;
 
-    private JobMenuWindow _jobMenu;
-
     public List<Component> CollidableComponents
     {
       get
@@ -59,6 +59,8 @@ namespace TopDown.States
     }
 
     public ItemMenu ItemMenu { get; set; }
+
+    public JobMenuWindow JobMenu;
 
     public static Controls.Keyboard Keyboard;
 
@@ -95,6 +97,16 @@ namespace TopDown.States
     public GameStates State { get; set; }
 
     public DateTime Time { get; set; }
+
+    public List<Building> Workplaces
+    {
+      get
+      {
+        var components = _gameComponents.Where(c => c is Blacksmith).Cast<Building>().ToList();// as List<Building>;
+
+        return components != null ? components : new List<Building>();
+      }
+    }
 
     public void AddComponent(Building building)
     {
@@ -242,7 +254,7 @@ namespace TopDown.States
 
       _buildMenu = new BuildMenuWindow(this);
 
-      _jobMenu = new JobMenuWindow(this);
+      JobMenu = new JobMenuWindow(this);
 
       ItemMenu = new ItemMenu(this);
       //ItemMenu.LoadContent(_content);
@@ -425,6 +437,7 @@ namespace TopDown.States
 
       _guiComponents = new List<Component>()
       {
+        new FrameCounter(),
         Keyboard,
         Mouse,
         MessageBox,
@@ -432,7 +445,7 @@ namespace TopDown.States
         new Toolbar_Bottom(this),
         new ResourceView(Resources),
         _buildMenu,
-        _jobMenu,
+        JobMenu,
         ItemMenu,
       };
 

@@ -8,6 +8,7 @@ using Engine.Models;
 using Microsoft.Xna.Framework;
 using TopDown.States;
 using Engine;
+using TopDown.Buildings;
 
 namespace TopDown.Sprites
 {
@@ -37,6 +38,12 @@ namespace TopDown.Sprites
       }
     }
 
+    public Sprite DisplaySprite { get; private set; }
+
+    public string Job { get; set; }
+
+    public Building JobBuilding { get; private set; }
+
     public string Name { get; set; }
 
     public override Vector2 Position
@@ -51,7 +58,16 @@ namespace TopDown.Sprites
       }
     }
 
-    public Sprite DisplaySprite { get; private set; }
+    public event EventHandler Work;
+
+    public void AssignJob()
+    {
+      var jb = _gameScreen.JobMenu.JobButton.JobBuilding;
+
+      Job = jb.Name;
+
+      Work += jb.Work;
+    }
 
     public NPC(Dictionary<string, Animation> animations, GameScreen gameScreen) : base(animations)
     {
@@ -60,7 +76,7 @@ namespace TopDown.Sprites
       _walkingPath = new List<Vector2>();
 
       var animation = _animations.First().Value;
-      
+
       DisplaySprite = new Sprite(animation.Texture)
       {
         SourceRectangle = new Rectangle(0, 0, animation.FrameWidth, animation.FrameHeight),
@@ -68,6 +84,8 @@ namespace TopDown.Sprites
       };
 
       Name = Names[GameEngine.Random.Next(0, Names.Length)];
+
+      Job = "Unemployed";
     }
 
     protected override void SetAnimation()
@@ -102,27 +120,29 @@ namespace TopDown.Sprites
           _walkingPath.RemoveAt(0);
       }
 
-      if (_walkingPath.Count == 0)
-      {
-        Random random = new Random();
+      Work?.Invoke(this, new EventArgs());
 
-        var value = random.Next(0, _gameScreen.PathComponents.Count);
+      //if (_walkingPath.Count == 0)
+      //{
+      //  Random random = new Random();
 
-        _walkingPath = _gameScreen.PathFinder.FindPath(Position, _gameScreen.PathComponents[value].Position);
-      }
+      //  var value = random.Next(0, _gameScreen.PathComponents.Count);
 
-      var targetPosition = _walkingPath.Count > 0 ? _walkingPath.FirstOrDefault() : Position;
+      //  _walkingPath = _gameScreen.PathFinder.FindPath(Position, _gameScreen.PathComponents[value].Position);
+      //}
 
-      if (Position.X < targetPosition.X)
-        Velocity.X = 1;
-      else if (Position.X > targetPosition.X)
-        Velocity.X = -1;
-      else if (Position.Y < targetPosition.Y)
-        Velocity.Y = 1;
-      else if (Position.Y > targetPosition.Y)
-        Velocity.Y = -1;
+      //var targetPosition = _walkingPath.Count > 0 ? _walkingPath.FirstOrDefault() : Position;
 
-      _animationManager.Update(gameTime);
+      //if (Position.X < targetPosition.X)
+      //  Velocity.X = 1;
+      //else if (Position.X > targetPosition.X)
+      //  Velocity.X = -1;
+      //else if (Position.Y < targetPosition.Y)
+      //  Velocity.Y = 1;
+      //else if (Position.Y > targetPosition.Y)
+      //  Velocity.Y = -1;
+
+      //_animationManager.Update(gameTime);
     }
   }
 }

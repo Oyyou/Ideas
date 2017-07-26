@@ -108,6 +108,8 @@ namespace TopDown.Buildings
       }
     }
 
+    public string Name { get; set; }
+
     public override Rectangle Rectangle
     {
       get
@@ -467,6 +469,11 @@ namespace TopDown.Buildings
         default:
           break;
       }
+    }
+
+    public virtual void Work(object sender, EventArgs e)
+    {
+
     }
   }
 }

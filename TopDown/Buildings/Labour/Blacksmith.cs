@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TopDown.Sprites;
 using TopDown.States;
 
 namespace TopDown.Buildings.Labour
@@ -66,6 +67,7 @@ namespace TopDown.Buildings.Labour
 
     public Blacksmith(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
     {
+      Name = "Blacksmith";
     }
 
     protected override void SetDoorLocations()
@@ -98,6 +100,15 @@ namespace TopDown.Buildings.Labour
           IsValid = false,
         },
       };
+    }
+
+    public override void Work(object sender, EventArgs e)
+    {
+      var npc = sender as NPC;
+
+      // TODO: Walk to work!
+
+      // Stand by anvil
     }
   }
 }
