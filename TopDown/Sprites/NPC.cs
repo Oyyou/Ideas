@@ -64,9 +64,17 @@ namespace TopDown.Sprites
     {
       var jb = _gameScreen.JobMenu.JobButton.JobBuilding;
 
-      Job = jb.Name;
+      // Remove the same job from any NPC that is currently working said job
+      foreach (var npc in _gameScreen.NPCComponents.Where(c => c.JobBuilding == jb))
+      {
+        npc.Unemploy();
+      }
 
-      Work += jb.Work;
+      JobBuilding = jb;
+
+      Job = JobBuilding.Name;
+
+      Work += JobBuilding.Work;
     }
 
     public NPC(Dictionary<string, Animation> animations, GameScreen gameScreen) : base(animations)
@@ -110,6 +118,12 @@ namespace TopDown.Sprites
       {
         _animationManager.Stop();
       }
+    }
+
+    public void Unemploy()
+    {
+      JobBuilding = null;
+      Job = "Unemployed";
     }
 
     public override void Update(GameTime gameTime)

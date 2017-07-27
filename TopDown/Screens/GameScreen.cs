@@ -68,11 +68,11 @@ namespace TopDown.States
 
     public static Controls.Mouse Mouse;
 
-    public IEnumerable<Component> NPCComponents
+    public IEnumerable<NPC> NPCComponents
     {
       get
       {
-        return _gameComponents.Where(c => c is NPC);
+        return _gameComponents.Where(c => c is NPC).Cast<NPC>();
       }
     }
 
@@ -102,9 +102,9 @@ namespace TopDown.States
     {
       get
       {
-        var components = _gameComponents.Where(c => c is Blacksmith).Cast<Building>().ToList();// as List<Building>;
+        var components = _gameComponents.Where(c => c is Blacksmith || c is Tavern).Cast<Building>().ToList();
 
-        return components != null ? components : new List<Building>();
+        return components ?? new List<Building>();
       }
     }
 
@@ -401,6 +401,20 @@ namespace TopDown.States
 
                   break;
 
+                case "Blacksmith":
+
+                  var blacksmith = new Blacksmith(this, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
+                  {
+                    Position = new Vector2(collisionObject.X, collisionObject.Y),
+                    State = BuildingStates.Built_Out,
+                  };
+
+                  blacksmith.LoadContent(_content);
+
+                  _gameComponents.Add(blacksmith);
+
+                  break;
+
                 default:
                   throw new Exception("Unknown building: " + collisionObject.Name);
 
@@ -430,7 +444,10 @@ namespace TopDown.States
         }
       }
 
-      PathFinder.UpdateMap(PathComponents.Select(c => c.Position).ToList());
+      var pathPositions = Workplaces.SelectMany(c => c.PathPositions).ToList();
+      pathPositions.AddRange(PathComponents.Select(c => c.Position).ToList());
+
+      PathFinder.UpdateMap(pathPositions);
 
       var buttonTexture = gameModel.ContentManger.Load<Texture2D>("Controls/Button");
       var buttonFont = gameModel.ContentManger.Load<SpriteFont>("Fonts/Font");

@@ -24,6 +24,9 @@ namespace TopDown.Controls.JobMenu
 
     private Texture2D _subButtonTexture;
 
+    /// <summary>
+    /// The job currently clicked
+    /// </summary>
     public JobMenuButton JobButton;
 
     public override void CheckCollision(Component component)
@@ -97,10 +100,17 @@ namespace TopDown.Controls.JobMenu
       foreach (var subButton in _subButtons)
       {
         subButton.Update(gameTime);
+        subButton.IsJobSelected = JobButton != null && JobButton.JobBuilding == subButton.NPC.JobBuilding;
         subButton.IsHovering = false;
 
-        foreach (var component in subButton.Components)
-          component.IsEnabled = JobButton != null;
+        var condition1 = JobButton != null && JobButton.JobBuilding != subButton.NPC.JobBuilding;
+        var condition2 = JobButton != null && JobButton.JobBuilding == subButton.NPC.JobBuilding;
+
+        subButton.Add.IsVisible = condition1;
+        subButton.Add.IsEnabled = condition1;
+
+        subButton.Minus.IsVisible = condition2;
+        subButton.Minus.IsEnabled = condition2;
       }
     }
 

@@ -73,6 +73,53 @@ namespace TopDown.Buildings
 
     protected Texture2D _woodChipTexture;
 
+    public Color Color { get; set; }
+
+    public const float DefaultLayer = 0.8f;
+
+    public override Vector2 Position
+    {
+      get { return _spriteOutside.Position; }
+      set
+      {
+        _spriteInside.Position = value;
+        _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+      }
+    }
+
+    public string Name { get; set; }
+
+    public virtual List<Vector2> PathPositions
+    {
+      get
+      {
+        var positions = new List<Vector2>();
+
+        for (int y = 0; y < Rectangle.Height; y+=32)
+        {
+          for (int x = 0; x < Rectangle.Width; x += 32)
+          {
+            positions.Add(new Vector2(Rectangle.X + x, Rectangle.Y + y));
+          }
+        }
+
+        return positions;
+      }
+    }
+
+    public override Rectangle Rectangle
+    {
+      get
+      {
+        return _spriteInside.Rectangle;
+      }
+
+      set
+      {
+        base.Rectangle = value;
+      }
+    }
+
     public virtual BuildingStates State
     {
       get { return _state; }
@@ -91,35 +138,6 @@ namespace TopDown.Buildings
             CollisionRectangles = new List<Rectangle>();
             break;
         }
-      }
-    }
-
-    public Color Color { get; set; }
-
-    public const float DefaultLayer = 0.8f;
-
-    public override Vector2 Position
-    {
-      get { return _spriteOutside.Position; }
-      set
-      {
-        _spriteInside.Position = value;
-        _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
-      }
-    }
-
-    public string Name { get; set; }
-
-    public override Rectangle Rectangle
-    {
-      get
-      {
-        return _spriteInside.Rectangle;
-      }
-
-      set
-      {
-        base.Rectangle = value;
       }
     }
 

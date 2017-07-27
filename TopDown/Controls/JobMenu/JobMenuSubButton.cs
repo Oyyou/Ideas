@@ -13,9 +13,36 @@ namespace TopDown.Controls.JobMenu
 {
   public class JobMenuSubButton : Button
   {
-    private Button _add;
+    public Button Add;
 
-    private NPC _npc;
+    public Button Minus;
+
+    protected override Color _colour
+    {
+      get
+      {
+        if (IsJobSelected)
+          return Color.Green;
+
+        if (!IsEnabled)
+          return Color.Black;
+
+        if (IsSelected)
+          return Color.Yellow;
+
+        if (IsHovering)
+          return Color.Gray;
+
+        return Color.White;
+      }
+    }
+
+    public NPC NPC { get; private set; }
+
+    /// <summary>
+    /// If the NPC has a job, and the job is 'clicked' on the job menu, change colour
+    /// </summary>
+    public bool IsJobSelected { get; set; }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
@@ -28,32 +55,32 @@ namespace TopDown.Controls.JobMenu
 
       if (_font != null)
       {
-        spriteBatch.DrawString(_font, _npc.Name, new Vector2(Position.X + 42, Position.Y + 5), Color.Black, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
-        spriteBatch.DrawString(_font, _npc.Job, new Vector2(Position.X + 42, Position.Y + 25), Color.Black, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+        spriteBatch.DrawString(_font, NPC.Name, new Vector2(Position.X + 42, Position.Y + 5), Color.Black, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+        spriteBatch.DrawString(_font, NPC.Job, new Vector2(Position.X + 42, Position.Y + 25), Color.Black, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
       }
 
     }
 
     private void DrawNPCIcon(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      var scale = _npc.DisplaySprite.Scale;
+      var scale = NPC.DisplaySprite.Scale;
 
-      var width = _npc.DisplaySprite.SourceRectangle.Width * scale;
-      var height = _npc.DisplaySprite.SourceRectangle.Height * scale;
+      var width = NPC.DisplaySprite.SourceRectangle.Width * scale;
+      var height = NPC.DisplaySprite.SourceRectangle.Height * scale;
 
       var x = (Position.X + 5) + 16 - (width / 2);
       var y = (Position.Y + 5) + 16 - (height / 2);
 
-      _npc.DisplaySprite.Position = new Vector2(x, y);
+      NPC.DisplaySprite.Position = new Vector2(x, y);
 
-      _npc.DisplaySprite.Layer = Layer + 0.001f;
+      NPC.DisplaySprite.Layer = Layer + 0.001f;
 
-      _npc.DisplaySprite.Draw(gameTime, spriteBatch);
+      NPC.DisplaySprite.Draw(gameTime, spriteBatch);
     }
 
     public JobMenuSubButton(Texture2D texture, SpriteFont font, NPC npc) : base(texture, font)
     {
-      _npc = npc;
+      NPC = npc;
     }
 
     public override void LoadContent(ContentManager content)
@@ -62,23 +89,42 @@ namespace TopDown.Controls.JobMenu
 
       var addTexture = content.Load<Texture2D>("Controls/Add");
 
-      _add = new Button(addTexture)
+      var minusTexture = content.Load<Texture2D>("Controls/Minus");
+
+      var position = new Vector2(Rectangle.Right - addTexture.Width - 5, Rectangle.Top + 5);
+
+      Add = new Button(addTexture)
       {
-        Position = new Vector2(Rectangle.Right - addTexture.Width - 5, Rectangle.Top + 5),
+        Position = position,
         Layer = Layer + 0.001f,
       };
 
-      _add.Click += Add_Click;
+      Add.Click += Add_Click;
 
-      Components.Add(_add);
+      Minus = new Button(minusTexture)
+      {
+        Position = position,
+        Layer = Layer + 0.001f,
+        IsVisible = false,
+      };
 
-      foreach (var component in Components)
+      Minus.Click += Minus_Click;
+
+      Components.Add(Add);
+      Components.Add(Minus);
+
+      foreach (var component in Components) 
         component.LoadContent(content);
+    }
+
+    private void Minus_Click(object sender, EventArgs e)
+    {
+      NPC.Unemploy();
     }
 
     private void Add_Click(object sender, EventArgs e)
     {
-      _npc.AssignJob();
+      NPC.AssignJob();
     }
   }
 }

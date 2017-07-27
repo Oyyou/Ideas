@@ -56,7 +56,8 @@ namespace TopDown.Buildings.Labour
               new Rectangle(x + 96, y + height - 1, 96, 1), // bottom right
             };
 
-            collisionRectangles.AddRange(Components.SelectMany(c => c.CollisionRectangles).ToList());
+            if (Components != null)
+              collisionRectangles.AddRange(Components.SelectMany(c => c.CollisionRectangles).ToList());
 
             CollisionRectangles = collisionRectangles;
 

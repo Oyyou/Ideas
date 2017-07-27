@@ -66,13 +66,7 @@ namespace Engine.Controls
 
       _font = null;
 
-      Rectangle = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
-
-      PenColor = Color.Black;
-
-      IsSelected = false;
-
-      IsEnabled = true;
+      Initialise();
     }
 
     public Button(Texture2D texture, SpriteFont font)
@@ -81,13 +75,7 @@ namespace Engine.Controls
 
       _font = font;
 
-      Rectangle = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
-
-      PenColor = Color.Black;
-
-      IsSelected = false;
-
-      IsEnabled = true;
+      Initialise();
     }
 
     public override void CheckCollision(Component component)
@@ -97,6 +85,9 @@ namespace Engine.Controls
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      if (!IsVisible)
+        return;
+
       spriteBatch.Draw(_texture, Rectangle, null, _colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
 
       foreach (var component in Components)
@@ -114,6 +105,19 @@ namespace Engine.Controls
       float y = (Rectangle.Y + (Rectangle.Height / 2)) - (_font.MeasureString(Text).Y / 2);
 
       spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+    }
+
+    private void Initialise()
+    {
+      Rectangle = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+
+      PenColor = Color.Black;
+
+      IsSelected = false;
+
+      IsEnabled = true;
+
+      IsVisible = true;
     }
 
     public override void LoadContent(ContentManager content)
