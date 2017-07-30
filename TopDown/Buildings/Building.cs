@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using TopDown.FX;
 using Engine.Sprites;
+using static TopDown.Logic.Pathfinder;
 
 namespace TopDown.Buildings
 {
@@ -89,21 +90,42 @@ namespace TopDown.Buildings
 
     public string Name { get; set; }
 
-    public virtual List<Vector2> PathPositions
+    public virtual List<SearchNode> PathPositions
     {
       get
       {
-        var positions = new List<Vector2>();
+        var searchNodes = new List<SearchNode>();
 
-        for (int y = 0; y < Rectangle.Height; y+=32)
+        var index = 0;
+
+        for (int y = 0; y < Rectangle.Height; y += 32)
         {
           for (int x = 0; x < Rectangle.Width; x += 32)
           {
-            positions.Add(new Vector2(Rectangle.X + x, Rectangle.Y + y));
+            index++;
+
+            var searchNode = new SearchNode()
+            {
+              Position = new Vector2((Rectangle.X + x) / 32, (Rectangle.Y + y) / 32),
+              Walkable = true,
+              Neighbors = new SearchNode[]
+              {
+                y == 0 ? new SearchNode() : null, // Top
+                y == Rectangle.Height - 32 ? new SearchNode() : null, // Down
+                x == 0 ? new SearchNode() : null, // Left
+                x == Rectangle.Width - 32 ? new SearchNode() : null, // Right
+              },
+            };
+
+            // TODO: Set to door position
+            if (x == 0 && y == Rectangle.Height - 32)
+              searchNode.Neighbors[1] = null;
+
+            searchNodes.Add(searchNode);
           }
         }
 
-        return positions;
+        return searchNodes;
       }
     }
 

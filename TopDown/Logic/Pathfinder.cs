@@ -7,7 +7,7 @@ namespace TopDown.Logic
 {
   public class Pathfinder
   {
-    internal class SearchNode
+    public class SearchNode
     {
       /// <summary>
       /// Location on the map
@@ -58,9 +58,9 @@ namespace TopDown.Logic
     {
       get
       {
-        var t = _pathPositions.OrderByDescending(c => c.X);
+        var t = _pathPositionsV2.OrderByDescending(c => c.Position.X);
 
-        return (int)t.FirstOrDefault().X;
+        return (int)t.FirstOrDefault().Position.X;
       }
     }
 
@@ -68,9 +68,9 @@ namespace TopDown.Logic
     {
       get
       {
-        var t = _pathPositions.OrderByDescending(c => c.Y);
+        var t = _pathPositionsV2.OrderByDescending(c => c.Position.Y);
 
-        return (int)t.FirstOrDefault().Y;
+        return (int)t.FirstOrDefault().Position.Y;
       }
     }
 
@@ -78,9 +78,9 @@ namespace TopDown.Logic
     {
       get
       {
-        var t = _pathPositions.OrderBy(c => c.X);
+        var t = _pathPositionsV2.OrderBy(c => c.Position.X);
 
-        return (int)t.FirstOrDefault().X;
+        return (int)t.FirstOrDefault().Position.X;
       }
     }
 
@@ -88,13 +88,13 @@ namespace TopDown.Logic
     {
       get
       {
-        var t = _pathPositions.OrderBy(c => c.Y);
+        var t = _pathPositionsV2.OrderBy(c => c.Position.Y);
 
-        return (int)t.FirstOrDefault().Y;
+        return (int)t.FirstOrDefault().Position.Y;
       }
     }
 
-    private List<Vector2> _pathPositions;
+    private List<SearchNode> _pathPositionsV2;
 
     // Holds search nodes that are avaliable to search.
     private List<SearchNode> openList = new List<SearchNode>();
@@ -120,7 +120,6 @@ namespace TopDown.Logic
     /// </summary>
     public void InitializeSearchNodes()
     {
-      //searchNodes = new SearchNode[levelWidth, levelHeight];
       _searchNodes = new Dictionary<Tuple<int, int>, SearchNode>();
 
       //For each of the tiles in our map, we
@@ -129,12 +128,22 @@ namespace TopDown.Logic
       {
         for (int y = _startY; y <= _endY; y++)
         {
+          var position = new Vector2(x, y);
+
+          var node = _pathPositionsV2.Where(c => c.Position == position).FirstOrDefault();
+
+          if (node != null && node.Neighbors != null)
+          {
+            _searchNodes.Add(new Tuple<int, int>(x, y), node);
+            continue;
+          }
+
           //Create a search node to represent this tile.
-          SearchNode node = new SearchNode();
+          node = new SearchNode();
           node.Position = new Vector2(x, y);
 
           // Can only walk on the empty and floor tiles
-          node.Walkable = _pathPositions.Contains(node.Position);
+          node.Walkable = _pathPositionsV2.Any(c => c.Position == node.Position);
 
           // We only want to store nodes
           // that can be walked on.
@@ -183,12 +192,19 @@ namespace TopDown.Logic
             if (position.X < _startX || position.X > _endX ||
                 position.Y < _startY || position.Y > _endY)
             {
+              node.Neighbors[i] = null;
               continue;
             }
 
             //SearchNode neighbor = searchNodes[(int)position.X, (int)position.Y];
             var neighborKey = new Tuple<int, int>((int)position.X, (int)position.Y);
             var neighbor = _searchNodes.ContainsKey(neighborKey) ? _searchNodes[neighborKey] : null;
+
+            if (node.Neighbors[i] != null)
+            {
+              node.Neighbors[i] = null;
+              continue;
+            }
 
             // We will only bother keeping a reference 
             // to the nodes that can be walked on.
@@ -308,8 +324,6 @@ namespace TopDown.Logic
       ResetSearchNodes();
 
       // Store references to the start and end nodes for convenience.
-      //SearchNode startNode = searchNodes[(int)startPoint.X / 32, (int)startPoint.Y / 32];
-      //SearchNode endNode = searchNodes[(int)endPoint.X / 32, (int)endPoint.Y / 32];
 
       var startNode = _searchNodes[new Tuple<int, int>((int)startPoint.X / 32, (int)startPoint.Y / 32)];
       var endNode = _searchNodes[new Tuple<int, int>((int)endPoint.X / 32, (int)endPoint.Y / 32)];
@@ -320,57 +334,11 @@ namespace TopDown.Logic
         return new List<Vector2>();
       }
 
-      //int count = 0;
-      //while (endNode == null)
-      //{
-      //  switch (count)
-      //  {
-      //    case 0:
-      //      endNode = searchNodes[((int)endPoint.X / Map.TileSize) - 1, (int)endPoint.Y / Map.TileSize];
-      //      break;
-      //    case 1:
-      //      endNode = searchNodes[((int)endPoint.X / Map.TileSize) + 1, (int)endPoint.Y / Map.TileSize];
-      //      break;
-      //    case 2:
-      //      endNode = searchNodes[((int)endPoint.X / Map.TileSize), ((int)endPoint.Y / Map.TileSize) - 1];
-      //      break;
-      //    case 3:
-      //      endNode = searchNodes[((int)endPoint.X / Map.TileSize), ((int)endPoint.Y / Map.TileSize) + 1];
-      //      break;
-      //    default:
-      //      throw new Exception("Looks like there is nowhere to go for end node. Oops");
-      //  }
-
-      //  count++;
-      //}
-
       // Only try to find a path if the start and end points are different.
       if (startNode == endNode)
       {
         return new List<Vector2>();
       }
-
-
-      //using (System.IO.StreamWriter writer = new System.IO.StreamWriter(@"D:\derp.txt"))
-      //{
-      //    for (int y = 0; y < levelHeight; y++)
-      //    {
-      //    for (int x = 0; x < levelWidth; x++)
-      //    {
-      //      var searchNode = searchNodes[x, y];
-      //
-      //      if (searchNode != null)
-      //      {
-      //        writer.Write("0");
-      //      }
-      //      else
-      //      {
-      //        writer.Write("1");
-      //      }
-      //    }
-      //    writer.WriteLine();
-      //  }
-      //}
 
       /////////////////////////////////////////////////////////////////////
       // Step 2 : Set the start node’s G value to 0 and its F value to the 
@@ -495,7 +463,7 @@ namespace TopDown.Logic
       {
         for (int x = _startX; x <= _endX; x++)
         {
-          if (_pathPositions.Contains(new Vector2(x, y)))
+          if (_pathPositionsV2.Any(c => c.Position == new Vector2(x, y)))
             Console.Write("0");
           else
             Console.Write("1");
@@ -505,9 +473,9 @@ namespace TopDown.Logic
       }
     }
 
-    public void UpdateMap(List<Vector2> pathPositions)
+    public void UpdateMap(List<SearchNode> pathPositions)
     {
-      _pathPositions = pathPositions.Select(c => c / 32).ToList();
+      _pathPositionsV2 = pathPositions;
 
       InitializeSearchNodes();
     }

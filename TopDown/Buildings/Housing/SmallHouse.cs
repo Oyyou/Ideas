@@ -15,6 +15,10 @@ namespace TopDown.Buildings.Housing
 
     protected override int _outsideExtraWidth => 40;
 
+    public const int MaxResidents = 2;
+
+    public int ResidentCount { get; set; }
+
     public override BuildingStates State
     {
       get { return _state; }

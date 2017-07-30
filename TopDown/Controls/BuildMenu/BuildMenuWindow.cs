@@ -325,6 +325,22 @@ namespace TopDown.Controls.BuildMenu
         anvil,
       };
 
+      var mine = new BuildMenuSubButton(_subButtonTexture, _font)
+      {
+        Text = "Mine",
+        Layer = 0.99f,
+        GameScreenSetValue = States.GameStates.PlacingBuilding,
+        ResourceCost = new Models.Resources()
+        {
+          Food = 15,
+          Gold = 10,
+          Wood = 30,
+          Stone = 40,
+        },
+      };
+
+      mine.Click += Mine_Click;
+
       _buildSubOptions = new List<BuildMenuSubButton>()
       {
         blacksmith,
@@ -354,23 +370,19 @@ namespace TopDown.Controls.BuildMenu
             Stone = 40,
           },
         },
-        new BuildMenuSubButton(_subButtonTexture, _font)
-        {
-          Text = "Mine",
-          Layer =  0.99f,
-          GameScreenSetValue = States.GameStates.PlacingBuilding,
-          ResourceCost = new Models.Resources()
-          {
-            Food = 15,
-            Gold = 10,
-            Wood = 30,
-            Stone = 40,
-          },
-        },
+        mine,
       };
 
       foreach (var component in _buildSubOptions)
         component.LoadContent(_content);
+    }
+
+    private void Mine_Click(object sender, EventArgs e)
+    {
+      _gameScreen.AddComponent(new Mine(_gameScreen, _content.Load<Texture2D>("Buildings/Mine/In"), _content.Load<Texture2D>("Buildings/Mine/Out"))
+      {
+        State = Buildings.BuildingStates.Placing,
+      });
     }
 
     private void Blacksmith_Click(object sender, EventArgs e)

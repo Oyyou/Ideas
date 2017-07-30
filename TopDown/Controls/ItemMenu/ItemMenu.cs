@@ -65,8 +65,8 @@ namespace TopDown.Controls.ItemMenu
         _gameState.SelectedBuilding.State = BuildingStates.Building;
         _gameState.SelectedBuilding = null;
       }
-      
-      if(_gameState.SelectedPathBuilder != null)
+
+      if (_gameState.SelectedPathBuilder != null)
       {
         _gameState.SelectedPathBuilder.Paths.Last().IsRemoved = true;
 
@@ -79,7 +79,7 @@ namespace TopDown.Controls.ItemMenu
         _gameState.SelectedPathBuilder = null;
       }
 
-      _gameState.PathFinder.UpdateMap(_gameState.PathComponents.Select(c => c.Position).ToList());
+      _gameState.UpdateMap();
 
       FullReset();
     }
@@ -165,13 +165,13 @@ namespace TopDown.Controls.ItemMenu
           ((ItemMenuButton)component).CurrentState == ItemMenuButtonStates.Placed) ||
           ((ItemMenuButton)component).Amount > 0)
         {
-          //foreach (var c in Components)
-          //{
-          //  if (c == component)
-          //    continue;
+          foreach (var c in Components)
+          {
+            if (c == component)
+              continue;
 
-            ((ItemMenuButton)component).CanClick = true;
-          //}
+            ((ItemMenuButton)c).CanClick = true;
+          }
         }
       }
 
@@ -205,7 +205,7 @@ namespace TopDown.Controls.ItemMenu
 
       Components.Add(done);
       Components.Add(cancel);
-            
+
       var y = _position.Y + 5;
 
       foreach (var item in Components)

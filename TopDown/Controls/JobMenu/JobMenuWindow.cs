@@ -100,11 +100,11 @@ namespace TopDown.Controls.JobMenu
       foreach (var subButton in _subButtons)
       {
         subButton.Update(gameTime);
-        subButton.IsJobSelected = JobButton != null && JobButton.JobBuilding == subButton.NPC.JobBuilding;
+        subButton.IsJobSelected = JobButton != null && JobButton.JobBuilding == subButton.NPC.Workplace;
         subButton.IsHovering = false;
 
-        var condition1 = JobButton != null && JobButton.JobBuilding != subButton.NPC.JobBuilding;
-        var condition2 = JobButton != null && JobButton.JobBuilding == subButton.NPC.JobBuilding;
+        var condition1 = JobButton != null && JobButton.JobBuilding != subButton.NPC.Workplace;
+        var condition2 = JobButton != null && JobButton.JobBuilding == subButton.NPC.Workplace;
 
         subButton.Add.IsVisible = condition1;
         subButton.Add.IsEnabled = condition1;

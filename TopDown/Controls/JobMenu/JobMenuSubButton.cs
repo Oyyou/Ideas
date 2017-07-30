@@ -24,6 +24,9 @@ namespace TopDown.Controls.JobMenu
         if (IsJobSelected)
           return Color.Green;
 
+        if (NPC.Workplace != null)
+          return Color.Red;
+
         if (!IsEnabled)
           return Color.Black;
 

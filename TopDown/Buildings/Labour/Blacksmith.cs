@@ -107,9 +107,9 @@ namespace TopDown.Buildings.Labour
     {
       var npc = sender as NPC;
 
-      // TODO: Walk to work!
+      var anvil = Components.First();
 
-      // Stand by anvil
+      npc.WalkTo(anvil.Position - new Vector2(32, 0));
     }
   }
 }

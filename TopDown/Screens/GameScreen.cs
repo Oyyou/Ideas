@@ -22,9 +22,11 @@ using TopDown.Controls.BuildMenu;
 using TopDown.Controls.ItemMenu;
 using TopDown.Controls.JobMenu;
 using TopDown.Core;
+using TopDown.Furnitures;
 using TopDown.Logic;
 using TopDown.Resources;
 using TopDown.Sprites;
+using static TopDown.Logic.Pathfinder;
 
 namespace TopDown.States
 {
@@ -50,11 +52,27 @@ namespace TopDown.States
 
     private List<Component> _guiComponents;
 
+    public IEnumerable<Building> BuildingComponents
+    {
+      get
+      {
+        return _gameComponents.Where(c => c is Building).Cast<Building>();
+      }
+    }
+
     public List<Component> CollidableComponents
     {
       get
       {
         return _gameComponents.Where(c => c.CollisionRectangles != null && c.CollisionRectangles.Count > 0).ToList();
+      }
+    }
+
+    public IEnumerable<SmallHouse> HouseComponents
+    {
+      get
+      {
+        return _gameComponents.Where(c => c is SmallHouse).Cast<SmallHouse>();
       }
     }
 
@@ -67,6 +85,14 @@ namespace TopDown.States
     public static MessageBox MessageBox;
 
     public static Controls.Mouse Mouse;
+
+    public int MaxNPCCount
+    {
+      get
+      {
+        return _gameComponents.Where(c => c is SmallHouse).Count() * SmallHouse.MaxResidents;
+      }
+    }
 
     public IEnumerable<NPC> NPCComponents
     {
@@ -102,7 +128,7 @@ namespace TopDown.States
     {
       get
       {
-        var components = _gameComponents.Where(c => c is Blacksmith || c is Tavern).Cast<Building>().ToList();
+        var components = _gameComponents.Where(c => c is Blacksmith || c is Tavern || c is Mine).Cast<Building>().ToList();
 
         return components ?? new List<Building>();
       }
@@ -127,6 +153,39 @@ namespace TopDown.States
       SelectedPathBuilder = pathBuilder;
 
       AddComponent(component: pathBuilder);
+    }
+
+    public void AddNPC()
+    {
+      if (NPCComponents.Count() >= MaxNPCCount)
+        return;
+
+      var playerAnimations = new Dictionary<string, Animation>()
+      {
+        { "WalkDown", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkDown"), 4) },
+        { "WalkLeft", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkLeft"), 4) },
+        { "WalkRight", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkRight"), 4) },
+        { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkUp"), 4) },
+      };
+
+      var house = HouseComponents.Where(c => c.ResidentCount < SmallHouse.MaxResidents && (c.State == BuildingStates.Built_In || c.State == BuildingStates.Built_Out)).FirstOrDefault();
+
+      if (house == null)
+        return;
+
+      var npc = new NPC(playerAnimations, this)
+      {
+        Position = new Vector2(736, 288),
+        IsCollidable = false,
+        Layer = Building.DefaultLayer,
+        Home = house,
+      };
+
+      house.ResidentCount++;
+
+      npc.LoadContent(_content);
+
+      _gameComponents.Add(npc);
     }
 
     private void BuildMenuUpdate(GameTime gameTime)
@@ -161,6 +220,7 @@ namespace TopDown.States
       var x = GameEngine.ScreenWidth - _font.MeasureString(time).X - 10;
 
       _spriteBatch.DrawString(_font, time, new Vector2(x, 5), Color.Red);
+      _spriteBatch.DrawString(_font, $"{NPCComponents.Count()}/{MaxNPCCount}", new Vector2(x, 25), Color.Red);
 
       foreach (var component in _guiComponents)
         component.Draw(gameTime, _spriteBatch);
@@ -172,7 +232,7 @@ namespace TopDown.States
     {
 
     }
-        
+
     private void ItemMenuUpdate(GameTime gameTime)
     {
       foreach (var component in _guiComponents)
@@ -377,78 +437,6 @@ namespace TopDown.States
         }
       }
 
-      foreach (var objectGroup in map.ObjectGroups)
-      {
-        switch (objectGroup.Name)
-        {
-          case "Buildings":
-
-            foreach (var collisionObject in objectGroup.CollisionObjects)
-            {
-              switch (collisionObject.Name)
-              {
-                case "SmallHouse":
-
-                  var smallHouse = new SmallHouse(this, _content.Load<Texture2D>("Buildings/SmallHouse/In"), _content.Load<Texture2D>("Buildings/SmallHouse/Out"))
-                  {
-                    Position = new Vector2(collisionObject.X, collisionObject.Y),
-                    State = BuildingStates.Built_Out,
-                  };
-
-                  smallHouse.LoadContent(_content);
-
-                  _gameComponents.Add(smallHouse);
-
-                  break;
-
-                case "Blacksmith":
-
-                  var blacksmith = new Blacksmith(this, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
-                  {
-                    Position = new Vector2(collisionObject.X, collisionObject.Y),
-                    State = BuildingStates.Built_Out,
-                  };
-
-                  blacksmith.LoadContent(_content);
-
-                  _gameComponents.Add(blacksmith);
-
-                  break;
-
-                default:
-                  throw new Exception("Unknown building: " + collisionObject.Name);
-
-              }
-            }
-
-            break;
-
-          case "NPCs":
-
-            foreach (var collisionObject in objectGroup.CollisionObjects)
-            {
-              var position = new Vector2(collisionObject.X, collisionObject.Y);
-
-              _gameComponents.Add(new NPC(playerAnimations, this)
-              {
-                Position = position,
-                IsCollidable = false,
-                Layer = 0.9f,
-              });
-            }
-
-            break;
-
-          default:
-            throw new Exception("Unknown group: " + objectGroup.Name);
-        }
-      }
-
-      var pathPositions = Workplaces.SelectMany(c => c.PathPositions).ToList();
-      pathPositions.AddRange(PathComponents.Select(c => c.Position).ToList());
-
-      PathFinder.UpdateMap(pathPositions);
-
       var buttonTexture = gameModel.ContentManger.Load<Texture2D>("Controls/Button");
       var buttonFont = gameModel.ContentManger.Load<SpriteFont>("Fonts/Font");
 
@@ -471,6 +459,137 @@ namespace TopDown.States
 
       foreach (var component in _guiComponents)
         component.LoadContent(_content);
+
+      foreach (var objectGroup in map.ObjectGroups)
+      {
+        switch (objectGroup.Name)
+        {
+          case "Blacksmith":
+
+            var blacksmith = new Blacksmith(this, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
+            {
+            };
+
+            blacksmith.LoadContent(_content);
+
+
+            foreach (var collisionObject in objectGroup.CollisionObjects)
+            {
+              var position = new Vector2(collisionObject.X, collisionObject.Y);
+
+              switch (collisionObject.Name)
+              {
+                case "Building":
+
+                  blacksmith.Position = position;
+
+                  break;
+
+                case "Anvil":
+                  var anvil = new Furniture(_content.Load<Texture2D>("Furniture/Anvil"), this)
+                  {
+                    Position = position,
+                    State = PlacableObjectStates.Placed,
+                  };
+
+                  anvil.LoadContent(_content);
+
+                  blacksmith.Components.Add(anvil);
+
+                  break;
+
+                default:
+                  throw new Exception("Unknown object: " + collisionObject.Name);
+              }
+            }
+
+            blacksmith.State = BuildingStates.Built_Out;
+            _gameComponents.Add(blacksmith);
+
+            break;
+
+          case "NPCs":
+
+            foreach (var collisionObject in objectGroup.CollisionObjects)
+            {
+              var position = new Vector2(collisionObject.X, collisionObject.Y);
+
+              var npc = new NPC(playerAnimations, this)
+              {
+                Position = position,
+                IsCollidable = false,
+                Layer = Building.DefaultLayer,
+              };
+
+              npc.LoadContent(_content);
+
+              _gameComponents.Add(npc);
+            }
+
+            break;
+
+          default:
+            //throw new Exception("Unknown group: " + objectGroup.Name);
+            break;
+        }
+      }
+
+      UpdateMap();
+    }
+
+    public void UpdateMap()
+    {
+      var pathPositions = BuildingComponents.SelectMany(c => c.PathPositions).ToList();
+
+      var pathSearchNodes = new List<SearchNode>();
+
+      foreach (var component in PathComponents)
+      {
+        var top = new Rectangle((int)component.Position.X, (int)component.Position.Y - 32, 32, 32);
+        var bottom = new Rectangle((int)component.Position.X, (int)component.Position.Y + 32, 32, 32);
+        var left = new Rectangle((int)component.Position.X - 32, (int)component.Position.Y, 32, 32);
+        var right = new Rectangle((int)component.Position.X + 32, (int)component.Position.Y, 32, 32);
+
+        var searchNode = new SearchNode()
+        {
+          Position = component.Position / 32,
+          Walkable = true,
+          Neighbors = new SearchNode[4],
+        };
+
+        foreach (var workplace in BuildingComponents)
+        {
+          if (workplace.Rectangle.Intersects(top))
+          {
+            if (component.Position.X == workplace.Rectangle.X) // TODO: Change to doorPosition of workplace
+              searchNode.Neighbors[0] = null;
+            else searchNode.Neighbors[0] = new SearchNode();
+          }
+
+          if (workplace.Rectangle.Intersects(bottom))
+          {
+            searchNode.Neighbors[1] = new SearchNode();
+          }
+
+          if (workplace.Rectangle.Intersects(left))
+          {
+            searchNode.Neighbors[2] = new SearchNode();
+          }
+
+          if (workplace.Rectangle.Intersects(right))
+          {
+            searchNode.Neighbors[3] = new SearchNode();
+          }
+        }
+
+        pathSearchNodes.Add(searchNode);
+      }
+
+      pathPositions.AddRange(pathSearchNodes);
+
+      PathFinder.UpdateMap(pathPositions);
+
+      PathFinder.WriteMap();
     }
 
     private void PlacingBuildingUpdate(GameTime gameTime)
@@ -564,6 +683,8 @@ namespace TopDown.States
 
     private void PlayingUpdate(GameTime gameTime)
     {
+      AddNPC();
+
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
@@ -619,7 +740,7 @@ namespace TopDown.States
 
     public override void Update(GameTime gameTime)
     {
-      Time = Time.AddSeconds(1);
+      Time = Time.AddSeconds(5);
 
       switch (State)
       {

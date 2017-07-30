@@ -40,9 +40,9 @@ namespace TopDown.Sprites
 
     public Sprite DisplaySprite { get; private set; }
 
-    public string Job { get; set; }
+    public Building Home { get; set; }
 
-    public Building JobBuilding { get; private set; }
+    public string Job { get; set; }
 
     public string Name { get; set; }
 
@@ -60,21 +60,23 @@ namespace TopDown.Sprites
 
     public event EventHandler Work;
 
+    public Building Workplace { get; private set; }
+
     public void AssignJob()
     {
       var jb = _gameScreen.JobMenu.JobButton.JobBuilding;
 
       // Remove the same job from any NPC that is currently working said job
-      foreach (var npc in _gameScreen.NPCComponents.Where(c => c.JobBuilding == jb))
+      foreach (var npc in _gameScreen.NPCComponents.Where(c => c.Workplace == jb))
       {
         npc.Unemploy();
       }
 
-      JobBuilding = jb;
+      Workplace = jb;
 
-      Job = JobBuilding.Name;
+      Job = Workplace.Name;
 
-      Work += JobBuilding.Work;
+      Work += Workplace.Work;
     }
 
     public NPC(Dictionary<string, Animation> animations, GameScreen gameScreen) : base(animations)
@@ -122,7 +124,7 @@ namespace TopDown.Sprites
 
     public void Unemploy()
     {
-      JobBuilding = null;
+      Workplace = null;
       Job = "Unemployed";
     }
 
@@ -134,29 +136,36 @@ namespace TopDown.Sprites
           _walkingPath.RemoveAt(0);
       }
 
-      Work?.Invoke(this, new EventArgs());
+      var goWork = Work != null && _gameScreen.Time.Hour >= 8 && _gameScreen.Time.Hour < 17;
 
-      //if (_walkingPath.Count == 0)
-      //{
-      //  Random random = new Random();
+      if (goWork)
+        Work?.Invoke(this, new EventArgs());
+      else
+        WalkTo(new Vector2(Home.Rectangle.X + 32, Home.Rectangle.Y + 32));
 
-      //  var value = random.Next(0, _gameScreen.PathComponents.Count);
+      _animationManager.Update(gameTime);
+    }
 
-      //  _walkingPath = _gameScreen.PathFinder.FindPath(Position, _gameScreen.PathComponents[value].Position);
-      //}
+    public void WalkTo(Vector2 target)
+    {
+      if (Position == target)
+      {
+        return;
+      }
 
-      //var targetPosition = _walkingPath.Count > 0 ? _walkingPath.FirstOrDefault() : Position;
+      if (_walkingPath.Count == 0)
+        _walkingPath = _gameScreen.PathFinder.FindPath(Position, target);
 
-      //if (Position.X < targetPosition.X)
-      //  Velocity.X = 1;
-      //else if (Position.X > targetPosition.X)
-      //  Velocity.X = -1;
-      //else if (Position.Y < targetPosition.Y)
-      //  Velocity.Y = 1;
-      //else if (Position.Y > targetPosition.Y)
-      //  Velocity.Y = -1;
+      var targetPosition = _walkingPath.Count > 0 ? _walkingPath.FirstOrDefault() : Position;
 
-      //_animationManager.Update(gameTime);
+      if (Position.X < targetPosition.X)
+        Velocity.X = 1;
+      else if (Position.X > targetPosition.X)
+        Velocity.X = -1;
+      else if (Position.Y < targetPosition.Y)
+        Velocity.Y = 1;
+      else if (Position.Y > targetPosition.Y)
+        Velocity.Y = -1;
     }
   }
 }
