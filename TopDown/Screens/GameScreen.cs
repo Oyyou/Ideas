@@ -19,6 +19,7 @@ using TopDown.Buildings.Housing;
 using TopDown.Buildings.Labour;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
+using TopDown.Controls.CraftingMenu;
 using TopDown.Controls.ItemMenu;
 using TopDown.Controls.JobMenu;
 using TopDown.Core;
@@ -38,6 +39,7 @@ namespace TopDown.States
     ItemMenu,
     PlacingItems,
     JobMenu,
+    CraftingMenu,
   }
 
   public class GameScreen : State
@@ -45,6 +47,8 @@ namespace TopDown.States
     private BuildMenuWindow _buildMenu;
 
     private Camera _camera;
+
+    private CraftingMenuWindow _craftingMenu;
 
     private SpriteFont _font;
 
@@ -200,6 +204,18 @@ namespace TopDown.States
       }
     }
 
+    private void CraftingMenuUpdate(GameTime gameTime)
+    {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
+
+      if (Keyboard.IsKeyPressed(Keys.C) ||
+        Keyboard.IsKeyPressed(Keys.Escape))
+      {
+        State = GameStates.Playing;
+      }
+    }
+
     public override void Draw(GameTime gameTime)
     {
       _spriteBatch.Begin(
@@ -313,6 +329,8 @@ namespace TopDown.States
       PathFinder = new Pathfinder();
 
       _buildMenu = new BuildMenuWindow(this);
+
+      _craftingMenu = new CraftingMenuWindow(this);
 
       JobMenu = new JobMenuWindow(this);
 
@@ -450,6 +468,7 @@ namespace TopDown.States
         new Toolbar_Bottom(this),
         new ResourceView(Resources),
         _buildMenu,
+        _craftingMenu,
         JobMenu,
         ItemMenu,
       };
@@ -707,6 +726,9 @@ namespace TopDown.States
       if (GameScreen.Keyboard.IsKeyPressed(Keys.J))
         State = GameStates.JobMenu;
 
+      if (GameScreen.Keyboard.IsKeyPressed(Keys.C))
+        State = GameStates.CraftingMenu;
+
       if (Keyboard.IsKeyPressed(Keys.Enter))
         MessageBox.Show("You just pressed Enter. Well done :)");
     }
@@ -773,6 +795,12 @@ namespace TopDown.States
         case GameStates.JobMenu:
 
           JobMenuUpdate(gameTime);
+
+          break;
+
+        case GameStates.CraftingMenu:
+
+          CraftingMenuUpdate(gameTime);
 
           break;
         default:
