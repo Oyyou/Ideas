@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using TopDown.States;
 using Engine;
 using TopDown.Buildings;
+using TopDown.Items;
 
 namespace TopDown.Sprites
 {
@@ -38,6 +39,11 @@ namespace TopDown.Sprites
       }
     }
 
+    /// <summary>
+    /// The item that the NPC is currently crafting
+    /// </summary>
+    public Item CraftingItem { get; set; }
+
     public Sprite DisplaySprite { get; private set; }
 
     public Building Home { get; set; }
@@ -58,7 +64,9 @@ namespace TopDown.Sprites
       }
     }
 
-    public event EventHandler Work;
+    public delegate void WorkEvent(NPC npc, GameTime gameTime);
+
+    public event WorkEvent Work;
 
     public Building Workplace { get; private set; }
 
@@ -76,6 +84,7 @@ namespace TopDown.Sprites
 
       Job = Workplace.Name;
 
+      //Work += Workplace.Work;
       Work += Workplace.Work;
     }
 
@@ -139,7 +148,7 @@ namespace TopDown.Sprites
       var goWork = Work != null && _gameScreen.Time.Hour >= 8 && _gameScreen.Time.Hour < 17;
 
       if (goWork)
-        Work?.Invoke(this, new EventArgs());
+        Work?.Invoke(this, gameTime);
       else
         WalkTo(new Vector2(Home.Rectangle.X + 32, Home.Rectangle.Y + 32));
 

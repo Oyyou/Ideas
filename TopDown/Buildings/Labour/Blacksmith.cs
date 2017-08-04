@@ -103,13 +103,45 @@ namespace TopDown.Buildings.Labour
       };
     }
 
-    public override void Work(object sender, EventArgs e)
+    public override void Work(NPC npc, GameTime gameTime)
     {
-      var npc = sender as NPC;
-
       var anvil = Components.First();
 
-      npc.WalkTo(anvil.Position - new Vector2(32, 0));
+      var workPosition = anvil.Position - new Vector2(32, 0);
+
+      if (npc.Position != workPosition)
+        npc.WalkTo(workPosition);
+      else
+      {
+        if (npc.CraftingItem != null)
+        {
+          CraftItem(npc, gameTime);
+        }
+        else
+        {
+          if (_gameState.CraftingMenu.CraftingItems.Count > 0)
+          {
+            // Assign the first item in the queue to the NPC
+            npc.CraftingItem = _gameState.CraftingMenu.CraftingItems.Dequeue();
+          }
+
+          if (npc.CraftingItem != null)
+          {
+            CraftItem(npc, gameTime);
+          }
+        }
+      }
+    }
+
+    private void CraftItem(NPC npc, GameTime gameTime)
+    {
+      npc.CraftingItem.CraftingTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+      if (npc.CraftingItem.CraftingTime >= npc.CraftingItem.CraftTime)
+      {
+        _gameState.InventoryItems.Add(npc.CraftingItem);
+        npc.CraftingItem = null;
+      }
     }
   }
 }

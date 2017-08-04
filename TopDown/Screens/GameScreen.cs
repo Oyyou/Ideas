@@ -20,10 +20,12 @@ using TopDown.Buildings.Labour;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
 using TopDown.Controls.CraftingMenu;
+using TopDown.Controls.InventoryMenu;
 using TopDown.Controls.ItemMenu;
 using TopDown.Controls.JobMenu;
 using TopDown.Core;
 using TopDown.Furnitures;
+using TopDown.Items;
 using TopDown.Logic;
 using TopDown.Resources;
 using TopDown.Sprites;
@@ -40,6 +42,7 @@ namespace TopDown.States
     PlacingItems,
     JobMenu,
     CraftingMenu,
+    InventoryMenu,
   }
 
   public class GameScreen : State
@@ -48,7 +51,7 @@ namespace TopDown.States
 
     private Camera _camera;
 
-    private CraftingMenuWindow _craftingMenu;
+    public CraftingMenuWindow CraftingMenu;
 
     private SpriteFont _font;
 
@@ -79,6 +82,13 @@ namespace TopDown.States
         return _gameComponents.Where(c => c is SmallHouse).Cast<SmallHouse>();
       }
     }
+
+    /// <summary>
+    /// Items in the inventory
+    /// </summary>
+    public List<Item> InventoryItems { get; set; }
+
+    public InventoryMenuWindow InventoryMenu { get; set; }
 
     public ItemMenu ItemMenu { get; set; }
 
@@ -249,8 +259,22 @@ namespace TopDown.States
 
     }
 
+    private void InventoryMenuUpdate(GameTime gameTime)
+    {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
+
+      if (Keyboard.IsKeyPressed(Keys.I) ||
+        Keyboard.IsKeyPressed(Keys.Escape))
+      {
+        State = GameStates.Playing;
+      }
+    }
+
     private void ItemMenuUpdate(GameTime gameTime)
     {
+      Time = Time.AddSeconds(30);
+
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
@@ -330,12 +354,15 @@ namespace TopDown.States
 
       _buildMenu = new BuildMenuWindow(this);
 
-      _craftingMenu = new CraftingMenuWindow(this);
+      CraftingMenu = new CraftingMenuWindow(this);
 
       JobMenu = new JobMenuWindow(this);
 
+      InventoryMenu = new InventoryMenuWindow(this);
+
       ItemMenu = new ItemMenu(this);
-      //ItemMenu.LoadContent(_content);
+
+      InventoryItems = new List<Item>();
 
       _camera = new Camera();
 
@@ -468,7 +495,8 @@ namespace TopDown.States
         new Toolbar_Bottom(this),
         new ResourceView(Resources),
         _buildMenu,
-        _craftingMenu,
+        CraftingMenu,
+        InventoryMenu,
         JobMenu,
         ItemMenu,
       };
@@ -613,6 +641,8 @@ namespace TopDown.States
 
     private void PlacingBuildingUpdate(GameTime gameTime)
     {
+      Time = Time.AddSeconds(30);
+
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
@@ -666,6 +696,8 @@ namespace TopDown.States
 
     private void PlacingItemsUpdate(GameTime gameTime)
     {
+      Time = Time.AddSeconds(30);
+
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
@@ -702,6 +734,8 @@ namespace TopDown.States
 
     private void PlayingUpdate(GameTime gameTime)
     {
+      Time = Time.AddSeconds(30);
+
       AddNPC();
 
       foreach (var component in _guiComponents)
@@ -728,6 +762,9 @@ namespace TopDown.States
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.C))
         State = GameStates.CraftingMenu;
+
+      if (GameScreen.Keyboard.IsKeyPressed(Keys.I))
+        State = GameStates.InventoryMenu;
 
       if (Keyboard.IsKeyPressed(Keys.Enter))
         MessageBox.Show("You just pressed Enter. Well done :)");
@@ -762,8 +799,6 @@ namespace TopDown.States
 
     public override void Update(GameTime gameTime)
     {
-      Time = Time.AddSeconds(5);
-
       switch (State)
       {
         case GameStates.Playing:
@@ -801,6 +836,12 @@ namespace TopDown.States
         case GameStates.CraftingMenu:
 
           CraftingMenuUpdate(gameTime);
+
+          break;
+
+        case GameStates.InventoryMenu:
+
+          InventoryMenuUpdate(gameTime);
 
           break;
         default:

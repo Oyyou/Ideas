@@ -97,10 +97,8 @@ namespace TopDown.Buildings.Labour
       }
     }
 
-    public override void Work(object sender, EventArgs e)
+    public override void Work(NPC npc, GameTime gameTime)
     {
-      var npc = sender as NPC;
-
       var position = new Vector2(Rectangle.X + 64, Rectangle.Y + 64);
 
       npc.WalkTo(position);

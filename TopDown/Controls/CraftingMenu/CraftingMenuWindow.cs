@@ -78,7 +78,7 @@ namespace TopDown.Controls.CraftingMenu
     private void WeaponsButton_Click(object sender, EventArgs e)
     {
       var woodenSwordButton = new CraftingMenuSubButton(_subButtonTexture, _font,
-        new Item(_content.Load<Texture2D>("Items/WoodenSword"), 3, "Wooden Sword")
+        new Item(_content.Load<Texture2D>("Items/WoodenSword"), 3, "Wooden Sword", ItemCategories.Weapons)
         {
           ResourceCost = new Models.Resources()
           {
@@ -104,7 +104,7 @@ namespace TopDown.Controls.CraftingMenu
     {
       var button = sender as CraftingMenuSubButton;
 
-      CraftingItems.Enqueue(button.CraftingItem);
+      CraftingItems.Enqueue((Item)button.CraftingItem.Clone());
     }
 
     public override void UnloadContent()

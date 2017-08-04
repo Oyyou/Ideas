@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Audio;
 using TopDown.FX;
 using Engine.Sprites;
 using static TopDown.Logic.Pathfinder;
+using TopDown.Sprites;
 
 namespace TopDown.Buildings
 {
@@ -511,7 +512,7 @@ namespace TopDown.Buildings
       }
     }
 
-    public virtual void Work(object sender, EventArgs e)
+    public virtual void Work(NPC npc, GameTime gameTime)
     {
 
     }

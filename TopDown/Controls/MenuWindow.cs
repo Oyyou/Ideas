@@ -32,7 +32,7 @@ namespace TopDown.Controls
 
     private void CloseButton_Click(object sender, EventArgs e)
     {
-      _gameScreen.State = States.GameStates.Playing;
+      OnClose();
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -85,6 +85,11 @@ namespace TopDown.Controls
     public MenuWindow(GameScreen gameScreen)
     {
       _gameScreen = gameScreen;
+    }
+
+    protected virtual void OnClose()
+    {
+      _gameScreen.State = States.GameStates.Playing;
     }
 
     public override void UnloadContent()

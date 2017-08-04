@@ -46,6 +46,7 @@
     <Compile Include="Buildings\Labour\Mine.cs" />
     <Compile Include="Controls\CraftingMenu\CraftingMenuSubButton.cs" />
     <Compile Include="Controls\CraftingMenu\CraftingMenuWindow.cs" />
+    <Compile Include="Controls\InventoryMenu\InventoryMenuWindow.cs" />
     <Compile Include="Controls\JobMenu\JobMenuButton.cs" />
     <Compile Include="Controls\JobMenu\JobMenuSubButton.cs" />
     <Compile Include="Controls\JobMenu\JobMenuWindow.cs" />
@@ -102,9 +103,7 @@
       <Name>Engine</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controls\ItemsMenu\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
