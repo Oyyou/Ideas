@@ -26,7 +26,7 @@ namespace TopDown.Controls.ItemMenu
 
     private SpriteFont _font;
 
-    private GameScreen _gameState;
+    private GameScreen _gameScreen;
 
     private Vector2 _position;
 
@@ -34,18 +34,18 @@ namespace TopDown.Controls.ItemMenu
 
     private void Cancel_Click(object sender, EventArgs e)
     {
-      _gameState.State = States.GameStates.BuildMenu;
+      _gameScreen.State = States.GameStates.BuildMenu;
 
-      if (_gameState.SelectedBuilding != null)
+      if (_gameScreen.SelectedBuilding != null)
       {
-        _gameState.SelectedBuilding.IsRemoved = true;
-        _gameState.SelectedBuilding = null;
+        _gameScreen.SelectedBuilding.IsRemoved = true;
+        _gameScreen.SelectedBuilding = null;
       }
 
-      if (_gameState.SelectedPathBuilder != null)
+      if (_gameScreen.SelectedPathBuilder != null)
       {
-        _gameState.SelectedPathBuilder.IsRemoved = true;
-        _gameState.SelectedPathBuilder = null;
+        _gameScreen.SelectedPathBuilder.IsRemoved = true;
+        _gameScreen.SelectedPathBuilder = null;
       }
 
       this.FullReset();
@@ -58,36 +58,36 @@ namespace TopDown.Controls.ItemMenu
 
     private void Done_Click(object sender, EventArgs e)
     {
-      _gameState.State = States.GameStates.Playing;
+      _gameScreen.State = States.GameStates.Playing;
 
-      if (_gameState.SelectedBuilding != null)
+      if (_gameScreen.SelectedBuilding != null)
       {
-        _gameState.SelectedBuilding.State = BuildingStates.Building;
-        _gameState.SelectedBuilding = null;
+        _gameScreen.SelectedBuilding.State = BuildingStates.Building;
+        _gameScreen.SelectedBuilding = null;
       }
 
-      if (_gameState.SelectedPathBuilder != null)
+      if (_gameScreen.SelectedPathBuilder != null)
       {
-        _gameState.SelectedPathBuilder.Paths.Last().IsRemoved = true;
+        _gameScreen.SelectedPathBuilder.Paths.Last().IsRemoved = true;
 
-        foreach (var component in _gameState.SelectedPathBuilder.Paths)
+        foreach (var component in _gameScreen.SelectedPathBuilder.Paths)
         {
-          _gameState.AddComponent(component);
+          _gameScreen.AddComponent(component);
         }
 
-        _gameState.SelectedPathBuilder.IsRemoved = true;
-        _gameState.SelectedPathBuilder = null;
+        _gameScreen.SelectedPathBuilder.IsRemoved = true;
+        _gameScreen.SelectedPathBuilder = null;
       }
 
-      _gameState.UpdateMap();
+      _gameScreen.UpdateMap();
 
       FullReset();
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      if (_gameState.State != States.GameStates.PlacingItems &&
-        _gameState.State != States.GameStates.ItemMenu)
+      if (_gameScreen.State != States.GameStates.PlacingItems &&
+        _gameScreen.State != States.GameStates.ItemMenu)
         return;
 
       _background.Draw(gameTime, spriteBatch);
@@ -98,7 +98,7 @@ namespace TopDown.Controls.ItemMenu
 
     public ItemMenu(GameScreen gameState)
     {
-      _gameState = gameState;
+      _gameScreen = gameState;
     }
 
     public override void LoadContent(ContentManager content)
@@ -153,8 +153,8 @@ namespace TopDown.Controls.ItemMenu
 
     public override void Update(GameTime gameTime)
     {
-      if (_gameState.State != States.GameStates.PlacingItems &&
-        _gameState.State != States.GameStates.ItemMenu)
+      if (_gameScreen.State != States.GameStates.PlacingItems &&
+        _gameScreen.State != States.GameStates.ItemMenu)
         return;
 
       _background.Update(gameTime);
@@ -185,7 +185,7 @@ namespace TopDown.Controls.ItemMenu
     {
       Components = new List<Component>();
 
-      _gameState.State = component.GameScreenSetValue;
+      _gameScreen.State = component.GameScreenSetValue;
 
       Components = component.Items.Select(c => c as Component).ToList();
 

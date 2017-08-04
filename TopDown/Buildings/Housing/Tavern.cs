@@ -71,7 +71,7 @@ namespace TopDown.Buildings.Housing
 
     protected override void SetDoorLocations()
     {
-      _doorLocations = new List<DoorLocation>()
+      DoorLocations = new List<DoorLocation>()
       {
         new DoorLocation()
         {

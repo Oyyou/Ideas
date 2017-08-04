@@ -1,41 +1,24 @@
 ﻿using Engine;
+using Engine.Controls;
+using Engine.Sprites;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Engine.Sprites;
-using Engine.Controls;
 using TopDown.States;
-using Microsoft.Xna.Framework.Input;
 
-namespace TopDown.Controls
+namespace TopDown.Controls.Toolbars
 {
-  public class Toolbar_Bottom : Component
+  public class BottomToolbar : Toolbar
   {
-    private List<Button> _icons;
-
-    private GameScreen _gameState;
-
-    private Sprite _toolbarSprite;
-
-    public override void CheckCollision(Component component)
+    public BottomToolbar(GameScreen gameScreen) : base(gameScreen)
     {
 
-    }
-
-    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      if (_gameState.State != GameStates.Playing)
-        return;
-
-      _toolbarSprite.Draw(gameTime, spriteBatch);
-
-      foreach (var icon in _icons)
-        icon.Draw(gameTime, spriteBatch);
     }
 
     private void FistButton_Click(object sender, EventArgs e)
@@ -60,16 +43,7 @@ namespace TopDown.Controls
         pickaxeButton,
       };
 
-      var x = _toolbarSprite.Position.X + 1;
-
-      foreach (var icon in _icons)
-      {
-        icon.LoadContent(content);
-
-        icon.Position = new Vector2(x, _toolbarSprite.Position.Y + 1);
-
-        x += 60;
-      }
+      InitializeIcons(content);
     }
 
     private void PickaxeButton_Click(object sender, EventArgs e)
@@ -77,19 +51,9 @@ namespace TopDown.Controls
       GameScreen.Mouse.MouseState = MouseStates.Mining;
     }
 
-    public Toolbar_Bottom(GameScreen gameState)
-    {
-      _gameState = gameState;
-    }
-
-    public override void UnloadContent()
-    {
-      _toolbarSprite.UnloadContent();
-    }
-
     public override void Update(GameTime gameTime)
     {
-      if (_gameState.State != GameStates.Playing)
+      if (_gameScreen.State != GameStates.Playing)
         return;
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.D1))

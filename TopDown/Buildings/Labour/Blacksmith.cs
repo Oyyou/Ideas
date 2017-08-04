@@ -73,7 +73,7 @@ namespace TopDown.Buildings.Labour
 
     protected override void SetDoorLocations()
     {
-      _doorLocations = new List<DoorLocation>()
+      DoorLocations = new List<DoorLocation>()
       {
         new DoorLocation()
         {
@@ -119,10 +119,10 @@ namespace TopDown.Buildings.Labour
         }
         else
         {
-          if (_gameState.CraftingMenu.CraftingItems.Count > 0)
+          if (_gameScreen.CraftingMenu.CraftingItems.Count > 0)
           {
             // Assign the first item in the queue to the NPC
-            npc.CraftingItem = _gameState.CraftingMenu.CraftingItems.Dequeue();
+            npc.CraftingItem = _gameScreen.CraftingMenu.CraftingItems.Dequeue();
           }
 
           if (npc.CraftingItem != null)
@@ -139,7 +139,7 @@ namespace TopDown.Buildings.Labour
 
       if (npc.CraftingItem.CraftingTime >= npc.CraftingItem.CraftTime)
       {
-        _gameState.InventoryItems.Add(npc.CraftingItem);
+        _gameScreen.InventoryItems.Add(npc.CraftingItem);
         npc.CraftingItem = null;
       }
     }

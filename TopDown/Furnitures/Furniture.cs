@@ -21,7 +21,7 @@ namespace TopDown.Furnitures
 
   public class Furniture : Sprite, ICloneable
   {
-    private GameScreen _gameState;
+    private GameScreen _gameScreen;
 
     private bool _updated;
 
@@ -34,9 +34,9 @@ namespace TopDown.Furnitures
       base.LoadContent(content);
     }
 
-    public Furniture(Texture2D texture, GameScreen gameState) : base(texture)
+    public Furniture(Texture2D texture, GameScreen gameScreen) : base(texture)
     {
-      _gameState = gameState;
+      _gameScreen = gameScreen;
 
       IsCollidable = true;
     }
@@ -65,22 +65,22 @@ namespace TopDown.Furnitures
             {
               State = PlacableObjectStates.Placed;
 
-              _gameState.ItemMenu.CurrentButton.Amount--;
+              _gameScreen.ItemMenu.CurrentButton.Amount--;
 
-              if (_gameState.ItemMenu.CurrentButton.Amount > 0)
+              if (_gameScreen.ItemMenu.CurrentButton.Amount > 0)
               {
-                _gameState.ItemMenu.CurrentButton.CurrentState = Controls.ItemMenu.ItemMenuButtonStates.Clicked;
+                _gameScreen.ItemMenu.CurrentButton.CurrentState = Controls.ItemMenu.ItemMenuButtonStates.Clicked;
 
                 var newFurniture = (Furniture)this.Clone();
                 newFurniture.State = PlacableObjectStates.Placing;
 
-                _gameState.SelectedBuilding.Components.Add(newFurniture);
-                _gameState.State = States.GameStates.PlacingItems;
+                _gameScreen.SelectedBuilding.Components.Add(newFurniture);
+                _gameScreen.State = States.GameStates.PlacingItems;
               }
               else
               {
-                _gameState.ItemMenu.CurrentButton.CurrentState = Controls.ItemMenu.ItemMenuButtonStates.Placed;
-                _gameState.State = States.GameStates.ItemMenu;
+                _gameScreen.ItemMenu.CurrentButton.CurrentState = Controls.ItemMenu.ItemMenuButtonStates.Placed;
+                _gameScreen.State = States.GameStates.ItemMenu;
               }
             }
           }

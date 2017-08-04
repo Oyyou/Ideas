@@ -74,8 +74,8 @@ namespace TopDown.Controls
 
       _timer = _timerMax;
 
-      if(fadeOut)
-      _timer = 0;
+      if (fadeOut)
+        _timer = 0;
 
       IsVisible = true;
     }

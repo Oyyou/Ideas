@@ -76,7 +76,7 @@ namespace TopDown.Buildings.Labour
 
     protected override void SetDoorLocations()
     {
-      _doorLocations = new List<DoorLocation>();
+      DoorLocations = new List<DoorLocation>();
 
       for (int y = -32; y <= Rectangle.Height; y += 32)
       {
@@ -87,7 +87,7 @@ namespace TopDown.Buildings.Labour
           if (x == -32 || y == -32 ||
             x == Rectangle.Width || y == Rectangle.Height)
           {
-            _doorLocations.Add(new DoorLocation()
+            DoorLocations.Add(new DoorLocation()
             {
               Position = position,
               IsValid = false,

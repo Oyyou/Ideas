@@ -62,7 +62,7 @@ namespace Engine.Sprites
         _layer = value;
 
         if (_animationManager != null)
-          _animationManager.Layer = Layer;
+          _animationManager.Layer = _layer;
       }
     }
 

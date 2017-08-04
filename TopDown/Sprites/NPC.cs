@@ -139,6 +139,11 @@ namespace TopDown.Sprites
 
     public override void Update(GameTime gameTime)
     {
+      if (Layer != Building.DefaultLayer + 0.001f)
+      {
+
+      }
+
       if (_walkingPath.Count > 0)
       {
         if (_walkingPath[0] == Position)

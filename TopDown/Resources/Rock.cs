@@ -16,7 +16,7 @@ namespace TopDown.Resources
 {
   public class Rock : Sprite
   {
-    private GameScreen _gameState;
+    private GameScreen _gameScreen;
 
     private const float _hitTimer = 0.3f;
 
@@ -60,9 +60,9 @@ namespace TopDown.Resources
       _soundEffect = content.Load<SoundEffect>("Sounds/RockHit");
     }
 
-    public Rock(Texture2D texture, GameScreen gameState) : base(texture)
+    public Rock(Texture2D texture, GameScreen gameScreen) : base(texture)
     {
-      _gameState = gameState;
+      _gameScreen = gameScreen;
     }
 
     public override void UnloadContent()
@@ -83,7 +83,7 @@ namespace TopDown.Resources
 
       if (GameScreen.Mouse.RectangleWithCamera.Intersects(this.Rectangle))
       {
-        if (Vector2.Distance(this.Position, _gameState.Player.Position) < 100)
+        if (Vector2.Distance(this.Position, _gameScreen.Player.Position) < 100)
         {
           Color = Color.Yellow;
 
@@ -105,7 +105,7 @@ namespace TopDown.Resources
               _soundEffect.Play();
 
               Resources.Stone--;
-              _gameState.Resources.Stone++;
+              _gameScreen.Resources.Stone++;
 
               if (Resources.Stone == 0)
                 IsRemoved = true;

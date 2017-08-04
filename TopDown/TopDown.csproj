@@ -51,6 +51,9 @@
     <Compile Include="Controls\JobMenu\JobMenuSubButton.cs" />
     <Compile Include="Controls\JobMenu\JobMenuWindow.cs" />
     <Compile Include="Controls\MenuWindow.cs" />
+    <Compile Include="Controls\Toolbars\Toolbar.cs" />
+    <Compile Include="Controls\Toolbars\BottomToolbar.cs" />
+    <Compile Include="Controls\Toolbars\TopToolbar.cs" />
     <Compile Include="Furnitures\Bar.cs" />
     <Compile Include="Furnitures\Furniture.cs" />
     <Compile Include="Buildings\Housing\SmallHouse.cs" />
@@ -64,8 +67,6 @@
     <Compile Include="Controls\MessageBox.cs" />
     <Compile Include="Controls\Mouse.cs" />
     <Compile Include="Controls\ResourceView.cs" />
-    <Compile Include="Controls\Toolbar_Top.cs" />
-    <Compile Include="Controls\Toolbar_Bottom.cs" />
     <Compile Include="Core\Camera.cs" />
     <Compile Include="FX\Particle.cs" />
     <Compile Include="Game1.cs" />

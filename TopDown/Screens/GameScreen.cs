@@ -23,6 +23,7 @@ using TopDown.Controls.CraftingMenu;
 using TopDown.Controls.InventoryMenu;
 using TopDown.Controls.ItemMenu;
 using TopDown.Controls.JobMenu;
+using TopDown.Controls.Toolbars;
 using TopDown.Core;
 using TopDown.Furnitures;
 using TopDown.Items;
@@ -36,6 +37,7 @@ namespace TopDown.States
   public enum GameStates
   {
     Playing,
+    Paused,
     BuildMenu,
     PlacingBuilding,
     ItemMenu,
@@ -191,7 +193,7 @@ namespace TopDown.States
       {
         Position = new Vector2(736, 288),
         IsCollidable = false,
-        Layer = Building.DefaultLayer,
+        Layer = Building.DefaultLayer + 0.001f,
         Home = house,
       };
 
@@ -200,30 +202,6 @@ namespace TopDown.States
       npc.LoadContent(_content);
 
       _gameComponents.Add(npc);
-    }
-
-    private void BuildMenuUpdate(GameTime gameTime)
-    {
-      foreach (var component in _guiComponents)
-        component.Update(gameTime);
-
-      if (Keyboard.IsKeyPressed(Keys.B) ||
-          Keyboard.IsKeyPressed(Keys.Escape))
-      {
-        State = GameStates.Playing;
-      }
-    }
-
-    private void CraftingMenuUpdate(GameTime gameTime)
-    {
-      foreach (var component in _guiComponents)
-        component.Update(gameTime);
-
-      if (Keyboard.IsKeyPressed(Keys.C) ||
-        Keyboard.IsKeyPressed(Keys.Escape))
-      {
-        State = GameStates.Playing;
-      }
     }
 
     public override void Draw(GameTime gameTime)
@@ -257,18 +235,6 @@ namespace TopDown.States
     public GameScreen()
     {
 
-    }
-
-    private void InventoryMenuUpdate(GameTime gameTime)
-    {
-      foreach (var component in _guiComponents)
-        component.Update(gameTime);
-
-      if (Keyboard.IsKeyPressed(Keys.I) ||
-        Keyboard.IsKeyPressed(Keys.Escape))
-      {
-        State = GameStates.Playing;
-      }
     }
 
     private void ItemMenuUpdate(GameTime gameTime)
@@ -330,18 +296,6 @@ namespace TopDown.States
       }
     }
 
-    private void JobMenuUpdate(GameTime gameTime)
-    {
-      foreach (var component in _guiComponents)
-        component.Update(gameTime);
-
-      if (Keyboard.IsKeyPressed(Keys.J) ||
-        Keyboard.IsKeyPressed(Keys.Escape))
-      {
-        State = GameStates.Playing;
-      }
-    }
-
     public override void LoadContent(GameModel gameModel)
     {
       base.LoadContent(gameModel);
@@ -394,7 +348,6 @@ namespace TopDown.States
       _gameComponents = new List<Component>()
       {
         Player,
-        //new PathBuilder(),
       };
 
       var map = TmxMap.Load("Content/Maps/Level01.tmx");
@@ -491,8 +444,8 @@ namespace TopDown.States
         Keyboard,
         Mouse,
         MessageBox,
-        new Toolbar_Top(this),
-        new Toolbar_Bottom(this),
+        new TopToolbar(this),
+        new BottomToolbar(this),
         new ResourceView(Resources),
         _buildMenu,
         CraftingMenu,
@@ -565,7 +518,7 @@ namespace TopDown.States
               {
                 Position = position,
                 IsCollidable = false,
-                Layer = Building.DefaultLayer,
+                Layer = Building.DefaultLayer + 0.001f,
               };
 
               npc.LoadContent(_content);
@@ -584,22 +537,34 @@ namespace TopDown.States
       UpdateMap();
     }
 
+    private void MenuUpdate(GameTime gameTime, Keys menuKey)
+    {
+      foreach (var component in _guiComponents)
+        component.Update(gameTime);
+
+      if (Keyboard.IsKeyPressed(menuKey) ||
+        Keyboard.IsKeyPressed(Keys.Escape))
+      {
+        State = GameStates.Playing;
+      }
+    }
+
     public void UpdateMap()
     {
       var pathPositions = BuildingComponents.SelectMany(c => c.PathPositions).ToList();
 
       var pathSearchNodes = new List<SearchNode>();
 
-      foreach (var component in PathComponents)
+      foreach (var path in PathComponents)
       {
-        var top = new Rectangle((int)component.Position.X, (int)component.Position.Y - 32, 32, 32);
-        var bottom = new Rectangle((int)component.Position.X, (int)component.Position.Y + 32, 32, 32);
-        var left = new Rectangle((int)component.Position.X - 32, (int)component.Position.Y, 32, 32);
-        var right = new Rectangle((int)component.Position.X + 32, (int)component.Position.Y, 32, 32);
+        var top = new Rectangle((int)path.Position.X, (int)path.Position.Y - 32, 32, 32);
+        var bottom = new Rectangle((int)path.Position.X, (int)path.Position.Y + 32, 32, 32);
+        var left = new Rectangle((int)path.Position.X - 32, (int)path.Position.Y, 32, 32);
+        var right = new Rectangle((int)path.Position.X + 32, (int)path.Position.Y, 32, 32);
 
         var searchNode = new SearchNode()
         {
-          Position = component.Position / 32,
+          Position = path.Position / 32,
           Walkable = true,
           Neighbors = new SearchNode[4],
         };
@@ -608,9 +573,16 @@ namespace TopDown.States
         {
           if (workplace.Rectangle.Intersects(top))
           {
-            if (component.Position.X == workplace.Rectangle.X) // TODO: Change to doorPosition of workplace
-              searchNode.Neighbors[0] = null;
-            else searchNode.Neighbors[0] = new SearchNode();
+            searchNode.Neighbors[0] = new SearchNode();
+
+            if (workplace.DoorLocations != null)
+            {
+              foreach (var doorLocation in workplace.DoorLocations)
+              {
+                if (path.Position == new Vector2(doorLocation.Position.X, doorLocation.Position.Y))
+                  searchNode.Neighbors[0] = null;
+              }
+            }
           }
 
           if (workplace.Rectangle.Intersects(bottom))
@@ -754,20 +726,26 @@ namespace TopDown.States
 
       _camera.Follow(((Sprite)_gameComponents[0]).Position);
 
-      if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
+      if (Keyboard.IsKeyPressed(Keys.P))
+        State = GameStates.Paused;
+
+      if (Keyboard.IsKeyPressed(Keys.B))
         State = GameStates.BuildMenu;
 
-      if (GameScreen.Keyboard.IsKeyPressed(Keys.J))
+      if (Keyboard.IsKeyPressed(Keys.J))
         State = GameStates.JobMenu;
 
-      if (GameScreen.Keyboard.IsKeyPressed(Keys.C))
+      if (Keyboard.IsKeyPressed(Keys.C))
         State = GameStates.CraftingMenu;
 
-      if (GameScreen.Keyboard.IsKeyPressed(Keys.I))
+      if (Keyboard.IsKeyPressed(Keys.I))
         State = GameStates.InventoryMenu;
 
       if (Keyboard.IsKeyPressed(Keys.Enter))
         MessageBox.Show("You just pressed Enter. Well done :)");
+
+      if (Keyboard.IsKeyPressed(Keys.P))
+        State = GameStates.Paused;
     }
 
     public override void PostUpdate(GameTime gameTime)
@@ -806,9 +784,16 @@ namespace TopDown.States
           PlayingUpdate(gameTime);
 
           break;
+
+        case GameStates.Paused:
+
+          MenuUpdate(gameTime, Keys.P);
+
+          break;
+
         case GameStates.BuildMenu:
 
-          BuildMenuUpdate(gameTime);
+          MenuUpdate(gameTime, Keys.B);
 
           break;
         case GameStates.PlacingBuilding:
@@ -829,19 +814,19 @@ namespace TopDown.States
 
         case GameStates.JobMenu:
 
-          JobMenuUpdate(gameTime);
+          MenuUpdate(gameTime, Keys.J);
 
           break;
 
         case GameStates.CraftingMenu:
 
-          CraftingMenuUpdate(gameTime);
+          MenuUpdate(gameTime, Keys.C);
 
           break;
 
         case GameStates.InventoryMenu:
 
-          InventoryMenuUpdate(gameTime);
+          MenuUpdate(gameTime, Keys.I);
 
           break;
         default:

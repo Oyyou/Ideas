@@ -28,7 +28,7 @@ namespace TopDown.Buildings
 
   public class Building : Component
   {
-    protected class DoorLocation
+    public class DoorLocation
     {
       public bool IsValid;
 
@@ -37,14 +37,9 @@ namespace TopDown.Buildings
 
     protected float _buildTimer;
 
-    /// <summary>
-    /// Locations in which there has to be at least one path so we can place the building.
-    /// </summary>
-    protected List<DoorLocation> _doorLocations;
-
     protected Sprite _spriteOutside;
 
-    protected GameScreen _gameState;
+    protected GameScreen _gameScreen;
 
     protected float _hitTimer;
 
@@ -57,6 +52,8 @@ namespace TopDown.Buildings
     protected virtual int _outsideExtraWidth { get; }
 
     protected List<Sprite> _particles;
+
+    protected Texture2D _pixel;
 
     protected Sprite _spriteInside;
 
@@ -73,11 +70,18 @@ namespace TopDown.Buildings
 
     protected Texture2D _textureOutside;
 
+    private bool _updated = false;
+
     protected Texture2D _woodChipTexture;
 
     public Color Color { get; set; }
 
     public const float DefaultLayer = 0.8f;
+
+    /// <summary>
+    /// Locations in which there has to be at least one path so we can place the building.
+    /// </summary>
+    public List<DoorLocation> DoorLocations;
 
     public override Vector2 Position
     {
@@ -86,6 +90,8 @@ namespace TopDown.Buildings
       {
         _spriteInside.Position = value;
         _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+
+        SetDoorLocations();
       }
     }
 
@@ -105,9 +111,11 @@ namespace TopDown.Buildings
           {
             index++;
 
+            var position = new Vector2((Rectangle.X + x) / 32, (Rectangle.Y + y) / 32);
+
             var searchNode = new SearchNode()
             {
-              Position = new Vector2((Rectangle.X + x) / 32, (Rectangle.Y + y) / 32),
+              Position = position,
               Walkable = true,
               Neighbors = new SearchNode[]
               {
@@ -118,9 +126,18 @@ namespace TopDown.Buildings
               },
             };
 
-            // TODO: Set to door position
-            if (x == 0 && y == Rectangle.Height - 32)
-              searchNode.Neighbors[1] = null;
+            if (DoorLocations != null && y == Rectangle.Height - 32)
+            {
+              var actualPosition = position * 32;
+
+              foreach (var doorPosition in DoorLocations)
+              {
+                if (new Vector2(doorPosition.Position.X, doorPosition.Position.Y - 32) == actualPosition)
+                {
+                  searchNode.Neighbors[1] = null;
+                }
+              }
+            }
 
             searchNodes.Add(searchNode);
           }
@@ -171,7 +188,7 @@ namespace TopDown.Buildings
 
       if (GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
       {
-        if (Vector2.Distance(_spriteInside.Position + new Vector2(_spriteInside.Rectangle.Width / 2, _spriteInside.Rectangle.Height / 2), _gameState.Player.Position) < 150)
+        if (Vector2.Distance(_spriteInside.Position + new Vector2(_spriteInside.Rectangle.Width / 2, _spriteInside.Rectangle.Height / 2), _gameScreen.Player.Position) < 150)
         {
           Color = Color.Yellow;
 
@@ -193,7 +210,7 @@ namespace TopDown.Buildings
               if (_buildTimer > _maxBuildTimer)
               {
                 State = BuildingStates.Built_Out;
-                _gameState.State = States.GameStates.Playing;
+                _gameScreen.State = States.GameStates.Playing;
               }
 
               _hitTimer = 0f;
@@ -227,7 +244,7 @@ namespace TopDown.Buildings
 
     public Building(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside)
     {
-      _gameState = gameState;
+      _gameScreen = gameState;
 
       _textureInside = textureInside;
 
@@ -264,13 +281,15 @@ namespace TopDown.Buildings
 
           _spriteInside.Draw(gameTime, spriteBatch);
 
-          foreach (var doorLocation in _doorLocations)
+          SetDoorLocations();
+
+          foreach (var doorLocation in DoorLocations)
           {
             var color = Color.LightGreen;
             if (!doorLocation.IsValid)
               color = Color.Red;
 
-            spriteBatch.Draw(texture: _t,
+            spriteBatch.Draw(texture: _pixel,
               destinationRectangle: new Rectangle(doorLocation.Position.ToPoint(), new Point(32, 32)),
               color: color,
               layerDepth: _spriteInside.Layer + 0.01f);
@@ -326,8 +345,6 @@ namespace TopDown.Buildings
       }
     }
 
-    protected Texture2D _t;
-
     protected void GenerateParticle(float lifeTimer)
     {
       var position = new Vector2(
@@ -348,7 +365,7 @@ namespace TopDown.Buildings
 
     public override void LoadContent(ContentManager content)
     {
-      _t = content.Load<Texture2D>("Pixel");
+      _pixel = content.Load<Texture2D>("Pixel");
 
       _soundEffect = content.Load<SoundEffect>("Sounds/Sawing");
       _soundEffectInstance = _soundEffect.CreateInstance();
@@ -360,7 +377,7 @@ namespace TopDown.Buildings
 
     protected virtual void SetDoorLocations()
     {
-      _doorLocations = new List<DoorLocation>()
+      DoorLocations = new List<DoorLocation>()
       {
         new DoorLocation()
         {
@@ -380,8 +397,6 @@ namespace TopDown.Buildings
         component.UnloadContent();
     }
 
-    private bool _updated = false;
-
     public override void Update(GameTime gameTime)
     {
       _updated = true;
@@ -394,13 +409,13 @@ namespace TopDown.Buildings
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
 
-          SetDoorLocations();
+          //SetDoorLocations();
 
           bool canPlace = false;
 
           _spriteInside.Color = Color.White;
 
-          foreach (var component in _gameState.PathComponents)
+          foreach (var component in _gameScreen.PathComponents)
           {
             if (component.Rectangle.Intersects(_spriteInside.Rectangle))
             {
@@ -409,7 +424,7 @@ namespace TopDown.Buildings
               break;
             }
 
-            _doorLocations.ForEach(c =>
+            DoorLocations.ForEach(c =>
             {
               if (c.Position == component.Position)
               {
@@ -424,7 +439,7 @@ namespace TopDown.Buildings
 
           if (canPlace)
           {
-            foreach (var component in _gameState.CollidableComponents)
+            foreach (var component in _gameScreen.CollidableComponents)
             {
               if (component.CollisionRectangles.Any(c => c.Intersects(this.Rectangle)))
               {
@@ -442,16 +457,16 @@ namespace TopDown.Buildings
           {
             _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
             State = BuildingStates.Placed;
-            _gameState.State = States.GameStates.ItemMenu;
+            _gameScreen.State = States.GameStates.ItemMenu;
           }
 
           break;
         case BuildingStates.Placed:
 
-          foreach (var component in Components.ToArray())
+          foreach (var furniture in Components.ToArray())
           {
-            component.Layer = _spriteInside.Layer + 0.001f;
-            component.Update(gameTime);
+            furniture.Layer = _spriteInside.Layer + 0.001f;
+            furniture.Update(gameTime);
           }
 
 
@@ -464,7 +479,8 @@ namespace TopDown.Buildings
 
           _particles.Clear();
 
-          _spriteInside.Layer = _spriteOutside.Layer - 0.002f;
+          _spriteInside.Layer = DefaultLayer;
+          _spriteOutside.Layer = DefaultLayer + 0.002f;
 
           foreach (var component in Components)
           {
@@ -472,16 +488,11 @@ namespace TopDown.Buildings
             component.Update(gameTime);
           }
 
-          if (_gameState.Player.IsIn(_spriteInside.Rectangle) ||
-            (_gameState.SelectedPathBuilder != null && _gameState.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
+          if (_gameScreen.Player.IsIn(_spriteInside.Rectangle) ||
+            (_gameScreen.SelectedPathBuilder != null && _gameScreen.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
           {
             _state = BuildingStates.Built_In;
           }
-
-          //if (_gameState.Player.Rectangle.Y <= InsideRectangle.Y + 60)
-          //  _spriteOutside.Layer = _gameState.Player.Layer + 0.001f;
-          //else
-          //  _spriteOutside.Layer = Building.DefaultLayer;
 
           break;
 
@@ -491,17 +502,15 @@ namespace TopDown.Buildings
 
           _spriteInside.Layer = Building.DefaultLayer;
 
-          foreach (var component in Components)
+          foreach (var furniture in Components)
           {
-            component.Layer = _spriteInside.Layer + 0.001f;
-            component.Update(gameTime);
+            furniture.Layer = _spriteInside.Layer + 0.001f;
+            furniture.Update(gameTime);
           }
 
-          if (!_gameState.Player.IsIn(_spriteInside.Rectangle) &&
-            !(_gameState.SelectedPathBuilder != null && _gameState.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
+          if (!_gameScreen.Player.IsIn(_spriteInside.Rectangle) &&
+            !(_gameScreen.SelectedPathBuilder != null && _gameScreen.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
           {
-            // Set Position
-            //Position = new Vector2(Position.X - (_template.OutExtraWidth / 2), Position.Y - _template.OutExtraHeight);
             _state = BuildingStates.Built_Out;
           }
 
@@ -512,6 +521,10 @@ namespace TopDown.Buildings
       }
     }
 
+    /// <summary>
+    /// The action the NPC will perform when hired
+    /// </summary>
+    /// <param name="npc">The NPC assigned to the building</param>
     public virtual void Work(NPC npc, GameTime gameTime)
     {
 
