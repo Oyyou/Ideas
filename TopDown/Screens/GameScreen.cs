@@ -557,10 +557,13 @@ namespace TopDown.States
 
       foreach (var path in PathComponents)
       {
-        var top = new Rectangle((int)path.Position.X, (int)path.Position.Y - 32, 32, 32);
-        var bottom = new Rectangle((int)path.Position.X, (int)path.Position.Y + 32, 32, 32);
-        var left = new Rectangle((int)path.Position.X - 32, (int)path.Position.Y, 32, 32);
-        var right = new Rectangle((int)path.Position.X + 32, (int)path.Position.Y, 32, 32);
+        var neighbors = new List<Rectangle>()
+        {
+          new Rectangle((int)path.Position.X, (int)path.Position.Y - 32, 32, 32),
+          new Rectangle((int)path.Position.X, (int)path.Position.Y + 32, 32, 32),
+          new Rectangle((int)path.Position.X - 32, (int)path.Position.Y, 32, 32),
+          new Rectangle((int)path.Position.X + 32, (int)path.Position.Y, 32, 32),
+        };
 
         var searchNode = new SearchNode()
         {
@@ -571,33 +574,23 @@ namespace TopDown.States
 
         foreach (var workplace in BuildingComponents)
         {
-          if (workplace.Rectangle.Intersects(top))
+          for (int i = 0; i < neighbors.Count; i++)
           {
-            searchNode.Neighbors[0] = new SearchNode();
+            var neigbor = neighbors[i];
 
-            if (workplace.DoorLocations != null)
+            if (workplace.Rectangle.Intersects(neigbor))
             {
-              foreach (var doorLocation in workplace.DoorLocations)
+              searchNode.Neighbors[i] = new SearchNode();
+
+              if (workplace.DoorLocations != null)
               {
-                if (path.Position == new Vector2(doorLocation.Position.X, doorLocation.Position.Y))
-                  searchNode.Neighbors[0] = null;
+                foreach (var doorLocation in workplace.DoorLocations)
+                {
+                  if (path.Position == new Vector2(doorLocation.Position.X, doorLocation.Position.Y))
+                    searchNode.Neighbors[i] = null;
+                }
               }
             }
-          }
-
-          if (workplace.Rectangle.Intersects(bottom))
-          {
-            searchNode.Neighbors[1] = new SearchNode();
-          }
-
-          if (workplace.Rectangle.Intersects(left))
-          {
-            searchNode.Neighbors[2] = new SearchNode();
-          }
-
-          if (workplace.Rectangle.Intersects(right))
-          {
-            searchNode.Neighbors[3] = new SearchNode();
           }
         }
 

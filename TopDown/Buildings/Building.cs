@@ -92,10 +92,26 @@ namespace TopDown.Buildings
         _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
 
         SetDoorLocations();
+        SetWalls();
       }
     }
 
     public string Name { get; set; }
+
+    protected class Wall
+    {
+      public enum Directions
+      {
+        Up,
+        Down,
+        Left,
+        Right,
+      }
+
+      public Directions Direction { get; set; }
+
+      public Vector2 Position { get; set; }
+    }
 
     public virtual List<SearchNode> PathPositions
     {
@@ -126,15 +142,54 @@ namespace TopDown.Buildings
               },
             };
 
-            if (DoorLocations != null && y == Rectangle.Height - 32)
+            if (Walls != null)
+              foreach (var wallTest in Walls)
+              {
+                if (wallTest.Position == new Vector2(x / 32, y / 32))
+                {
+                  switch (wallTest.Direction)
+                  {
+                    case Wall.Directions.Up:
+                      searchNode.Neighbors[0] = new SearchNode();
+                      break;
+                    case Wall.Directions.Down:
+                      searchNode.Neighbors[1] = new SearchNode();
+                      break;
+                    case Wall.Directions.Left:
+                      searchNode.Neighbors[2] = new SearchNode();
+                      break;
+                    case Wall.Directions.Right:
+                      searchNode.Neighbors[3] = new SearchNode();
+                      break;
+                  }
+                }
+              }
+
+            if (DoorLocations != null)
             {
               var actualPosition = position * 32;
 
-              foreach (var doorPosition in DoorLocations)
+              // Bottom
+              if (y == Rectangle.Height - 32)
               {
-                if (new Vector2(doorPosition.Position.X, doorPosition.Position.Y - 32) == actualPosition)
+                foreach (var doorLocation in DoorLocations)
                 {
-                  searchNode.Neighbors[1] = null;
+                  if (new Vector2(doorLocation.Position.X, doorLocation.Position.Y - 32) == actualPosition)
+                  {
+                    searchNode.Neighbors[1] = null;
+                  }
+                }
+              }
+
+              // Left
+              if (x == Rectangle.X - 32)
+              {
+                foreach (var doorLocation in DoorLocations)
+                {
+                  if (new Vector2(doorLocation.Position.X - 32, doorLocation.Position.Y) == actualPosition)
+                  {
+                    searchNode.Neighbors[2] = null;
+                  }
                 }
               }
             }
@@ -159,6 +214,8 @@ namespace TopDown.Buildings
         base.Rectangle = value;
       }
     }
+
+    protected List<Wall> Walls;
 
     public virtual BuildingStates State
     {
@@ -281,8 +338,6 @@ namespace TopDown.Buildings
 
           _spriteInside.Draw(gameTime, spriteBatch);
 
-          SetDoorLocations();
-
           foreach (var doorLocation in DoorLocations)
           {
             var color = Color.LightGreen;
@@ -387,6 +442,11 @@ namespace TopDown.Buildings
       };
     }
 
+    protected virtual void SetWalls()
+    {
+      Walls = new List<Wall>();
+    }
+
     public override void UnloadContent()
     {
       _spriteOutside?.UnloadContent();
@@ -409,7 +469,7 @@ namespace TopDown.Buildings
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
             (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
 
-          //SetDoorLocations();
+          SetDoorLocations();
 
           bool canPlace = false;
 

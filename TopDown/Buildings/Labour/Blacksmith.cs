@@ -71,6 +71,17 @@ namespace TopDown.Buildings.Labour
       Name = "Blacksmith";
     }
 
+    private void CraftItem(NPC npc, GameTime gameTime)
+    {
+      npc.CraftingItem.CraftingTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+      if (npc.CraftingItem.CraftingTime >= npc.CraftingItem.CraftTime)
+      {
+        _gameScreen.InventoryItems.Add(npc.CraftingItem);
+        npc.CraftingItem = null;
+      }
+    }
+
     protected override void SetDoorLocations()
     {
       DoorLocations = new List<DoorLocation>()
@@ -103,14 +114,67 @@ namespace TopDown.Buildings.Labour
       };
     }
 
+    protected override void SetWalls()
+    {
+      Walls = new List<Wall>()
+      {
+        new Wall()
+        {
+          Direction = Wall.Directions.Down,
+          Position = new Vector2(1, 2),
+        },
+        new Wall()
+        {
+          Direction = Wall.Directions.Down,
+          Position = new Vector2(2, 2),
+        },
+        new Wall()
+        {
+          Direction = Wall.Directions.Left,
+          Position = new Vector2(3, 3),
+        },
+        new Wall()
+        {
+          Direction = Wall.Directions.Left,
+          Position = new Vector2(3, 4),
+        },
+
+        new Wall()
+        {
+          Direction = Wall.Directions.Up,
+          Position = new Vector2(1, 3),
+        },
+        new Wall()
+        {
+          Direction = Wall.Directions.Up,
+          Position = new Vector2(2, 3),
+        },
+        new Wall()
+        {
+          Direction = Wall.Directions.Right,
+          Position = new Vector2(2, 3),
+        },
+        new Wall()
+        {
+          Direction = Wall.Directions.Right,
+          Position = new Vector2(2, 4),
+        },
+      };
+    }
+
     public override void Work(NPC npc, GameTime gameTime)
     {
-      var anvil = Components.First();
+      var anvil = Components.FirstOrDefault();
 
-      var workPosition = anvil.Position - new Vector2(32, 0);
+      var t = new Vector2(Position.X + 64, Position.Y + 64);
+      var t2 = new Vector2(Rectangle.X + 64, Rectangle.Y + 64);
+
+      var workPosition = anvil != null ? anvil.Position - new Vector2(32, 0) : new Vector2(Rectangle.X + 64, Rectangle.Y + 64);
 
       if (npc.Position != workPosition)
+      {
         npc.WalkTo(workPosition);
+      }
       else
       {
         if (npc.CraftingItem != null)
@@ -130,17 +194,6 @@ namespace TopDown.Buildings.Labour
             CraftItem(npc, gameTime);
           }
         }
-      }
-    }
-
-    private void CraftItem(NPC npc, GameTime gameTime)
-    {
-      npc.CraftingItem.CraftingTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-      if (npc.CraftingItem.CraftingTime >= npc.CraftingItem.CraftTime)
-      {
-        _gameScreen.InventoryItems.Add(npc.CraftingItem);
-        npc.CraftingItem = null;
       }
     }
   }

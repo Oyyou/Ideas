@@ -84,7 +84,6 @@ namespace TopDown.Sprites
 
       Job = Workplace.Name;
 
-      //Work += Workplace.Work;
       Work += Workplace.Work;
     }
 
@@ -133,17 +132,13 @@ namespace TopDown.Sprites
 
     public void Unemploy()
     {
+      Work -= Workplace.Work;
       Workplace = null;
       Job = "Unemployed";
     }
 
     public override void Update(GameTime gameTime)
     {
-      if (Layer != Building.DefaultLayer + 0.001f)
-      {
-
-      }
-
       if (_walkingPath.Count > 0)
       {
         if (_walkingPath[0] == Position)
