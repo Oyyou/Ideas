@@ -66,6 +66,56 @@ namespace TopDown.Buildings.Labour
       }
     }
 
+    protected override List<Wall> Walls
+    {
+      get
+      {
+        return new List<Wall>()
+        {
+          new Wall()
+          {
+            Direction = Wall.Directions.Down,
+            Position = new Vector2(1, 2),
+          },
+          new Wall()
+          {
+            Direction = Wall.Directions.Down,
+            Position = new Vector2(2, 2),
+          },
+          new Wall()
+          {
+            Direction = Wall.Directions.Left,
+            Position = new Vector2(3, 3),
+          },
+          new Wall()
+          {
+            Direction = Wall.Directions.Left,
+            Position = new Vector2(3, 4),
+          },
+          new Wall()
+          {
+            Direction = Wall.Directions.Up,
+            Position = new Vector2(1, 3),
+          },
+          new Wall()
+          {
+            Direction = Wall.Directions.Up,
+            Position = new Vector2(2, 3),
+          },
+          new Wall()
+          {
+            Direction = Wall.Directions.Right,
+            Position = new Vector2(2, 3),
+          },
+          new Wall()
+          {
+            Direction = Wall.Directions.Right,
+            Position = new Vector2(2, 4),
+          },
+        };
+      }
+    }
+
     public Blacksmith(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
     {
       Name = "Blacksmith";
@@ -110,54 +160,6 @@ namespace TopDown.Buildings.Labour
         {
           Position = new Vector2(_spriteInside.Rectangle.X + 64, _spriteInside.Rectangle.Bottom),
           IsValid = false,
-        },
-      };
-    }
-
-    protected override void SetWalls()
-    {
-      Walls = new List<Wall>()
-      {
-        new Wall()
-        {
-          Direction = Wall.Directions.Down,
-          Position = new Vector2(1, 2),
-        },
-        new Wall()
-        {
-          Direction = Wall.Directions.Down,
-          Position = new Vector2(2, 2),
-        },
-        new Wall()
-        {
-          Direction = Wall.Directions.Left,
-          Position = new Vector2(3, 3),
-        },
-        new Wall()
-        {
-          Direction = Wall.Directions.Left,
-          Position = new Vector2(3, 4),
-        },
-
-        new Wall()
-        {
-          Direction = Wall.Directions.Up,
-          Position = new Vector2(1, 3),
-        },
-        new Wall()
-        {
-          Direction = Wall.Directions.Up,
-          Position = new Vector2(2, 3),
-        },
-        new Wall()
-        {
-          Direction = Wall.Directions.Right,
-          Position = new Vector2(2, 3),
-        },
-        new Wall()
-        {
-          Direction = Wall.Directions.Right,
-          Position = new Vector2(2, 4),
         },
       };
     }

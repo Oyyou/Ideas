@@ -68,6 +68,14 @@ namespace TopDown.Buildings.Housing
       }
     }
 
+    protected override List<Wall> Walls
+    {
+      get
+      {
+        return new List<Wall>();
+      }
+    }
+
     public SmallHouse(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
     {
     }

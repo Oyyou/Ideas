@@ -24,9 +24,18 @@ namespace TopDown.Sprites
       "John",
     };
 
+    #region Fields
+
     private GameScreen _gameScreen;
 
+    /// <summary>
+    /// The path the NPC is currently walking on
+    /// </summary>
     private List<Vector2> _walkingPath;
+
+    #endregion
+
+    #region Properties
 
     /// <summary>
     /// We don't need the NPCs to collide with anything
@@ -44,10 +53,19 @@ namespace TopDown.Sprites
     /// </summary>
     public Item CraftingItem { get; set; }
 
+    /// <summary>
+    /// The image shown on the "Job Menu"
+    /// </summary>
     public Sprite DisplaySprite { get; private set; }
 
+    /// <summary>
+    /// Where the NPC lives
+    /// </summary>
     public Building Home { get; set; }
 
+    /// <summary>
+    /// The job title (TODO: get this from the 'Workplace'
+    /// </summary>
     public string Job { get; set; }
 
     public string Name { get; set; }
@@ -66,9 +84,19 @@ namespace TopDown.Sprites
 
     public delegate void WorkEvent(NPC npc, GameTime gameTime);
 
+    /// <summary>
+    /// The even gained from the workplace
+    /// </summary>
     public event WorkEvent Work;
 
+    /// <summary>
+    /// Where the NPC works (TODO: add a schedule per workplace, or NPC)
+    /// </summary>
     public Building Workplace { get; private set; }
+
+    #endregion
+
+    #region Methods
 
     public void AssignJob()
     {
@@ -79,6 +107,8 @@ namespace TopDown.Sprites
       {
         npc.Unemploy();
       }
+
+      _walkingPath.Clear();
 
       Workplace = jb;
 
@@ -132,9 +162,19 @@ namespace TopDown.Sprites
 
     public void Unemploy()
     {
+      _walkingPath.Clear();
       Work -= Workplace.Work;
       Workplace = null;
       Job = "Unemployed";
+    }
+
+    public override void UnloadContent()
+    {
+      base.UnloadContent();
+
+      _walkingPath.Clear();
+
+      DisplaySprite.UnloadContent();
     }
 
     public override void Update(GameTime gameTime)
@@ -176,5 +216,7 @@ namespace TopDown.Sprites
       else if (Position.Y > targetPosition.Y)
         Velocity.Y = -1;
     }
+
+    #endregion
   }
 }

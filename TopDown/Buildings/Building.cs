@@ -35,6 +35,21 @@ namespace TopDown.Buildings
       public Vector2 Position { get; set; }
     }
 
+    protected class Wall
+    {
+      public enum Directions
+      {
+        Up,
+        Down,
+        Left,
+        Right,
+      }
+
+      public Directions Direction { get; set; }
+
+      public Vector2 Position { get; set; }
+    }
+
     protected float _buildTimer;
 
     protected Sprite _spriteOutside;
@@ -83,6 +98,8 @@ namespace TopDown.Buildings
     /// </summary>
     public List<DoorLocation> DoorLocations;
 
+    public string Name { get; set; }
+
     public override Vector2 Position
     {
       get { return _spriteOutside.Position; }
@@ -92,27 +109,12 @@ namespace TopDown.Buildings
         _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
 
         SetDoorLocations();
-        SetWalls();
       }
     }
 
-    public string Name { get; set; }
-
-    protected class Wall
-    {
-      public enum Directions
-      {
-        Up,
-        Down,
-        Left,
-        Right,
-      }
-
-      public Directions Direction { get; set; }
-
-      public Vector2 Position { get; set; }
-    }
-
+    /// <summary>
+    /// The points inside a building used for path finding
+    /// </summary>
     public virtual List<SearchNode> PathPositions
     {
       get
@@ -215,8 +217,6 @@ namespace TopDown.Buildings
       }
     }
 
-    protected List<Wall> Walls;
-
     public virtual BuildingStates State
     {
       get { return _state; }
@@ -235,6 +235,17 @@ namespace TopDown.Buildings
             CollisionRectangles = new List<Rectangle>();
             break;
         }
+      }
+    }
+
+    /// <summary>
+    /// The walls inside the building that we can't go through
+    /// </summary>
+    protected virtual List<Wall> Walls
+    {
+      get
+      {
+        return new List<Wall>();
       }
     }
 
@@ -268,6 +279,7 @@ namespace TopDown.Buildings
               {
                 State = BuildingStates.Built_Out;
                 _gameScreen.State = States.GameStates.Playing;
+                _gameScreen.UpdateMap();
               }
 
               _hitTimer = 0f;
@@ -442,19 +454,17 @@ namespace TopDown.Buildings
       };
     }
 
-    protected virtual void SetWalls()
-    {
-      Walls = new List<Wall>();
-    }
-
     public override void UnloadContent()
     {
       _spriteOutside?.UnloadContent();
       _spriteInside?.UnloadContent();
+
       _soundEffect?.Dispose();
 
       foreach (var component in Components)
         component.UnloadContent();
+
+      Walls?.Clear();
     }
 
     public override void Update(GameTime gameTime)

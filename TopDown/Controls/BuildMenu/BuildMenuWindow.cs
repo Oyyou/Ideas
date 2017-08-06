@@ -95,8 +95,6 @@ namespace TopDown.Controls.BuildMenu
             _gameScreen.SelectedPathBuilder.Paths.Last().IsRemoved = true;
           }
 
-          // 
-
           itemOption.CurrentState = ItemMenuButtonStates.Clickable;
           _gameScreen.State = States.GameStates.ItemMenu;
 
@@ -149,6 +147,10 @@ namespace TopDown.Controls.BuildMenu
     {
       var smallHouse = new BuildMenuSubButton(_subButtonTexture, _font)
       {
+        Building = new SmallHouse(_gameScreen, _content.Load<Texture2D>("Buildings/SmallHouse/In"), _content.Load<Texture2D>("Buildings/SmallHouse/Out"))
+        {
+          State = Buildings.BuildingStates.Placing,
+        },
         Text = "Small House",
         Layer = 0.99f,
         GameScreenSetValue = States.GameStates.PlacingBuilding,
@@ -193,7 +195,7 @@ namespace TopDown.Controls.BuildMenu
         toilet,
       };
 
-      smallHouse.Click += SmallHouse_Click;
+      smallHouse.Click += SubButton_Click;
 
       return smallHouse;
     }
@@ -202,6 +204,10 @@ namespace TopDown.Controls.BuildMenu
     {
       var tavern = new BuildMenuSubButton(_subButtonTexture, _font)
       {
+        Building = new Tavern(_gameScreen, _content.Load<Texture2D>("Buildings/Tavern/In"), _content.Load<Texture2D>("Buildings/Tavern/Out"))
+        {
+          State = Buildings.BuildingStates.Placing,
+        },
         Text = "Tavern",
         Layer = 0.99f,
         GameScreenSetValue = States.GameStates.PlacingBuilding,
@@ -267,31 +273,32 @@ namespace TopDown.Controls.BuildMenu
         booth,
       };
 
-      tavern.Click += Tavern_Click;
+      tavern.Click += SubButton_Click;
 
       return tavern;
     }
 
-    private void Tavern_Click(object sender, EventArgs e)
+    private void SubButton_Click(object sender, EventArgs e)
     {
-      _gameScreen.AddComponent(new Tavern(_gameScreen, _content.Load<Texture2D>("Buildings/Tavern/In"), _content.Load<Texture2D>("Buildings/Tavern/Out"))
-      {
-        State = Buildings.BuildingStates.Placing,
-      });
-    }
+      if (!(sender is BuildMenuSubButton))
+        throw new Exception("This event can only be applied to a 'BuildMenuSubButton'.");
 
-    private void SmallHouse_Click(object sender, EventArgs e)
-    {
-      _gameScreen.AddComponent(new SmallHouse(_gameScreen, _content.Load<Texture2D>("Buildings/SmallHouse/In"), _content.Load<Texture2D>("Buildings/SmallHouse/Out"))
-      {
-        State = Buildings.BuildingStates.Placing,
-      });
+      var button = sender as BuildMenuSubButton;
+
+      if (button.Building == null)
+        throw new Exception($"Button '{button.Text}' doesn't have a building set.");
+
+      _gameScreen.AddComponent(button.Building);
     }
 
     private void LabourButton_Click(object sender, EventArgs e)
     {
       var blacksmith = new BuildMenuSubButton(_subButtonTexture, _font)
       {
+        Building = new Blacksmith(_gameScreen, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
+        {
+          State = Buildings.BuildingStates.Placing,
+        },
         Text = "Blacksmith",
         Layer = 0.99f,
         GameScreenSetValue = States.GameStates.PlacingBuilding,
@@ -304,7 +311,7 @@ namespace TopDown.Controls.BuildMenu
         },
       };
 
-      blacksmith.Click += Blacksmith_Click;
+      blacksmith.Click += SubButton_Click;
 
       var anvil = new ItemMenuButton(_mainButtonTexture, _font)
       {
@@ -327,6 +334,10 @@ namespace TopDown.Controls.BuildMenu
 
       var mine = new BuildMenuSubButton(_subButtonTexture, _font)
       {
+        Building = new Mine(_gameScreen, _content.Load<Texture2D>("Buildings/Mine/In"), _content.Load<Texture2D>("Buildings/Mine/Out"))
+        {
+          State = Buildings.BuildingStates.Placing,
+        },
         Text = "Mine",
         Layer = 0.99f,
         GameScreenSetValue = States.GameStates.PlacingBuilding,
@@ -339,7 +350,7 @@ namespace TopDown.Controls.BuildMenu
         },
       };
 
-      mine.Click += Mine_Click;
+      mine.Click += SubButton_Click;
 
       _buildSubOptions = new List<BuildMenuSubButton>()
       {
@@ -375,22 +386,6 @@ namespace TopDown.Controls.BuildMenu
 
       foreach (var component in _buildSubOptions)
         component.LoadContent(_content);
-    }
-
-    private void Mine_Click(object sender, EventArgs e)
-    {
-      _gameScreen.AddComponent(new Mine(_gameScreen, _content.Load<Texture2D>("Buildings/Mine/In"), _content.Load<Texture2D>("Buildings/Mine/Out"))
-      {
-        State = Buildings.BuildingStates.Placing,
-      });
-    }
-
-    private void Blacksmith_Click(object sender, EventArgs e)
-    {
-      _gameScreen.AddComponent(new Blacksmith(_gameScreen, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
-      {
-        State = Buildings.BuildingStates.Placing,
-      });
     }
 
     public override void LoadContent(ContentManager content)

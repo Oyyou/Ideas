@@ -7,11 +7,17 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using TopDown.Controls.ItemMenu;
+using TopDown.Buildings;
 
 namespace TopDown.Controls.BuildMenu
 {
   public class BuildMenuSubButton : Button
   {
+    /// <summary>
+    /// The building this button will create
+    /// </summary>
+    public Building Building { get; set; }
+
     public States.GameStates GameScreenSetValue { get; set; }
 
     public List<ItemMenuButton> Items { get; set; }

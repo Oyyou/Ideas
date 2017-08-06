@@ -62,7 +62,7 @@ namespace TopDown.Controls.ItemMenu
 
       var newText = Text + " x " + Amount;
 
-      if (Amount == -1)
+      if (Amount < 0)
         newText = Text;
 
       float x = (Rectangle.X + (Rectangle.Width / 2)) - (_font.MeasureString(newText).X / 2);
@@ -133,15 +133,6 @@ namespace TopDown.Controls.ItemMenu
 
           break;
         case ItemMenuButtonStates.Placed:
-
-          // This is retarded. Fix
-          //if (Amount > 0)
-          //{
-          //  Amount--;
-
-          //  if (Amount > 0)
-          //    CurrentState = ItemMenuButtonStates.Clickable;
-          //}
 
           break;
         default:

@@ -64,8 +64,9 @@ namespace TopDown.States
     public IEnumerable<Building> BuildingComponents
     {
       get
-      {
-        return _gameComponents.Where(c => c is Building).Cast<Building>();
+      {        
+        return _gameComponents.Where(c => c is Building).Cast<Building>()
+          .Where(c => c.State == BuildingStates.Built_In || c.State == BuildingStates.Built_Out);
       }
     }
 
@@ -144,7 +145,7 @@ namespace TopDown.States
     {
       get
       {
-        var components = _gameComponents.Where(c => c is Blacksmith || c is Tavern || c is Mine).Cast<Building>().ToList();
+        var components = BuildingComponents.Where(c => c is Blacksmith || c is Tavern || c is Mine).Cast<Building>().ToList();
 
         return components ?? new List<Building>();
       }
@@ -189,9 +190,11 @@ namespace TopDown.States
       if (house == null)
         return;
 
+      var doorPosition = house.DoorLocations.FirstOrDefault().Position;
+
       var npc = new NPC(playerAnimations, this)
       {
-        Position = new Vector2(736, 288),
+        Position = doorPosition,
         IsCollidable = false,
         Layer = Building.DefaultLayer + 0.001f,
         Home = house,

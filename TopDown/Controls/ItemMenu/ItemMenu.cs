@@ -77,9 +77,9 @@ namespace TopDown.Controls.ItemMenu
 
         _gameScreen.SelectedPathBuilder.IsRemoved = true;
         _gameScreen.SelectedPathBuilder = null;
-      }
 
-      _gameScreen.UpdateMap();
+        _gameScreen.UpdateMap();
+      }
 
       FullReset();
     }

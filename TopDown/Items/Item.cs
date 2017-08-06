@@ -13,6 +13,9 @@ namespace TopDown.Items
   {
     Weapons,
     Armour,
+    Tool,
+    Clothing,
+    Jewellery
   }
 
   public class Item : Sprite
@@ -31,11 +34,11 @@ namespace TopDown.Items
 
     public readonly string Name;
 
+    /// <summary>
+    /// The cost of the item
+    /// </summary>
     public Models.Resources ResourceCost;
 
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="craftTime">How long it'll take to craft (not including worker modifier) in seconds</param>
     /// <param name="name">The name of the craftable item</param>
     public Item(Texture2D texture, float craftTime, string name, ItemCategories category) : base(texture)
