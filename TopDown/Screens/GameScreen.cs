@@ -64,7 +64,7 @@ namespace TopDown.States
     public IEnumerable<Building> BuildingComponents
     {
       get
-      {        
+      {
         return _gameComponents.Where(c => c is Building).Cast<Building>()
           .Where(c => c.State == BuildingStates.Built_In || c.State == BuildingStates.Built_Out);
       }
@@ -732,7 +732,26 @@ namespace TopDown.States
         State = GameStates.JobMenu;
 
       if (Keyboard.IsKeyPressed(Keys.C))
+      {
+        CraftingMenu.ComboBox.Reset();
+
+        var npcs = NPCComponents.Where(c => c.Workplace != null && c.Workplace.Name == "Blacksmith");
+
+        var items = new List<ComboBoxItem>();
+        foreach (var npc in npcs)
+        {
+          var item = new ComboBoxItem(CraftingMenu.ComboBox);
+          item.LoadContent(_content);
+
+          item.Text = npc.Name;
+
+          items.Add(item);
+        }
+
+        CraftingMenu.ComboBox.Items = items;
+
         State = GameStates.CraftingMenu;
+      }
 
       if (Keyboard.IsKeyPressed(Keys.I))
         State = GameStates.InventoryMenu;

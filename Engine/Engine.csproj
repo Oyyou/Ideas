@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Component.cs" />
     <Compile Include="Controls\Button.cs" />
+    <Compile Include="Controls\ComboBoxItem.cs" />
+    <Compile Include="Controls\ComboBox.cs" />
     <Compile Include="FX\GrassParticle.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="Managers\AnimationManager.cs" />

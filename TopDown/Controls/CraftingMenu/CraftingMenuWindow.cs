@@ -14,6 +14,11 @@ namespace TopDown.Controls.CraftingMenu
 {
   public class CraftingMenuWindow : MenuWindow
   {
+    /// <summary>
+    /// For the NPCs
+    /// </summary>
+    public ComboBox ComboBox;
+
     private Texture2D _mainButtonTexture;
 
     private Texture2D _subButtonTexture;
@@ -64,11 +69,17 @@ namespace TopDown.Controls.CraftingMenu
         Layer = 0.99f,
       };
 
+      ComboBox = new ComboBox();
+
       Components.Add(weaponsButton);
       Components.Add(armourButton);
+      Components.Add(ComboBox);
 
       foreach (var component in Components)
         component.LoadContent(content);
+
+      ComboBox.Position = new Vector2(_closeButton.Position.X - ComboBox.Width - 5, _closeButton.Position.Y);
+      ComboBox.Layer = _closeButton.Layer;
 
       _subButtons = new List<CraftingMenuSubButton>();
 

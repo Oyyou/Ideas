@@ -125,7 +125,7 @@ namespace Engine.Controls
       Components = new List<Component>();
     }
 
-    protected virtual void OnClick()
+    public virtual void OnClick()
     {
       Click?.Invoke(this, new EventArgs());
     }
