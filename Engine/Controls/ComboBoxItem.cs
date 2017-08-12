@@ -13,6 +13,14 @@ namespace Engine.Controls
   {
     private Button _button;
 
+    public object Content { get; set; }
+
+    public event EventHandler Click
+    {
+      add { _button.Click += value; }
+      remove { _button.Click -= value; }
+    }
+
     public int Height
     {
       get

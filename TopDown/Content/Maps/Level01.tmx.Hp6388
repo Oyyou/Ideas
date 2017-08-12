@@ -10018,7 +10018,7 @@
  </objectgroup>
  <objectgroup name="SmallHouse">
   <object id="14" name="Building" x="704" y="96" width="192" height="192"/>
-  <object id="15" name="Bed" x="800" y="160" width="96" height="64"/>
+  <object id="15" x="800" y="160" width="96" height="64"/>
  </objectgroup>
  <layer name="Path" width="100" height="100">
   <data>

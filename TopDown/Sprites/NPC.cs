@@ -10,6 +10,7 @@ using TopDown.States;
 using Engine;
 using TopDown.Buildings;
 using TopDown.Items;
+using Microsoft.Xna.Framework.Content;
 
 namespace TopDown.Sprites
 {
@@ -52,6 +53,8 @@ namespace TopDown.Sprites
     /// The item that the NPC is currently crafting
     /// </summary>
     public Item CraftingItem { get; set; }
+
+    public List<Item> CraftingItems { get; set; }
 
     /// <summary>
     /// The image shown on the "Job Menu"
@@ -115,6 +118,13 @@ namespace TopDown.Sprites
       Job = Workplace.Name;
 
       Work += Workplace.Work;
+    }
+
+    public override void LoadContent(ContentManager content)
+    {
+      base.LoadContent(content);
+
+      CraftingItems = new List<Item>();
     }
 
     public NPC(Dictionary<string, Animation> animations, GameScreen gameScreen) : base(animations)

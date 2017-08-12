@@ -128,6 +128,7 @@ namespace TopDown.Buildings.Labour
       if (npc.CraftingItem.CraftingTime >= npc.CraftingItem.CraftTime)
       {
         _gameScreen.InventoryItems.Add(npc.CraftingItem);
+        npc.CraftingItems.Remove(npc.CraftingItem);
         npc.CraftingItem = null;
       }
     }
@@ -185,10 +186,10 @@ namespace TopDown.Buildings.Labour
         }
         else
         {
-          if (_gameScreen.CraftingMenu.CraftingItems.Count > 0)
+          if (npc.CraftingItems.Count > 0)
           {
             // Assign the first item in the queue to the NPC
-            npc.CraftingItem = _gameScreen.CraftingMenu.CraftingItems.Dequeue();
+            npc.CraftingItem = npc.CraftingItems.First();
           }
 
           if (npc.CraftingItem != null)

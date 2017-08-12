@@ -17,6 +17,8 @@ namespace TopDown.Controls.InventoryMenu
   {
     private List<Item> _items;
 
+    private List<Button> _mainButtons;
+
     private Texture2D _mainButtonTexture;
 
     private Texture2D _subButtonTexture;
@@ -35,6 +37,9 @@ namespace TopDown.Controls.InventoryMenu
         return;
 
       foreach (var component in Components)
+        component.Draw(gameTime, spriteBatch);
+
+      foreach (var component in _mainButtons)
         component.Draw(gameTime, spriteBatch);
 
       foreach (var component in _items)
@@ -67,6 +72,8 @@ namespace TopDown.Controls.InventoryMenu
       var y = Position.Y + 56;
       var yIncrement = _mainButtonTexture.Height + 5;
 
+      _mainButtons = new List<Button>();
+
       foreach (var category in categories)
       {
         var categoryButton = new Button(_mainButtonTexture, _font)
@@ -80,8 +87,11 @@ namespace TopDown.Controls.InventoryMenu
 
         y += yIncrement;
 
-        Components.Add(categoryButton);
+        _mainButtons.Add(categoryButton);
       }
+
+      foreach (var component in _mainButtons)
+        component.LoadContent(content);
 
       foreach (var component in Components)
         component.LoadContent(content);
@@ -105,10 +115,35 @@ namespace TopDown.Controls.InventoryMenu
     public override void Update(GameTime gameTime)
     {
       if (_gameScreen.State != States.GameStates.InventoryMenu)
+      {
+        foreach (var component in _mainButtons)
+        {
+          component.IsSelected = false;
+        }
+
+        _items = new List<Item>();
+
         return;
+      }
 
       foreach (var component in Components)
         component.Update(gameTime);
+
+      foreach (var component in _mainButtons)
+      {
+        // Sets the colour of the selected button
+        if (component.IsClicked)
+        {
+          foreach (var c in _mainButtons)
+          {
+            c.IsSelected = false;
+          }
+
+          component.IsSelected = true;
+        }
+
+        component.Update(gameTime);
+      }
 
       var x = Position.X + 196;
       var xIncrement = 0;

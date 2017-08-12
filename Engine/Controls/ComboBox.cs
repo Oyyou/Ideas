@@ -17,6 +17,8 @@ namespace Engine.Controls
 
     private float _timer;
 
+    public string DefaultText { get; set; }
+
     public int Height
     {
       get
@@ -107,7 +109,7 @@ namespace Engine.Controls
 
       _button.Click += Click;
 
-      _button.Text = "Select NPC";
+      _button.Text = DefaultText;
 
       Items = new List<ComboBoxItem>();
     }
@@ -118,7 +120,7 @@ namespace Engine.Controls
       SelectedItem = null;
 
       if (_button != null)
-        _button.Text = "Select NPC";
+        _button.Text = DefaultText;
     }
 
     public override void UnloadContent()

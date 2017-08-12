@@ -469,12 +469,11 @@ namespace TopDown.States
         {
           case "Blacksmith":
 
-            var blacksmith = new Blacksmith(this, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
-            {
-            };
+            var blacksmith = new Blacksmith(this,
+              _content.Load<Texture2D>("Buildings/Blacksmith/In"),
+              _content.Load<Texture2D>("Buildings/Blacksmith/Out"));
 
             blacksmith.LoadContent(_content);
-
 
             foreach (var collisionObject in objectGroup.CollisionObjects)
             {
@@ -508,6 +507,49 @@ namespace TopDown.States
 
             blacksmith.State = BuildingStates.Built_Out;
             _gameComponents.Add(blacksmith);
+
+            break;
+
+          case "SmallHouse":
+
+            var smallHouse = new SmallHouse(this,
+              _content.Load<Texture2D>("Buildings/SmallHouse/In"),
+              _content.Load<Texture2D>("Buildings/SmallHouse/Out"));
+
+            smallHouse.LoadContent(_content);
+            
+            foreach (var collisionObject in objectGroup.CollisionObjects)
+            {
+              var position = new Vector2(collisionObject.X, collisionObject.Y);
+
+              switch (collisionObject.Name)
+              {
+                case "Building":
+
+                  smallHouse.Position = position;
+
+                  break;
+
+                case "Bed":
+                  var bed = new Furniture(_content.Load<Texture2D>("Furniture/Bed"), this)
+                  {
+                    Position = position,
+                    State = PlacableObjectStates.Placed,
+                  };
+
+                  bed.LoadContent(_content);
+
+                  smallHouse.Components.Add(bed);
+
+                  break;
+
+                default:
+                  throw new Exception("Unknown object: " + collisionObject.Name);
+              }
+            }
+
+            smallHouse.State = BuildingStates.Built_Out;
+            _gameComponents.Add(smallHouse);
 
             break;
 
@@ -733,6 +775,7 @@ namespace TopDown.States
 
       if (Keyboard.IsKeyPressed(Keys.C))
       {
+        var selectedItem = CraftingMenu.ComboBox.SelectedItem;
         CraftingMenu.ComboBox.Reset();
 
         var npcs = NPCComponents.Where(c => c.Workplace != null && c.Workplace.Name == "Blacksmith");
@@ -741,6 +784,9 @@ namespace TopDown.States
         foreach (var npc in npcs)
         {
           var item = new ComboBoxItem(CraftingMenu.ComboBox);
+
+          item.Content = npc;
+
           item.LoadContent(_content);
 
           item.Text = npc.Name;
@@ -749,6 +795,14 @@ namespace TopDown.States
         }
 
         CraftingMenu.ComboBox.Items = items;
+
+        if(selectedItem != null)
+        {
+          if (CraftingMenu.ComboBox.Items.Any(c => c.Text == selectedItem.Text))
+          {
+            CraftingMenu.ComboBox.SelectedItem = CraftingMenu.ComboBox.Items.Where(c => c.Text == selectedItem.Text).FirstOrDefault();
+          }
+        }
 
         State = GameStates.CraftingMenu;
       }
