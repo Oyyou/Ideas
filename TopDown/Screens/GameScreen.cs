@@ -53,14 +53,14 @@ namespace TopDown.States
 
     private Camera _camera;
 
-    public CraftingMenuWindow CraftingMenu;
+    private Effect _effect;
 
     private SpriteFont _font;
 
-    public List<Component> GameComponents;
-
     private List<Component> _guiComponents;
-    
+
+    private RenderTarget2D _renderTarget;
+
     public IEnumerable<Building> BuildingComponents
     {
       get
@@ -70,6 +70,8 @@ namespace TopDown.States
       }
     }
 
+    public CraftingMenuWindow CraftingMenu;
+
     public List<Component> CollidableComponents
     {
       get
@@ -77,6 +79,8 @@ namespace TopDown.States
         return GameComponents.Where(c => c.CollisionRectangles != null && c.CollisionRectangles.Count > 0).ToList();
       }
     }
+
+    public List<Component> GameComponents;
 
     public IEnumerable<SmallHouse> HouseComponents
     {
@@ -209,6 +213,12 @@ namespace TopDown.States
 
     public override void Draw(GameTime gameTime)
     {
+      // Set the render target
+      _graphicsDevice.SetRenderTarget(_renderTarget);
+
+      _graphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+
+      _graphicsDevice.Clear(Color.Green);
 
       _spriteBatch.Begin(
         SpriteSortMode.FrontToBack,
@@ -219,7 +229,22 @@ namespace TopDown.States
       foreach (var component in GameComponents)
         component.Draw(gameTime, _spriteBatch);
 
-      _spriteBatch.End();      
+      _spriteBatch.End();
+
+      // Drop the render target
+      _graphicsDevice.SetRenderTarget(null);
+
+      _graphicsDevice.Clear(Color.Black);
+
+      _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
+                  SamplerState.LinearClamp, DepthStencilState.Default,
+                  RasterizerState.CullNone, _effect);
+
+      _spriteBatch.Draw(_renderTarget, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.White);
+
+      _spriteBatch.End();
+
+      DrawGui(gameTime);  
     }
 
     public void DrawGui(GameTime gameTime)
@@ -305,6 +330,16 @@ namespace TopDown.States
     public override void LoadContent(GameModel gameModel)
     {
       base.LoadContent(gameModel);
+
+      _renderTarget = new RenderTarget2D(
+        _graphicsDevice,
+        _graphicsDevice.PresentationParameters.BackBufferWidth,
+        _graphicsDevice.PresentationParameters.BackBufferHeight,
+        false,
+        _graphicsDevice.PresentationParameters.BackBufferFormat,
+        DepthFormat.Depth24);
+
+      _effect = _content.Load<Effect>("Effect/BlackAndWhite");
 
       _font = _content.Load<SpriteFont>("Fonts/Font");
 
@@ -597,61 +632,6 @@ namespace TopDown.States
       }
     }
 
-    public void UpdateMap()
-    {
-      var pathPositions = BuildingComponents.SelectMany(c => c.PathPositions).ToList();
-
-      var pathSearchNodes = new List<SearchNode>();
-
-      foreach (var path in PathComponents)
-      {
-        var neighbors = new List<Rectangle>()
-        {
-          new Rectangle((int)path.Position.X, (int)path.Position.Y - 32, 32, 32),
-          new Rectangle((int)path.Position.X, (int)path.Position.Y + 32, 32, 32),
-          new Rectangle((int)path.Position.X - 32, (int)path.Position.Y, 32, 32),
-          new Rectangle((int)path.Position.X + 32, (int)path.Position.Y, 32, 32),
-        };
-
-        var searchNode = new SearchNode()
-        {
-          Position = path.Position / 32,
-          Walkable = true,
-          Neighbors = new SearchNode[4],
-        };
-
-        foreach (var workplace in BuildingComponents)
-        {
-          for (int i = 0; i < neighbors.Count; i++)
-          {
-            var neigbor = neighbors[i];
-
-            if (workplace.Rectangle.Intersects(neigbor))
-            {
-              searchNode.Neighbors[i] = new SearchNode();
-
-              if (workplace.DoorLocations != null)
-              {
-                foreach (var doorLocation in workplace.DoorLocations)
-                {
-                  if (path.Position == new Vector2(doorLocation.Position.X, doorLocation.Position.Y))
-                    searchNode.Neighbors[i] = null;
-                }
-              }
-            }
-          }
-        }
-
-        pathSearchNodes.Add(searchNode);
-      }
-
-      pathPositions.AddRange(pathSearchNodes);
-
-      PathFinder.UpdateMap(pathPositions);
-
-      PathFinder.WriteMap();
-    }
-
     private void PlacingBuildingUpdate(GameTime gameTime)
     {
       Time = Time.AddSeconds(30);
@@ -748,7 +728,7 @@ namespace TopDown.States
     private void PlayingUpdate(GameTime gameTime)
     {
       Time = Time.AddSeconds(30);
-      
+
       AddNPC();
 
       foreach (var component in _guiComponents)
@@ -849,6 +829,13 @@ namespace TopDown.States
 
     public override void Update(GameTime gameTime)
     {
+      // TODO: Might be an idea to 'hard-code' the darkness for different times of the day.
+      //  I can't see how maths can be used for daylight.
+      float someMaths = (float)Math.Sin((-MathHelper.PiOver2 + 2 * Math.PI * (Time.Hour + (Time.Minute / 60))) / 48);
+      float DarknessLevel = Math.Abs(MathHelper.SmoothStep(12f, 2f, someMaths));
+
+      _effect.Parameters["DarknessLevel"].SetValue(DarknessLevel);
+
       switch (State)
       {
         case GameStates.Playing:
@@ -904,6 +891,61 @@ namespace TopDown.States
         default:
           throw new Exception("Unknown state: " + State.ToString());
       }
+    }
+
+    public void UpdateMap()
+    {
+      var pathPositions = BuildingComponents.SelectMany(c => c.PathPositions).ToList();
+
+      var pathSearchNodes = new List<SearchNode>();
+
+      foreach (var path in PathComponents)
+      {
+        var neighbors = new List<Rectangle>()
+        {
+          new Rectangle((int)path.Position.X, (int)path.Position.Y - 32, 32, 32),
+          new Rectangle((int)path.Position.X, (int)path.Position.Y + 32, 32, 32),
+          new Rectangle((int)path.Position.X - 32, (int)path.Position.Y, 32, 32),
+          new Rectangle((int)path.Position.X + 32, (int)path.Position.Y, 32, 32),
+        };
+
+        var searchNode = new SearchNode()
+        {
+          Position = path.Position / 32,
+          Walkable = true,
+          Neighbors = new SearchNode[4],
+        };
+
+        foreach (var workplace in BuildingComponents)
+        {
+          for (int i = 0; i < neighbors.Count; i++)
+          {
+            var neigbor = neighbors[i];
+
+            if (workplace.Rectangle.Intersects(neigbor))
+            {
+              searchNode.Neighbors[i] = new SearchNode();
+
+              if (workplace.DoorLocations != null)
+              {
+                foreach (var doorLocation in workplace.DoorLocations)
+                {
+                  if (path.Position == new Vector2(doorLocation.Position.X, doorLocation.Position.Y))
+                    searchNode.Neighbors[i] = null;
+                }
+              }
+            }
+          }
+        }
+
+        pathSearchNodes.Add(searchNode);
+      }
+
+      pathPositions.AddRange(pathSearchNodes);
+
+      PathFinder.UpdateMap(pathPositions);
+
+      PathFinder.WriteMap();
     }
   }
 }

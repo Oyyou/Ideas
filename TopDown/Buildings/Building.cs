@@ -174,7 +174,20 @@ namespace TopDown.Buildings
 
             if (DoorLocations != null)
             {
+              // The position inside the building
               var actualPosition = position * 32;
+
+              // Top
+              if (y == 0)
+              {
+                foreach (var doorLocation in DoorLocations)
+                {
+                  if (new Vector2(doorLocation.Position.X, doorLocation.Position.Y + 32) == actualPosition)
+                  {
+                    searchNode.Neighbors[0] = null;
+                  }
+                }
+              }
 
               // Bottom
               if (y == Rectangle.Height - 32)
@@ -189,13 +202,25 @@ namespace TopDown.Buildings
               }
 
               // Left
-              if (x == Rectangle.X - 32)
+              if (x == 0)
+              {
+                foreach (var doorLocation in DoorLocations)
+                {
+                  if (new Vector2(doorLocation.Position.X + 32, doorLocation.Position.Y) == actualPosition)
+                  {
+                    searchNode.Neighbors[2] = null;
+                  }
+                }
+              }
+
+              // Bottom
+              if (x == Rectangle.Width - 32)
               {
                 foreach (var doorLocation in DoorLocations)
                 {
                   if (new Vector2(doorLocation.Position.X - 32, doorLocation.Position.Y) == actualPosition)
                   {
-                    searchNode.Neighbors[2] = null;
+                    searchNode.Neighbors[4] = null;
                   }
                 }
               }
