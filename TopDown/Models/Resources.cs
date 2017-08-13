@@ -15,5 +15,16 @@ namespace TopDown.Models
     public int Stone { get; set; }
 
     public int Wood { get; set; }
+
+    public Dictionary<string, int> GetContent()
+    {
+      return new Dictionary<string, int>()
+      {
+        { "Food", Food },
+        { "Gold", Gold },
+        { "Stone", Stone },
+        { "Wood", Wood },
+      }.Where(c => c.Value > 0).ToDictionary(c => c.Key, v => v.Value);
+    }
   }
 }

@@ -58,6 +58,18 @@ namespace TopDown.Controls.ItemMenu
 
     private void Done_Click(object sender, EventArgs e)
     {
+      // Items that need to be placed before finishing the building
+      var requiredItems = Components.Cast<ItemMenuButton>().Where(c => c.IsRequired && c.CurrentState != ItemMenuButtonStates.Placed);
+
+      if (requiredItems.Count() > 0)
+      {
+        var button = sender as ItemMenuButton;
+        button.CurrentState = ItemMenuButtonStates.Clickable;
+
+        GameScreen.MessageBox.Show("Still need to add: " + string.Join(", ", requiredItems.Select(c => c.Text).ToArray()));
+        return;
+      }
+
       _gameScreen.State = States.GameStates.Playing;
 
       if (_gameScreen.SelectedBuilding != null)
@@ -124,21 +136,12 @@ namespace TopDown.Controls.ItemMenu
 
     }
 
-    public void PartialReset()
+    public void FullReset()
     {
       foreach (var component in Components)
       {
         ((ItemMenuButton)component).CanClick = true;
         ((ItemMenuButton)component).CurrentState = ItemMenuButtonStates.Clickable;
-      }
-    }
-
-    public void FullReset()
-    {
-      PartialReset();
-
-      foreach (var component in Components)
-      {
         ((ItemMenuButton)component).Amount = ((ItemMenuButton)component).StartAmount.Value;
       }
     }

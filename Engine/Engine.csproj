@@ -73,8 +73,6 @@
     <Compile Include="TMXSharp\TmxMap.cs" />
     <Compile Include="Utilities\FrameCounter.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="System\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

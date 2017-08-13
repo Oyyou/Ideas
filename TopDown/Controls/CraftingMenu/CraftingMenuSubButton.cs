@@ -31,12 +31,29 @@ namespace TopDown.Controls.CraftingMenu
 
       spriteBatch.DrawString(_font, text, new Vector2(x, y), Color.Red, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
 
-      var resources = CraftingItem.ResourceCost;
+      var resources = CraftingItem.ResourceCost.GetContent();
 
-      spriteBatch.DrawString(_font, "Food: " + resources.Food, new Vector2(Rectangle.X + 5, Rectangle.Y + 40), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
-      spriteBatch.DrawString(_font, "Wood: " + resources.Wood, new Vector2(Rectangle.X + (Rectangle.Width / 2) + 5, Rectangle.Y + 40), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
-      spriteBatch.DrawString(_font, "Stone: " + resources.Stone, new Vector2(Rectangle.X + 5, Rectangle.Y + 65), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
-      spriteBatch.DrawString(_font, "Gold: " + resources.Gold, new Vector2(Rectangle.X + (Rectangle.Width / 2) + 5, Rectangle.Y + 65), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+      var x1 = Rectangle.X + 5;
+      var y1 = Rectangle.Y + 30;
+
+      spriteBatch.DrawString(_font, "Resources:", new Vector2(x1, y1), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+
+      foreach (var resource in resources)
+      {
+        spriteBatch.DrawString(_font, resource.Key + ": " + resource.Value, new Vector2(x1, y1 += 25), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+      }
+
+      var stats = CraftingItem.Stats.GetContent();
+
+      var x2 = Rectangle.X + (Rectangle.Width / 2) + 5;
+      var y2 = Rectangle.Y + 30;
+
+      spriteBatch.DrawString(_font, "Stats:", new Vector2(x2, y2), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+
+      foreach (var stat in stats)
+      {
+        spriteBatch.DrawString(_font, stat.Key + ": " + stat.Value, new Vector2(x2, y2 += 25), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+      }
     }
   }
 }

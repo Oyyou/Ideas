@@ -127,6 +127,8 @@ namespace TopDown.Buildings.Labour
 
       if (npc.CraftingItem.CraftingTime >= npc.CraftingItem.CraftTime)
       {
+        npc.Skills.Blacksmith.Experience += npc.CraftingItem.ExperienceValue;
+
         _gameScreen.InventoryItems.Add(npc.CraftingItem);
         npc.CraftingItems.Remove(npc.CraftingItem);
         npc.CraftingItem = null;

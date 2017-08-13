@@ -167,6 +167,7 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Bed",
         Parent = smallHouse,
+        IsRequired = true,
         PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Bed"), _gameScreen)
         {
           State = PlacableObjectStates.Placing,

@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TopDown.Items;
+using TopDown.ItemStats;
+using TopDown.Models;
 using TopDown.Sprites;
 using TopDown.States;
 
@@ -52,22 +54,43 @@ namespace TopDown.Controls.CraftingMenu
         var npc = ComboBox.SelectedItem.Content as NPC;
 
         var x = _queueSprite.Position.X + 11;
+        var y = _queueSprite.Position.Y + 11;
 
-
-        foreach (var item in npc.CraftingItems.ToList())
+        var list = npc.CraftingItems.ToList();
+        var extraCount = 0;
+        for (int i = 0; i < list.Count; i++)
         {
-          item.Position = new Vector2(x, _queueSprite.Position.Y + 11);
+          var item = list[i];
+
+          item.Position = new Vector2(x, y);
           item.Layer = _queueSprite.Layer + 0.001f;
 
-          x += item.Rectangle.Width + 5;
+          var increment = item.Rectangle.Width + 4;
 
-          item.Draw(gameTime, spriteBatch);
+          if (x > _queueSprite.Rectangle.Right - increment - item.Rectangle.Width)
+            extraCount++;
+
+          if (extraCount == 0)
+          {
+            item.Draw(gameTime, spriteBatch);
+
+            x += increment;
+          }
+          else if(i == list.Count - 1) // if it's the last, let the player know how many other items are being crafted
+          {
+            var text = "+" + extraCount;
+
+            var newX = x + 20 - (_font.MeasureString(text).X / 2);
+            var newY = y + 20 - (_font.MeasureString(text).Y / 2);
+
+            spriteBatch.DrawString(_font, text , new Vector2(newX, newY), Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.99f);
+          }
         }
       }
 
       spriteBatch.DrawString(_font, "Crafting", _fontPosition, Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.99f);
 
-      if (!string.IsNullOrEmpty(_professionRequired))
+      if (!string.IsNullOrEmpty(_professionRequired) && ComboBox.IsVisible)
       {
         var newText = _professionRequired.EndsWith(":") ? _professionRequired : _professionRequired + ":";
 
@@ -93,7 +116,7 @@ namespace TopDown.Controls.CraftingMenu
 
       _mainButtonTexture = content.Load<Texture2D>("Controls/BuildMenuMainOptionButton"); _subButtonTexture = content.Load<Texture2D>("Controls/BuildMenuSubOptionButton");
 
-      _subButtonTexture = content.Load<Texture2D>("Controls/BuildMenuSubOptionButton");
+      _subButtonTexture = content.Load<Texture2D>("Controls/CraftingMenu/ItemOption");
 
       var weaponsButton = new Button(_mainButtonTexture, _font)
       {
@@ -125,6 +148,7 @@ namespace TopDown.Controls.CraftingMenu
       ComboBox = new ComboBox()
       {
         DefaultText = "Select NPC",
+        EmptyText = "No NPCs of profession",
       };
 
       _mainButtons = new List<Button>()
@@ -151,6 +175,8 @@ namespace TopDown.Controls.CraftingMenu
 
     private void MedicineButton_Click(object sender, EventArgs e)
     {
+      var category = ItemCategories.Medicine;
+
       _subButtons = new List<CraftingMenuSubButton>();
 
       _professionRequired = "Doctor";
@@ -158,12 +184,19 @@ namespace TopDown.Controls.CraftingMenu
 
     private void ArmourButton_Click(object sender, EventArgs e)
     {
+      var category = ItemCategories.Armour;
+
       var woodenChestPieceButton = new CraftingMenuSubButton(_subButtonTexture, _font,
-        new Item(_content.Load<Texture2D>("Items/WoodenChestPiece"), 3, "Wooden Chest Piece", ItemCategories.Weapons)
+        new Item(_content.Load<Texture2D>("Items/WoodenChestPiece"), 3, "Wooden Chest Piece", category)
         {
+          ExperienceValue = 3,
           ResourceCost = new Models.Resources()
           {
             Wood = 5,
+          },
+          Stats = new ArmourStats()
+          {
+            ArmourGained = 2,
           }
         })
       {
@@ -185,13 +218,21 @@ namespace TopDown.Controls.CraftingMenu
 
     private void WeaponsButton_Click(object sender, EventArgs e)
     {
+      var category = ItemCategories.Weapons;
+
       var woodenSwordButton = new CraftingMenuSubButton(_subButtonTexture, _font,
-        new Item(_content.Load<Texture2D>("Items/WoodenSword"), 3, "Wooden Sword", ItemCategories.Weapons)
+        new Item(_content.Load<Texture2D>("Items/WoodenSword"), 3, "Wooden Sword", category)
         {
+          ExperienceValue = 2,
           ResourceCost = new Models.Resources()
           {
             Wood = 2,
-          }
+          },
+          Stats = new WeaponStats()
+          {
+            AttackSpeed = 1,
+            Damage = 3,
+          },
         })
       {
         Layer = 0.99f,
@@ -238,8 +279,8 @@ namespace TopDown.Controls.CraftingMenu
       if (_gameScreen.State != States.GameStates.CraftingMenu)
         return;
 
-      foreach (var component in Components)
-        component.Update(gameTime);
+      ComboBox.IsEnabled = false;
+      ComboBox.IsVisible = false;
 
       foreach (var component in _mainButtons)
       {
@@ -254,8 +295,17 @@ namespace TopDown.Controls.CraftingMenu
           component.IsSelected = true;
         }
 
+        if(component.IsSelected)
+        {
+          ComboBox.IsEnabled = true;
+          ComboBox.IsVisible = true;
+        }
+
         component.Update(gameTime);
       }
+
+      foreach (var component in Components)
+        component.Update(gameTime);
 
       var x = Position.X + 196;
       var xIncrement = 0;

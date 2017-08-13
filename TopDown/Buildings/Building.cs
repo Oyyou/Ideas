@@ -100,6 +100,11 @@ namespace TopDown.Buildings
 
     public string Name { get; set; }
 
+    /// <summary>
+    /// This is the fella in charge of construction
+    /// </summary>
+    public NPC NPCBuilder { get; private set; }
+
     public override Vector2 Position
     {
       get { return _spriteOutside.Position; }
@@ -251,56 +256,6 @@ namespace TopDown.Buildings
 
     public void Build(GameTime gameTime)
     {
-      if (GameScreen.Mouse.MouseState != Controls.MouseStates.Building)
-        return;
-
-      if (GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
-      {
-        if (Vector2.Distance(_spriteInside.Position + new Vector2(_spriteInside.Rectangle.Width / 2, _spriteInside.Rectangle.Height / 2), _gameScreen.Player.Position) < 150)
-        {
-          Color = Color.Yellow;
-
-          if (GameScreen.Mouse.LeftDown)
-          {
-            _hitTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (_hitTimer > _maxHitTimer)
-            {
-              var positions = new List<Vector2>();
-
-              for (int i = 0; i < 10; i++)
-              {
-                GenerateParticle(_maxHitTimer);
-              }
-
-              _buildTimer += _hitTimer;
-
-              if (_buildTimer > _maxBuildTimer)
-              {
-                State = BuildingStates.Built_Out;
-                _gameScreen.State = States.GameStates.Playing;
-                _gameScreen.UpdateMap();
-              }
-
-              _hitTimer = 0f;
-
-              _soundEffectInstance.Play();
-            }
-          }
-        }
-        else
-        {
-          Color = Color.Red;
-          _hitTimer = 0;
-          _buildTimer = 0;
-        }
-      }
-      else
-      {
-        _hitTimer = 0;
-        _buildTimer = 0;
-      }
-
       foreach (var component in Components)
       {
         component.Layer = _spriteInside.Layer + 0.001f;
@@ -309,6 +264,45 @@ namespace TopDown.Buildings
 
       foreach (var component in _particles)
         component.Update(gameTime);
+    }
+    
+    public void BuildEvent(NPC npc, GameTime gameTime)
+    {
+      var doorLocation = DoorLocations.Where(c => c.IsValid).FirstOrDefault().Position;
+
+      // Walk to the door if we're not there
+      if (npc.Position != doorLocation)
+      {
+        npc.WalkTo(doorLocation);
+        return;
+      }
+
+      // Otherwise we wanna build it!
+      _hitTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+      if (_hitTimer > _maxHitTimer)
+      {
+        var positions = new List<Vector2>();
+
+        for (int i = 0; i < 10; i++)
+        {
+          GenerateParticle(_maxHitTimer);
+        }
+
+        _buildTimer += _hitTimer;
+
+        if (_buildTimer > _maxBuildTimer)
+        {
+          State = BuildingStates.Built_Out;
+          _gameScreen.State = States.GameStates.Playing;
+          _gameScreen.UpdateMap();
+          npc.Build -= this.BuildEvent;
+        }
+
+        _hitTimer = 0f;
+
+        _soundEffectInstance.Play();
+      }
     }
 
     public Building(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside)
@@ -542,6 +536,28 @@ namespace TopDown.Buildings
 
           break;
         case BuildingStates.Building:
+          
+          if (NPCBuilder != null)
+          {
+            if (NPCBuilder.IsWorking)
+              NPCBuilder = null;
+          }
+
+          if (NPCBuilder == null)
+          {
+            var npc = _gameScreen.NPCComponents
+              .Where(c => !c.IsBuilding && !c.IsWorking)
+              .OrderBy(c =>
+                Vector2.Distance(
+                  c.Home.DoorLocations.FirstOrDefault().Position,
+                  this.DoorLocations.Where(v => v.IsValid).FirstOrDefault().Position))
+              .FirstOrDefault();
+
+            NPCBuilder = npc;
+
+            NPCBuilder.Build += BuildEvent;
+          }
+
           Build(gameTime);
           break;
 

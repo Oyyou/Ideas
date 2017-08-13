@@ -19,6 +19,8 @@ namespace Engine.Controls
 
     public string DefaultText { get; set; }
 
+    public string EmptyText { get; set; }
+
     public int Height
     {
       get
@@ -91,6 +93,9 @@ namespace Engine.Controls
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      if (!IsVisible)
+        return;
+
       _button.Draw(gameTime, spriteBatch);
 
       if (!Show)
@@ -137,7 +142,13 @@ namespace Engine.Controls
 
     public override void Update(GameTime gameTime)
     {
+      if (!IsEnabled)
+        return;
+
       _button.Update(gameTime);
+
+      if (Items.Count == 0)
+        _button.Text = EmptyText;
 
       if (!Show)
       {
