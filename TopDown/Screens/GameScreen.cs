@@ -60,7 +60,7 @@ namespace TopDown.States
     private List<Component> _gameComponents;
 
     private List<Component> _guiComponents;
-
+    
     public IEnumerable<Building> BuildingComponents
     {
       get
@@ -209,6 +209,7 @@ namespace TopDown.States
 
     public override void Draw(GameTime gameTime)
     {
+
       _spriteBatch.Begin(
         SpriteSortMode.FrontToBack,
         BlendState.AlphaBlend,
@@ -218,8 +219,11 @@ namespace TopDown.States
       foreach (var component in _gameComponents)
         component.Draw(gameTime, _spriteBatch);
 
-      _spriteBatch.End();
+      _spriteBatch.End();      
+    }
 
+    public void DrawGui(GameTime gameTime)
+    {
       _spriteBatch.Begin(SpriteSortMode.FrontToBack);
 
       var time = Time.ToString("hh:mm") + (Time.Hour >= 12 ? " pm" : " am");
@@ -237,7 +241,6 @@ namespace TopDown.States
 
     public GameScreen()
     {
-
     }
 
     private void ItemMenuUpdate(GameTime gameTime)
@@ -703,7 +706,7 @@ namespace TopDown.States
     private void PlayingUpdate(GameTime gameTime)
     {
       Time = Time.AddSeconds(30);
-
+      
       AddNPC();
 
       foreach (var component in _guiComponents)
