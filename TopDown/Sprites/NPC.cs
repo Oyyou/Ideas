@@ -10,6 +10,9 @@ using TopDown.States;
 using Engine;
 using TopDown.Buildings;
 using TopDown.Items;
+using Microsoft.Xna.Framework.Content;
+using TopDown.Models;
+using TopDown.Skills;
 
 namespace TopDown.Sprites
 {
@@ -38,6 +41,11 @@ namespace TopDown.Sprites
     #region Properties
 
     /// <summary>
+    /// Build a building
+    /// </summary>
+    public event WorkEvent Build;
+
+    /// <summary>
     /// We don't need the NPCs to collide with anything
     /// </summary>
     public override List<Rectangle> CollisionRectangles
@@ -53,6 +61,8 @@ namespace TopDown.Sprites
     /// </summary>
     public Item CraftingItem { get; set; }
 
+    public List<Item> CraftingItems { get; set; }
+
     /// <summary>
     /// The image shown on the "Job Menu"
     /// </summary>
@@ -62,6 +72,10 @@ namespace TopDown.Sprites
     /// Where the NPC lives
     /// </summary>
     public Building Home { get; set; }
+
+    public bool IsBuilding { get { return Build != null; } }
+
+    public bool IsWorking { get { return Work != null; } }
 
     /// <summary>
     /// The job title (TODO: get this from the 'Workplace'
@@ -82,10 +96,12 @@ namespace TopDown.Sprites
       }
     }
 
+    public Skills.Skills Skills { get; set; }
+
     public delegate void WorkEvent(NPC npc, GameTime gameTime);
 
     /// <summary>
-    /// The even gained from the workplace
+    /// The event gained from the workplace
     /// </summary>
     public event WorkEvent Work;
 
@@ -115,6 +131,26 @@ namespace TopDown.Sprites
       Job = Workplace.Name;
 
       Work += Workplace.Work;
+
+      if (Build != null)
+        Build -= Build;
+    }
+
+    public override void LoadContent(ContentManager content)
+    {
+      base.LoadContent(content);
+
+      CraftingItems = new List<Item>();
+
+      Skills = new Skills.Skills()
+      {
+        Blacksmith = new Skill()
+        {
+          Name = "Blacksmith",
+          Level = 0,
+          Experience = 0,
+        }
+      };
     }
 
     public NPC(Dictionary<string, Animation> animations, GameScreen gameScreen) : base(animations)
@@ -185,12 +221,22 @@ namespace TopDown.Sprites
           _walkingPath.RemoveAt(0);
       }
 
-      var goWork = Work != null && _gameScreen.Time.Hour >= 8 && _gameScreen.Time.Hour < 17;
+      var isWorkHours = _gameScreen.Time.Hour >= 8 && _gameScreen.Time.Hour < 17;
+      var goWork = Work != null && isWorkHours;
+      var build = Build != null && isWorkHours;
 
       if (goWork)
-        Work?.Invoke(this, gameTime);
+      {
+        Work(this, gameTime);
+      }
+      else if (build)
+      {
+        Build(this, gameTime);
+      }
       else
+      {
         WalkTo(new Vector2(Home.Rectangle.X + 32, Home.Rectangle.Y + 32));
+      }
 
       _animationManager.Update(gameTime);
     }

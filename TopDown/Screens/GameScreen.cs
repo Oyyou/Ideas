@@ -57,15 +57,15 @@ namespace TopDown.States
 
     private SpriteFont _font;
 
-    private List<Component> _gameComponents;
+    public List<Component> GameComponents;
 
     private List<Component> _guiComponents;
     
     public IEnumerable<Building> BuildingComponents
     {
       get
-      {        
-        return _gameComponents.Where(c => c is Building).Cast<Building>()
+      {
+        return GameComponents.Where(c => c is Building).Cast<Building>()
           .Where(c => c.State == BuildingStates.Built_In || c.State == BuildingStates.Built_Out);
       }
     }
@@ -74,7 +74,7 @@ namespace TopDown.States
     {
       get
       {
-        return _gameComponents.Where(c => c.CollisionRectangles != null && c.CollisionRectangles.Count > 0).ToList();
+        return GameComponents.Where(c => c.CollisionRectangles != null && c.CollisionRectangles.Count > 0).ToList();
       }
     }
 
@@ -82,7 +82,7 @@ namespace TopDown.States
     {
       get
       {
-        return _gameComponents.Where(c => c is SmallHouse).Cast<SmallHouse>();
+        return GameComponents.Where(c => c is SmallHouse).Cast<SmallHouse>();
       }
     }
 
@@ -107,7 +107,7 @@ namespace TopDown.States
     {
       get
       {
-        return _gameComponents.Where(c => c is SmallHouse).Count() * SmallHouse.MaxResidents;
+        return GameComponents.Where(c => c is SmallHouse && (((SmallHouse)c).State == BuildingStates.Built_In || ((SmallHouse)c).State == BuildingStates.Built_Out)).Count() * SmallHouse.MaxResidents;
       }
     }
 
@@ -115,7 +115,7 @@ namespace TopDown.States
     {
       get
       {
-        return _gameComponents.Where(c => c is NPC).Cast<NPC>();
+        return GameComponents.Where(c => c is NPC).Cast<NPC>();
       }
     }
 
@@ -125,7 +125,7 @@ namespace TopDown.States
     {
       get
       {
-        return _gameComponents.Where(c => c is Path).ToList();
+        return GameComponents.Where(c => c is Path).ToList();
       }
     }
 
@@ -162,7 +162,7 @@ namespace TopDown.States
     {
       component.LoadContent(_content);
 
-      _gameComponents.Add(component);
+      GameComponents.Add(component);
     }
 
     public void AddComponent(PathBuilder pathBuilder)
@@ -204,7 +204,7 @@ namespace TopDown.States
 
       npc.LoadContent(_content);
 
-      _gameComponents.Add(npc);
+      GameComponents.Add(npc);
     }
 
     public override void Draw(GameTime gameTime)
@@ -216,7 +216,7 @@ namespace TopDown.States
         null, null, null, null,
         _camera.Transform);
 
-      foreach (var component in _gameComponents)
+      foreach (var component in GameComponents)
         component.Draw(gameTime, _spriteBatch);
 
       _spriteBatch.End();      
@@ -250,18 +250,18 @@ namespace TopDown.States
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
-      foreach (var component in _gameComponents)
+      foreach (var component in GameComponents)
         component.Update(gameTime);
 
-      for (int i = 0; i < _gameComponents.Count; i++)
+      for (int i = 0; i < GameComponents.Count; i++)
       {
-        for (int j = i + 1; j < _gameComponents.Count; j++)
+        for (int j = i + 1; j < GameComponents.Count; j++)
         {
-          _gameComponents[i].CheckCollision(_gameComponents[j]);
+          GameComponents[i].CheckCollision(GameComponents[j]);
         }
       }
 
-      _camera.Follow(((Sprite)_gameComponents[0]).Position);
+      _camera.Follow(((Sprite)GameComponents[0]).Position);
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
       {
@@ -351,7 +351,7 @@ namespace TopDown.States
         Position = new Vector2(512, 320),
       };
 
-      _gameComponents = new List<Component>()
+      GameComponents = new List<Component>()
       {
         Player,
       };
@@ -398,7 +398,7 @@ namespace TopDown.States
             switch (data.GID)
             {
               case 8:
-                _gameComponents.Add(
+                GameComponents.Add(
                   new Rock(texture, this)
                   {
                     Layer = 0.1f,
@@ -409,7 +409,7 @@ namespace TopDown.States
                 break;
 
               case 9:
-                _gameComponents.Add(
+                GameComponents.Add(
                   new Path(texture)
                   {
                     Layer = 0.1f,
@@ -420,7 +420,7 @@ namespace TopDown.States
                 break;
 
               default:
-                _gameComponents.Add(
+                GameComponents.Add(
                   new Sprite(texture)
                   {
                     Layer = 0.1f,
@@ -460,7 +460,7 @@ namespace TopDown.States
         ItemMenu,
       };
 
-      foreach (var component in _gameComponents)
+      foreach (var component in GameComponents)
         component.LoadContent(_content);
 
       foreach (var component in _guiComponents)
@@ -472,12 +472,11 @@ namespace TopDown.States
         {
           case "Blacksmith":
 
-            var blacksmith = new Blacksmith(this, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
-            {
-            };
+            var blacksmith = new Blacksmith(this,
+              _content.Load<Texture2D>("Buildings/Blacksmith/In"),
+              _content.Load<Texture2D>("Buildings/Blacksmith/Out"));
 
             blacksmith.LoadContent(_content);
-
 
             foreach (var collisionObject in objectGroup.CollisionObjects)
             {
@@ -510,7 +509,50 @@ namespace TopDown.States
             }
 
             blacksmith.State = BuildingStates.Built_Out;
-            _gameComponents.Add(blacksmith);
+            GameComponents.Add(blacksmith);
+
+            break;
+
+          case "SmallHouse":
+
+            var smallHouse = new SmallHouse(this,
+              _content.Load<Texture2D>("Buildings/SmallHouse/In"),
+              _content.Load<Texture2D>("Buildings/SmallHouse/Out"));
+
+            smallHouse.LoadContent(_content);
+
+            foreach (var collisionObject in objectGroup.CollisionObjects)
+            {
+              var position = new Vector2(collisionObject.X, collisionObject.Y);
+
+              switch (collisionObject.Name)
+              {
+                case "Building":
+
+                  smallHouse.Position = position;
+
+                  break;
+
+                case "Bed":
+                  var bed = new Furniture(_content.Load<Texture2D>("Furniture/Bed"), this)
+                  {
+                    Position = position,
+                    State = PlacableObjectStates.Placed,
+                  };
+
+                  bed.LoadContent(_content);
+
+                  smallHouse.Components.Add(bed);
+
+                  break;
+
+                default:
+                  throw new Exception("Unknown object: " + collisionObject.Name);
+              }
+            }
+
+            smallHouse.State = BuildingStates.Built_Out;
+            GameComponents.Add(smallHouse);
 
             break;
 
@@ -529,7 +571,7 @@ namespace TopDown.States
 
               npc.LoadContent(_content);
 
-              _gameComponents.Add(npc);
+              GameComponents.Add(npc);
             }
 
             break;
@@ -617,18 +659,18 @@ namespace TopDown.States
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
-      foreach (var component in _gameComponents)
+      foreach (var component in GameComponents)
         component.Update(gameTime);
 
-      for (int i = 0; i < _gameComponents.Count; i++)
+      for (int i = 0; i < GameComponents.Count; i++)
       {
-        for (int j = i + 1; j < _gameComponents.Count; j++)
+        for (int j = i + 1; j < GameComponents.Count; j++)
         {
-          _gameComponents[i].CheckCollision(_gameComponents[j]);
+          GameComponents[i].CheckCollision(GameComponents[j]);
         }
       }
 
-      _camera.Follow(((Sprite)_gameComponents[0]).Position);
+      _camera.Follow(((Sprite)GameComponents[0]).Position);
 
       if (Keyboard.IsKeyPressed(Keys.B))
       {
@@ -672,18 +714,18 @@ namespace TopDown.States
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
-      foreach (var component in _gameComponents)
+      foreach (var component in GameComponents)
         component.Update(gameTime);
 
-      for (int i = 0; i < _gameComponents.Count; i++)
+      for (int i = 0; i < GameComponents.Count; i++)
       {
-        for (int j = i + 1; j < _gameComponents.Count; j++)
+        for (int j = i + 1; j < GameComponents.Count; j++)
         {
-          _gameComponents[i].CheckCollision(_gameComponents[j]);
+          GameComponents[i].CheckCollision(GameComponents[j]);
         }
       }
 
-      _camera.Follow(((Sprite)_gameComponents[0]).Position);
+      _camera.Follow(((Sprite)GameComponents[0]).Position);
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
       {
@@ -712,18 +754,18 @@ namespace TopDown.States
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
-      foreach (var component in _gameComponents)
+      foreach (var component in GameComponents)
         component.Update(gameTime);
 
-      for (int i = 0; i < _gameComponents.Count; i++)
+      for (int i = 0; i < GameComponents.Count; i++)
       {
-        for (int j = i + 1; j < _gameComponents.Count; j++)
+        for (int j = i + 1; j < GameComponents.Count; j++)
         {
-          _gameComponents[i].CheckCollision(_gameComponents[j]);
+          GameComponents[i].CheckCollision(GameComponents[j]);
         }
       }
 
-      _camera.Follow(((Sprite)_gameComponents[0]).Position);
+      _camera.Follow(((Sprite)GameComponents[0]).Position);
 
       if (Keyboard.IsKeyPressed(Keys.P))
         State = GameStates.Paused;
@@ -735,7 +777,38 @@ namespace TopDown.States
         State = GameStates.JobMenu;
 
       if (Keyboard.IsKeyPressed(Keys.C))
+      {
+        var selectedItem = CraftingMenu.ComboBox.SelectedItem;
+        CraftingMenu.ComboBox.Reset();
+
+        var npcs = NPCComponents.Where(c => c.Workplace != null && c.Workplace.Name == "Blacksmith");
+
+        var items = new List<ComboBoxItem>();
+        foreach (var npc in npcs)
+        {
+          var item = new ComboBoxItem(CraftingMenu.ComboBox);
+
+          item.Content = npc;
+
+          item.LoadContent(_content);
+
+          item.Text = npc.Name;
+
+          items.Add(item);
+        }
+
+        CraftingMenu.ComboBox.Items = items;
+
+        if (selectedItem != null)
+        {
+          if (CraftingMenu.ComboBox.Items.Any(c => c.Text == selectedItem.Text))
+          {
+            CraftingMenu.ComboBox.SelectedItem = CraftingMenu.ComboBox.Items.Where(c => c.Text == selectedItem.Text).FirstOrDefault();
+          }
+        }
+
         State = GameStates.CraftingMenu;
+      }
 
       if (Keyboard.IsKeyPressed(Keys.I))
         State = GameStates.InventoryMenu;
@@ -749,13 +822,13 @@ namespace TopDown.States
 
     public override void PostUpdate(GameTime gameTime)
     {
-      for (int i = 0; i < _gameComponents.Count; i++)
+      for (int i = 0; i < GameComponents.Count; i++)
       {
-        _gameComponents[i].PostUpdate(gameTime);
+        GameComponents[i].PostUpdate(gameTime);
 
-        if (_gameComponents[i].IsRemoved)
+        if (GameComponents[i].IsRemoved)
         {
-          _gameComponents.RemoveAt(i);
+          GameComponents.RemoveAt(i);
           i--;
         }
       }
@@ -763,13 +836,13 @@ namespace TopDown.States
 
     public override void UnloadContent()
     {
-      foreach (var component in _gameComponents)
+      foreach (var component in GameComponents)
         component.UnloadContent();
 
       foreach (var component in _guiComponents)
         component.UnloadContent();
 
-      _gameComponents.Clear();
+      GameComponents.Clear();
 
       _guiComponents.Clear();
     }

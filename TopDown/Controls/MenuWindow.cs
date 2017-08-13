@@ -15,6 +15,8 @@ namespace TopDown.Controls
 {
   public class MenuWindow : Component
   {
+    protected Button _closeButton;
+
     protected ContentManager _content;
 
     protected SpriteFont _font;
@@ -61,7 +63,7 @@ namespace TopDown.Controls
 
       var closeButtonTexture = content.Load<Texture2D>("Controls/Close");
 
-      var closeButton = new Button(closeButtonTexture)
+      _closeButton = new Button(closeButtonTexture)
       {
         Position = new Vector2(
           _windowSprite.Rectangle.Right - closeButtonTexture.Width - 5,
@@ -70,12 +72,12 @@ namespace TopDown.Controls
         Layer = 0.99f
       };
 
-      closeButton.Click += CloseButton_Click;
+      _closeButton.Click += CloseButton_Click;
 
       Components = new List<Component>()
       {
         _windowSprite,
-        closeButton,
+        _closeButton,
       };
 
       foreach (var component in Components)

@@ -55,6 +55,11 @@ namespace TopDown.Controls.ItemMenu
 
     public bool CanClick { get; set; }
 
+    /// <summary>
+    /// Is this item required?
+    /// </summary>
+    public bool IsRequired { get; set; }
+
     protected override void DrawText(SpriteBatch spriteBatch)
     {
       if (string.IsNullOrEmpty(Text) || _font == null)
@@ -88,6 +93,8 @@ namespace TopDown.Controls.ItemMenu
       CurrentState = ItemMenuButtonStates.Clickable;
 
       CanClick = true;
+
+      IsRequired = false;
     }
 
     public override void Update(GameTime gameTime)

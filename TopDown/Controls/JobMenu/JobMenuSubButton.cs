@@ -50,7 +50,7 @@ namespace TopDown.Controls.JobMenu
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.Draw(_texture, Rectangle, null, _colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
-
+      
       DrawNPCIcon(gameTime, spriteBatch);
 
       foreach (var component in Components)
