@@ -19,6 +19,7 @@
 #begin Fonts/Font.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Font.spritefont
 
@@ -641,7 +642,5 @@
 /build:Controls/Icons/Inventory.png
 
 #begin Items/Weapons.json
-/importer:
-/processor:
-/build:Items/Weapons.json
+/copy:Items/Weapons.json
 

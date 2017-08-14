@@ -5,8 +5,66 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ItemManager"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Item Manager" Height="350" Width="525">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="10" HorizontalAlignment="Left">
+                    <Label Content="Name:" Height="30" Margin="5" />
+                    <Label Content="Category:" Height="30" Margin="5" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="10">
+                    <TextBox Height="30" Margin="5" Text="{Binding Name}" />
+                    <ComboBox Height="30" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="10">
+                    <Border BorderThickness="2" BorderBrush="Black" Margin="10"
+                        HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Image HorizontalAlignment="Left" Width="40" Height="40"
+                       Source="{Binding ImagePath}"/>
+                    </Border>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Content="..." Margin="10" Width="20"
+                            Command="{Binding BrowseImages}"/>
+                        <TextBox DockPanel.Dock="Right" HorizontalAlignment="Stretch" Margin="10" Text="{Binding ImagePath}" />
+                    </DockPanel>
+                </StackPanel>
+            </Grid>
+
+            <GroupBox Grid.Row="1" Content="Stats" Margin="10">
+
+            </GroupBox>
+        </Grid>
+
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+
+        <GroupBox Grid.Column="2" Header="Item Explorer" Margin="10">
+            <TreeView ItemsSource="{Binding ItemHeaders}">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Items}">
+                        <Label Content="{Binding Category}"/>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </GroupBox>
     </Grid>
 </Window>

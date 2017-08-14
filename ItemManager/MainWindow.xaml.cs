@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ItemManager.ViewModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,42 +38,44 @@ namespace ItemManager
     {
       InitializeComponent();
 
-      var weapons = new List<Weapon>()
-      {
-        new Weapon()
-        {
-          Name = "Sword",
-          Range = 1,
-          Damage = 2,
-          AttackSpeed = 3,
-        },
-        new Weapon()
-        {
-          Name = "Spear",
-          Range = 2,
-          Damage = 3,
-          AttackSpeed = 2,
-        },
-        new Weapon()
-        {
-          Name = "Axe",
-          Range = 1,
-          Damage = 3,
-          AttackSpeed = 2,
-        },
-      };
+      DataContext = new ViewModel();
 
-      string jsonFile = JsonConvert.SerializeObject(weapons, Formatting.Indented);
+      //var weapons = new List<Weapon>()
+      //{
+      //  new Weapon()
+      //  {
+      //    Name = "Sword",
+      //    Range = 1,
+      //    Damage = 2,
+      //    AttackSpeed = 3,
+      //  },
+      //  new Weapon()
+      //  {
+      //    Name = "Spear",
+      //    Range = 2,
+      //    Damage = 3,
+      //    AttackSpeed = 2,
+      //  },
+      //  new Weapon()
+      //  {
+      //    Name = "Axe",
+      //    Range = 1,
+      //    Damage = 3,
+      //    AttackSpeed = 2,
+      //  },
+      //};
 
-      var fileName = "Weapons.json";
+      //string jsonFile = JsonConvert.SerializeObject(weapons, Formatting.Indented);
 
-      using (var str = new StreamWriter(fileName))
-      {
-        str.Write(jsonFile);
-      }
+      //var fileName = "Weapons.json";
 
-      var t = JsonConvert.DeserializeObject<List<Weapon>>(File.ReadAllText(fileName),
-        new JsonSerializerSettings() { Formatting = Formatting.Indented });
+      //using (var str = new StreamWriter(fileName))
+      //{
+      //  str.Write(jsonFile);
+      //}
+
+      //var t = JsonConvert.DeserializeObject<List<Weapon>>(File.ReadAllText(fileName),
+      //  new JsonSerializerSettings() { Formatting = Formatting.Indented });
     }
   }
 }
