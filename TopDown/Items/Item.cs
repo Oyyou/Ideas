@@ -20,6 +20,16 @@ namespace TopDown.Items
     Medicine
   }
 
+  public enum ItemMaterials
+  {
+    Wood,
+    Stone,
+    Iron,
+    Copper,
+    Silver,
+    Gold,
+  }
+
   public class Item : Sprite
   {
     public ItemCategories Category { get; set; }

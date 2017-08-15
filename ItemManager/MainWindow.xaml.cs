@@ -23,47 +23,11 @@ namespace ItemManager
   /// </summary>
   public partial class MainWindow : Window
   {
-    class Weapon
-    {
-      public string Name { get; set; }
-
-      public int Damage { get; set; }
-
-      public int AttackSpeed { get; set; }
-
-      public int Range { get; set; }
-    }
-
     public MainWindow()
     {
       InitializeComponent();
 
       DataContext = new ViewModel();
-
-      //var weapons = new List<Weapon>()
-      //{
-      //  new Weapon()
-      //  {
-      //    Name = "Sword",
-      //    Range = 1,
-      //    Damage = 2,
-      //    AttackSpeed = 3,
-      //  },
-      //  new Weapon()
-      //  {
-      //    Name = "Spear",
-      //    Range = 2,
-      //    Damage = 3,
-      //    AttackSpeed = 2,
-      //  },
-      //  new Weapon()
-      //  {
-      //    Name = "Axe",
-      //    Range = 1,
-      //    Damage = 3,
-      //    AttackSpeed = 2,
-      //  },
-      //};
 
       //string jsonFile = JsonConvert.SerializeObject(weapons, Formatting.Indented);
 

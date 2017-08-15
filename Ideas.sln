@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopDown", "TopDown\TopDown.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItemManager", "ItemManager\ItemManager.csproj", "{D021FAB3-7D24-45DC-9131-663844C5EF5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{C46D7D9F-D6EA-49EB-8A38-8A2E3E763DAE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,14 +40,6 @@ Global
 		{D021FAB3-7D24-45DC-9131-663844C5EF5A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D021FAB3-7D24-45DC-9131-663844C5EF5A}.Release|x86.ActiveCfg = Release|Any CPU
 		{D021FAB3-7D24-45DC-9131-663844C5EF5A}.Release|x86.Build.0 = Release|Any CPU
-		{C46D7D9F-D6EA-49EB-8A38-8A2E3E763DAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C46D7D9F-D6EA-49EB-8A38-8A2E3E763DAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C46D7D9F-D6EA-49EB-8A38-8A2E3E763DAE}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C46D7D9F-D6EA-49EB-8A38-8A2E3E763DAE}.Debug|x86.Build.0 = Debug|Any CPU
-		{C46D7D9F-D6EA-49EB-8A38-8A2E3E763DAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C46D7D9F-D6EA-49EB-8A38-8A2E3E763DAE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C46D7D9F-D6EA-49EB-8A38-8A2E3E763DAE}.Release|x86.ActiveCfg = Release|Any CPU
-		{C46D7D9F-D6EA-49EB-8A38-8A2E3E763DAE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

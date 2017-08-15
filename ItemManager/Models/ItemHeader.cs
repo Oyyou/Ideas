@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TopDown.Models;
 
 namespace ItemManager.Models
 {
@@ -11,11 +12,10 @@ namespace ItemManager.Models
   {
     public string Category { get; set; }
 
-    public ObservableCollection<ItemHeader> Items { get; set; }
+    public IEnumerable<ItemV2> Items { get; set; }
 
     public ItemHeader()
     {
-      Items = new ObservableCollection<ItemHeader>();
     }
   }
 }
