@@ -18,53 +18,59 @@
             </MenuItem>
         </Menu>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="350"/>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition/>
+                <ColumnDefinition MaxWidth="250" />
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto" MaxWidth="90"/>
+                        <ColumnDefinition MaxWidth="150"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" Margin="10" HorizontalAlignment="Left">
+                    <StackPanel Width="90" Grid.Column="0" HorizontalAlignment="Left">
                         <Label Content="Name:" Height="30" Margin="5" />
                         <Label Content="Category:" Height="30" Margin="5" />
                         <Label Content="Material:" Height="30" Margin="5" />
                     </StackPanel>
 
-                    <StackPanel Grid.Column="1" Margin="10">
-                        <TextBox Height="30" Margin="5" Text="{Binding Name}" />
+                    <StackPanel Grid.Column="1">
+                        <TextBox Height="30" Margin="5" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                         <ComboBox Height="30" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" />
                         <ComboBox Height="30" Margin="5" ItemsSource="{Binding Materials}" SelectedItem="{Binding Material}" />
                     </StackPanel>
 
-                    <StackPanel Grid.Column="2" Margin="10">
-                        <Border BorderThickness="2" BorderBrush="Black" Margin="10"
-                        HorizontalAlignment="Left" VerticalAlignment="Top">
-                            <Image HorizontalAlignment="Left" Width="40" Height="40"
-                       Source="{Binding ImagePath}"/>
+                    <Grid Grid.Column="2">
+                        <Border BorderThickness="2" BorderBrush="Black" Margin="5"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <Image Source="{Binding ImagePath}"/>
                         </Border>
-                        <DockPanel>
-                            <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Content="..." Margin="10" Width="20"
-                            Command="{Binding BrowseImages}"/>
-                            <TextBox DockPanel.Dock="Right" HorizontalAlignment="Stretch" Margin="10" Text="{Binding ImagePath}" />
-                        </DockPanel>
-                    </StackPanel>
+                    </Grid>
                 </Grid>
 
-                <GroupBox Grid.Row="1" Content="Stats" Margin="10">
+                <DockPanel Grid.Row="1">
+                    <Label Width="80" Margin="5" Content="Image Path:" />
+                    <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Content="..." Margin="5" Width="20"
+                            Command="{Binding BrowseImages}"/>
+                    <TextBox IsEnabled="False" DockPanel.Dock="Right" HorizontalAlignment="Stretch" Margin="5" Text="{Binding ImagePath}" />
+                </DockPanel>
+
+
+                <Button Grid.Row="2" Content="Save" Margin="5" Command="{Binding SaveItem}" />
+
+                <GroupBox Grid.Row="3" Content="Stats" Margin="5">
 
                 </GroupBox>
             </Grid>

@@ -12,7 +12,7 @@ namespace TopDown.Items
 {
   public enum ItemCategories
   {
-    Weapons,
+    Weapon,
     Armour,
     Tool,
     Clothing,

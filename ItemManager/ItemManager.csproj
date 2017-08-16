@@ -60,9 +60,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\SaveItem.cs" />
     <Compile Include="Commands\SetWorkingDirectory.cs" />
     <Compile Include="Commands\BrowseImages.cs" />
     <Compile Include="Models\ItemHeader.cs" />
+    <Compile Include="Models\Settings.cs" />
     <Compile Include="Utilities\ObservableObject.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="MainWindow.xaml">

@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace ItemManager
 {
@@ -23,11 +24,15 @@ namespace ItemManager
   /// </summary>
   public partial class MainWindow : Window
   {
+    private ViewModel _viewModel;
+
     public MainWindow()
     {
       InitializeComponent();
 
-      DataContext = new ViewModel();
+      _viewModel = new ViewModel();
+
+      DataContext = _viewModel;
 
       //string jsonFile = JsonConvert.SerializeObject(weapons, Formatting.Indented);
 
@@ -40,6 +45,13 @@ namespace ItemManager
 
       //var t = JsonConvert.DeserializeObject<List<Weapon>>(File.ReadAllText(fileName),
       //  new JsonSerializerSettings() { Formatting = Formatting.Indented });
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+      base.OnClosing(e);
+
+      _viewModel.SaveSettings();
     }
   }
 }

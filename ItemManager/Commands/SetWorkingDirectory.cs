@@ -20,7 +20,11 @@ namespace ItemManager.Commands
   {
     private ViewModel _viewModel;
 
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler CanExecuteChanged
+    {
+      add { CommandManager.RequerySuggested += value; }
+      remove { CommandManager.RequerySuggested -= value; }
+    }
 
     public SetWorkingDirectory(ViewModel viewModel)
     {
@@ -41,48 +45,10 @@ namespace ItemManager.Commands
       var result = dialog.ShowDialog();
 
       if (result == DialogResult.OK)
-      {
-        _viewModel.ItemHeaders = new ObservableCollection<ItemHeader>();
+      { 
+        _viewModel.WorkingDirectory = dialog.SelectedPath;
 
-        var directory = dialog.SelectedPath;
-
-        _viewModel.WorkingDirectory = directory;
-
-        var itemFiles = new Dictionary<string, IEnumerable<ItemV2>>();
-
-        foreach (var file in Directory.GetFiles(directory, "*.json"))
-        {
-          var fileName = Path.GetFileNameWithoutExtension(file);
-
-          var category = (ItemCategories)Enum.Parse(typeof(ItemCategories), fileName);
-
-          IEnumerable<ItemV2> items = null;
-
-          switch (category)
-          {
-            case ItemCategories.Weapons:
-              items = JsonConvert.DeserializeObject<List<Weapon>>(File.ReadAllText(file),
-                new JsonSerializerSettings() { Formatting = Formatting.Indented });
-              break;
-            case ItemCategories.Armour:
-              items = JsonConvert.DeserializeObject<List<Armour>>(File.ReadAllText(file),
-                new JsonSerializerSettings() { Formatting = Formatting.Indented });
-              break;
-            case ItemCategories.Tool:
-            case ItemCategories.Clothing:
-            case ItemCategories.Jewellery:
-            case ItemCategories.Medicine:
-            default:
-              MessageBox.Show("Not implemented category: " + category.ToString());
-              break;
-          }
-
-          _viewModel.ItemHeaders.Add(new ItemHeader()
-          {
-            Category = category.ToString(),
-            Items = items,
-          });
-        }
+        _viewModel.LoadJsonContent();
       }
     }
   }
