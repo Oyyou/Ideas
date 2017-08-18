@@ -26,6 +26,8 @@ namespace TopDown.Models
     /// </summary>
     public int ExperienceValue { get; set; }
 
+    public ItemMaterials Material { get; set; }
+
     public string Name { get; set; }
   }
 }

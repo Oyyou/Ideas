@@ -5,86 +5,125 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ItemManager"
         mc:Ignorable="d"
-        Title="Item Manager" Height="350" Width="525">
+        Title="Item Manager" Height="480" Width="640">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
                 <MenuItem Header="Set Directory..." Command="{Binding SetWorkingDirectory}" />
+                <MenuItem Header="Save" Command="{Binding SaveItems}" />
             </MenuItem>
         </Menu>
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="350"/>
+                <ColumnDefinition Width="450"/>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition MaxWidth="250" />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
+            <StackPanel Grid.Column="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" MaxWidth="90"/>
-                        <ColumnDefinition MaxWidth="150"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Row="0">
+                        <Label Content="Name:" Margin="5" Width="120"/>
+                        <TextBox Margin="5" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                    </DockPanel>
 
-                    <StackPanel Width="90" Grid.Column="0" HorizontalAlignment="Left">
-                        <Label Content="Name:" Height="30" Margin="5" />
-                        <Label Content="Category:" Height="30" Margin="5" />
-                        <Label Content="Material:" Height="30" Margin="5" />
-                    </StackPanel>
+                    <DockPanel Grid.Row="1">
+                        <Label Content="Category:" Margin="5" Width="120" />
+                        <ComboBox Margin="5" ItemsSource="{Binding Categories, Mode=OneTime}" SelectedValuePath="Key" SelectedValue="{Binding Category}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=Value}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </DockPanel>
 
-                    <StackPanel Grid.Column="1">
-                        <TextBox Height="30" Margin="5" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-                        <ComboBox Height="30" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" />
-                        <ComboBox Height="30" Margin="5" ItemsSource="{Binding Materials}" SelectedItem="{Binding Material}" />
-                    </StackPanel>
+                    <DockPanel Grid.Row="2">
+                        <Label Content="Material:" Margin="5" Width="120" />
+                        <ComboBox Margin="5" ItemsSource="{Binding Materials, Mode=OneTime}" SelectedValuePath="Key" SelectedValue="{Binding Material}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=Value}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </DockPanel>
 
-                    <Grid Grid.Column="2">
+                    <DockPanel Grid.Row="3">
+                        <Label Content="Experience Value:" Margin="5" Width="120" />
+                        <TextBox Margin="5" Text="{Binding ExperienceValue, UpdateSourceTrigger=PropertyChanged}" />
+                    </DockPanel>
+
+                    <DockPanel Grid.Row="4">
+                        <Label Content="Craft Time:" Margin="5" Width="120" />
+                        <TextBox Margin="5" Text="{Binding CraftTime, UpdateSourceTrigger=PropertyChanged}" />
+                    </DockPanel>
+
+                    <DockPanel Grid.Row="5">
+                        <Label Width="120" Margin="5" Content="Image Path:" />
+                        <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Content="..." Margin="5" Width="20"
+                            Command="{Binding BrowseImages}"/>
+                        <TextBox IsEnabled="False" DockPanel.Dock="Right" HorizontalAlignment="Stretch" Margin="5" Text="{Binding ImagePath}" />
+                    </DockPanel>
+
+                    <!--<Grid Grid.Column="2">
                         <Border BorderThickness="2" BorderBrush="Black" Margin="5"
                                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <Image Source="{Binding ImagePath}"/>
                         </Border>
-                    </Grid>
+                    </Grid>-->
                 </Grid>
 
-                <DockPanel Grid.Row="1">
-                    <Label Width="80" Margin="5" Content="Image Path:" />
-                    <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Content="..." Margin="5" Width="20"
-                            Command="{Binding BrowseImages}"/>
-                    <TextBox IsEnabled="False" DockPanel.Dock="Right" HorizontalAlignment="Stretch" Margin="5" Text="{Binding ImagePath}" />
-                </DockPanel>
 
+                <Button Content="Add" Margin="5" Command="{Binding AddItem}" />
 
-                <Button Grid.Row="2" Content="Save" Margin="5" Command="{Binding SaveItem}" />
+                <Expander Header="Resources">
+                    <Grid>
+                        
+                    </Grid>
+                </Expander>
 
-                <GroupBox Grid.Row="3" Content="Stats" Margin="5">
+                <Expander Header="Stats">
+                    <Grid>
 
-                </GroupBox>
-            </Grid>
+                    </Grid>
+                </Expander>
+
+                <Expander Header="Traits">
+                    <Grid>
+
+                    </Grid>
+                </Expander>
+            </StackPanel>
 
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
 
-            <GroupBox Grid.Column="2" Header="Item Explorer" Margin="10">
+            <GroupBox Grid.Column="2" Header="Item Explorer" HorizontalAlignment="Stretch">
                 <TreeView ItemsSource="{Binding ItemHeaders}">
                     <TreeView.ItemTemplate>
                         <DataTemplate>
                             <TreeViewItem ItemsSource="{Binding Items}" Header="{Binding Category}">
                                 <TreeViewItem.ItemTemplate>
                                     <DataTemplate>
-                                        <Button Padding="5" Content="{Binding Name}" />
+                                        <Button Padding="5" Content="{Binding Name}"
+                                                Command="{Binding Path=DataContext.EditItem, RelativeSource={RelativeSource AncestorType=GroupBox}}" 
+                                                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}}"/>
                                     </DataTemplate>
                                 </TreeViewItem.ItemTemplate>
                             </TreeViewItem>
@@ -93,5 +132,9 @@
                 </TreeView>
             </GroupBox>
         </Grid>
+
+        <StatusBar Grid.Row="2">
+            <Label Content="{Binding Status}" />
+        </StatusBar>
     </Grid>
 </Window>

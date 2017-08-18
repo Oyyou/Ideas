@@ -12,7 +12,7 @@ using TopDown.Models;
 
 namespace ItemManager.Commands
 {
-  public class SaveItem : ICommand
+  public class AddItem : ICommand
   {
     private ViewModel _viewModel;
 
@@ -22,7 +22,7 @@ namespace ItemManager.Commands
       remove { CommandManager.RequerySuggested -= value; }
     }
 
-    public SaveItem(ViewModel viewModel)
+    public AddItem(ViewModel viewModel)
     {
       _viewModel = viewModel;
     }
@@ -30,25 +30,69 @@ namespace ItemManager.Commands
     public bool CanExecute(object parameter)
     {
       if (string.IsNullOrEmpty(_viewModel.Name))
-        return false;
-
-      if (string.IsNullOrEmpty(_viewModel.Category))
-        return false;
-
-      if (string.IsNullOrEmpty(_viewModel.Material))
-        return false;
-
-      if (string.IsNullOrEmpty(_viewModel.ImagePath))
-        return false;
-
-      var itemHeader = _viewModel.ItemHeaders.Where(c => c.Category == _viewModel.Category).FirstOrDefault();
-
-      if (itemHeader != null)
       {
-        if (itemHeader.Items.Any(c => string.Equals(c.Name.Trim(), _viewModel.Name.Trim(), StringComparison.OrdinalIgnoreCase)))
-          return false;
+        _viewModel.Status = "Need to assign 'Name'";
+        return false;
       }
 
+      if (string.IsNullOrEmpty(_viewModel.Category))
+      {
+        _viewModel.Status = "Need to assign 'Category'";
+        return false;
+      }
+
+      if (string.IsNullOrEmpty(_viewModel.Material))
+      {
+        _viewModel.Status = "Need to assign 'Material'";
+        return false;
+      }
+
+      if (!float.TryParse(_viewModel.ExperienceValue, out float experienceValue))
+      {
+        _viewModel.Status = "'ExperienceValue' needs to be a number";
+        return false;
+      }
+      else if (experienceValue <= 0)
+      {
+        _viewModel.Status = "'ExperienceValue' needs to be a above '0'";
+        return false;
+      }
+
+      if (!float.TryParse(_viewModel.CraftTime, out float craftTime))
+      {
+        _viewModel.Status = "'CraftTime' needs to be a number";
+        return false;
+      }
+      else if (craftTime <= 0)
+      {
+        _viewModel.Status = "'CraftTime' needs to be a above '0'";
+        return false;
+      }
+
+      if (string.IsNullOrEmpty(_viewModel.ImagePath))
+      {
+        _viewModel.Status = "Need to assign 'ImagePath'";
+        return false;
+      }
+
+      if (string.IsNullOrEmpty(_viewModel.ImagePath))
+      {
+        _viewModel.Status = "Need to assign 'Image Path'";
+        return false;
+      }
+
+      //var itemHeader = _viewModel.ItemHeaders.Where(c => c.Category == _viewModel.Category).FirstOrDefault();
+
+      //if (itemHeader != null)
+      //{
+      //  if (itemHeader.Items.Any(c => string.Equals(c.Name.Trim(), _viewModel.Name.Trim(), StringComparison.OrdinalIgnoreCase)))
+      //  {
+      //    _viewModel.Status = "Item already exists";
+      //    return false;
+      //  }
+      //}
+
+      _viewModel.Status = "Ready";
       return true;
     }
 
@@ -62,14 +106,19 @@ namespace ItemManager.Commands
         {
           var newItems = itemHeader.Items.ToList();
 
-          ItemCategories category = (ItemCategories)Enum.Parse(typeof(ItemCategories), _viewModel.Category);
+          var category = (ItemCategories)Enum.Parse(typeof(ItemCategories), _viewModel.Category);
+
+          var material = (ItemMaterials)Enum.Parse(typeof(ItemMaterials), _viewModel.Material);
 
           switch (category)
           {
             case ItemCategories.Weapon:
               newItems.Add(new Weapon()
               {
-                Name = _viewModel.Name,                
+                Name = _viewModel.Name,
+                Category = category,
+                Material = material,
+
               });
               break;
             case ItemCategories.Armour:
