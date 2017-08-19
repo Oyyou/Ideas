@@ -33,18 +33,6 @@ namespace ItemManager
       _viewModel = new ViewModel();
 
       DataContext = _viewModel;
-
-      //string jsonFile = JsonConvert.SerializeObject(weapons, Formatting.Indented);
-
-      //var fileName = "Weapons.json";
-
-      //using (var str = new StreamWriter(fileName))
-      //{
-      //  str.Write(jsonFile);
-      //}
-
-      //var t = JsonConvert.DeserializeObject<List<Weapon>>(File.ReadAllText(fileName),
-      //  new JsonSerializerSettings() { Formatting = Formatting.Indented });
     }
 
     protected override void OnClosing(CancelEventArgs e)

@@ -3,6 +3,7 @@ using ItemManager.Models;
 using ItemManager.Utilities;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -23,6 +24,10 @@ namespace ItemManager.ViewModels
 
     private string _category;
 
+    private string _craftTime;
+
+    private string _experienceValue;
+
     private string _imagePath;
 
     private ObservableCollection<ItemHeader> _itemHeaders;
@@ -33,9 +38,17 @@ namespace ItemManager.ViewModels
 
     private Settings _settings;
 
+    private string _status;
+
     #endregion
 
     #region Properties
+
+    public ICommand AddItem
+    {
+      get;
+      private set;
+    }
 
     public ICommand BrowseImages
     {
@@ -53,11 +66,43 @@ namespace ItemManager.ViewModels
       }
     }
 
-    public ItemCategories[] Categories
+    public ObservableCollection<DictionaryEntry> Categories
     {
       get
       {
-        return Enum.GetValues(typeof(ItemCategories)) as ItemCategories[];
+        var categories = new ObservableCollection<DictionaryEntry>();
+        foreach (var item in (Enum.GetValues(typeof(ItemCategories)) as ItemCategories[]).ToList())
+        {
+          categories.Add(new DictionaryEntry(item, item));
+        }
+
+        return categories;
+      }
+    }
+
+    public string CraftTime
+    {
+      get { return _craftTime; }
+      set
+      {
+        _craftTime = value;
+        OnPropertyChanged("CraftTime");
+      }
+    }
+
+    public ICommand EditItem
+    {
+      get;
+      private set;
+    }
+
+    public string ExperienceValue
+    {
+      get { return _experienceValue; }
+      set
+      {
+        _experienceValue = value;
+        OnPropertyChanged("ExperienceValue");
       }
     }
 
@@ -91,11 +136,17 @@ namespace ItemManager.ViewModels
       }
     }
 
-    public ItemMaterials[] Materials
+    public ObservableCollection<DictionaryEntry> Materials
     {
       get
       {
-        return Enum.GetValues(typeof(ItemMaterials)) as ItemMaterials[];
+        var materials = new ObservableCollection<DictionaryEntry>();
+        foreach (var item in (Enum.GetValues(typeof(ItemMaterials)) as ItemMaterials[]).ToList())
+        {
+          materials.Add(new DictionaryEntry(item, item));
+        }
+
+        return materials;
       }
     }
 
@@ -109,16 +160,26 @@ namespace ItemManager.ViewModels
       }
     }
 
-    public ICommand SaveItem
+    public ICommand SaveItems
+    {
+      get;
+      private set;
+    }
+    
+    public ICommand SetWorkingDirectory
     {
       get;
       private set;
     }
 
-    public ICommand SetWorkingDirectory
+    public string Status
     {
-      get;
-      private set;
+      get { return _status; }
+      set
+      {
+        _status = value;
+        OnPropertyChanged("Status");
+      }
     }
 
     public string WorkingDirectory
@@ -187,6 +248,15 @@ namespace ItemManager.ViewModels
       }
     }
 
+    public void OpenItem(ItemV2 item)
+    {
+      Name = item.Name;
+      Category = item.Category.ToString();
+      Material = item.Material.ToString();
+      ExperienceValue = item.ExperienceValue.ToString();
+      CraftTime = item.CraftTime.ToString();
+    }
+
     public void SaveSettings()
     {
       var serializer = new XmlSerializer(typeof(Settings));
@@ -205,9 +275,13 @@ namespace ItemManager.ViewModels
 
       LoadJsonContent();
 
+      AddItem = new AddItem(this);
+
       BrowseImages = new BrowseImages(this);
 
-      SaveItem = new SaveItem(this);
+      EditItem = new EditItem(this);
+
+      SaveItems = new SaveItems(this);
 
       SetWorkingDirectory = new SetWorkingDirectory(this);
     }
