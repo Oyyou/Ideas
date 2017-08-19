@@ -74,9 +74,6 @@ namespace TopDown
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Update(GameTime gameTime)
     {
-      var gs = (GameScreen)_currentState;
-      var time = gs.Time;
-
       _currentState.Update(gameTime);
 
       _currentState.PostUpdate(gameTime);

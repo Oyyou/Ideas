@@ -236,8 +236,8 @@ namespace TopDown.States
 
       _graphicsDevice.Clear(Color.Black);
 
-      _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
-                  SamplerState.LinearClamp, DepthStencilState.Default,
+      _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied,
+                  SamplerState.LinearClamp, DepthStencilState.None,
                   RasterizerState.CullNone, _effect);
 
       _spriteBatch.Draw(_renderTarget, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.White);
@@ -827,14 +827,58 @@ namespace TopDown.States
       _guiComponents.Clear();
     }
 
+    public static void Transform(ref Vector2 position, ref Vector2 origin, ref Vector2 scale, float rotation,
+            out Matrix transform)
+    {
+      var cos = (float)Math.Cos(rotation);
+      var sin = (float)Math.Sin(rotation);
+
+      Vector2 scaledOrigin;
+      Vector2.Multiply(ref origin, ref scale, out scaledOrigin);
+
+      Vector2 transformedOrigin;
+      transformedOrigin.X = scaledOrigin.X * cos - scaledOrigin.Y * sin;
+      transformedOrigin.Y = scaledOrigin.X * sin + scaledOrigin.Y * cos;
+
+      transform.M11 = scale.X * cos;
+      transform.M12 = scale.X * sin;
+      transform.M13 = 0.0f;
+      transform.M14 = 0.0f;
+      transform.M21 = scale.Y * -sin;
+      transform.M22 = scale.Y * cos;
+      transform.M23 = 0.0f;
+      transform.M24 = 0.0f;
+      transform.M31 = 0.0f;
+      transform.M32 = 0.0f;
+      transform.M33 = 1.0f;
+      transform.M34 = 0.0f;
+      transform.M41 = position.X - transformedOrigin.X;
+      transform.M42 = position.Y - transformedOrigin.Y;
+      transform.M43 = 0.0f;
+      transform.M44 = 1.0f;
+    }
+
     public override void Update(GameTime gameTime)
     {
       // TODO: Might be an idea to 'hard-code' the darkness for different times of the day.
-      //  I can't see how maths can be used for daylight.
+      //  I can't see how maths can be used for daylight. Yes.
       float someMaths = (float)Math.Sin((-MathHelper.PiOver2 + 2 * Math.PI * (Time.Hour + (Time.Minute / 60))) / 48);
       float DarknessLevel = Math.Abs(MathHelper.SmoothStep(12f, 2f, someMaths));
 
-      _effect.Parameters["DarknessLevel"].SetValue(DarknessLevel);
+      //var Position = new Vector2(50, 50);
+      //var Scale = new Vector2(50);
+      //var Origin = new Vector2(50.0f, 50.5f);
+      //var Rotation = MathHelper.Pi - MathHelper.PiOver2 * 0.75f;
+      //Matrix LocalToWorld;
+      //Transform(ref Position, ref Origin, ref Scale, Rotation, out LocalToWorld);
+      //var cvp = Matrix.Identity;
+      //Matrix wvp;
+      //Matrix.Multiply(ref LocalToWorld, ref cvp, out wvp);
+
+      //_effect.Parameters["WorldViewProjection"].SetValue(wvp);
+      _effect.Parameters["LightColor"].SetValue(new Vector3(1, 1, 1));
+      _effect.Parameters["LightIntensity"].SetValue(1.5f);
+      // _effect.Parameters["DarknessLevel"].SetValue(1f);
 
       switch (State)
       {
