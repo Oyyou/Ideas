@@ -116,6 +116,8 @@ namespace ItemManager.ViewModels
       }
     }
 
+    public Dictionary<ItemCategories, List<Tuple<string, string>>> ImagesToCopy { get; set; }
+
     public ObservableCollection<ItemHeader> ItemHeaders
     {
       get { return _itemHeaders; }
@@ -196,6 +198,9 @@ namespace ItemManager.ViewModels
     
     public void LoadJsonContent()
     {
+      if (string.IsNullOrEmpty(WorkingDirectory))
+        return;
+
       ItemHeaders = new ObservableCollection<ItemHeader>();
 
       var itemFiles = new Dictionary<string, IEnumerable<ItemV2>>();
@@ -255,6 +260,7 @@ namespace ItemManager.ViewModels
       Material = item.Material.ToString();
       ExperienceValue = item.ExperienceValue.ToString();
       CraftTime = item.CraftTime.ToString();
+      ImagePath = $"{WorkingDirectory}\\{Category}\\{Name}.png";
     }
 
     public void SaveSettings()
@@ -270,6 +276,8 @@ namespace ItemManager.ViewModels
     public ViewModel()
     {
       _settings = new Settings();
+
+      ImagesToCopy = new Dictionary<ItemCategories, List<Tuple<string, string>>>();
 
       LoadSettings();
 
