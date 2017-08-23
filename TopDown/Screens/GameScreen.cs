@@ -34,6 +34,17 @@ using static TopDown.Logic.Pathfinder;
 
 namespace TopDown.States
 {
+  public enum Layers
+  {
+    Floor,          // 0.1
+    Path,           // 0.2
+    BuildingFloor,  // 0.3
+    BuildingBottom, // 0.4
+    Flora,          // 0.5
+    NPC,            // 0.6
+    BuildingTop,    // 0.7
+  }
+
   public enum GameStates
   {
     Playing,
@@ -135,7 +146,7 @@ namespace TopDown.States
 
     public Pathfinder PathFinder;
 
-    public TopDown.Sprites.Player Player { get; private set; }
+    //public TopDown.Sprites.Player Player { get; private set; }
 
     public Models.Resources Resources { get; set; }
 
@@ -214,16 +225,15 @@ namespace TopDown.States
     public override void Draw(GameTime gameTime)
     {
       // Set the render target
-      _graphicsDevice.SetRenderTarget(_renderTarget);
+      //_graphicsDevice.SetRenderTarget(_renderTarget);
 
-      _graphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
-
+      //_graphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
       _graphicsDevice.Clear(Color.Green);
 
       _spriteBatch.Begin(
         SpriteSortMode.FrontToBack,
         BlendState.AlphaBlend,
-        null, null, null, null,
+        SamplerState.PointWrap, null, null, null,
         _camera.Transform);
 
       foreach (var component in GameComponents)
@@ -232,17 +242,17 @@ namespace TopDown.States
       _spriteBatch.End();
 
       // Drop the render target
-      _graphicsDevice.SetRenderTarget(null);
+      //_graphicsDevice.SetRenderTarget(null);
 
-      _graphicsDevice.Clear(Color.Black);
+      //_graphicsDevice.Clear(Color.Black);
 
-      _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied,
-                  SamplerState.LinearClamp, DepthStencilState.None,
-                  RasterizerState.CullNone, _effect);
+      //_spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied,
+      //            SamplerState.LinearClamp, DepthStencilState.None,
+      //            RasterizerState.CullNone, _effect);
 
-      _spriteBatch.Draw(_renderTarget, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.White);
+      //_spriteBatch.Draw(_renderTarget, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.White);
 
-      _spriteBatch.End();
+      //_spriteBatch.End();
 
       DrawGui(gameTime);  
     }
@@ -286,7 +296,7 @@ namespace TopDown.States
         }
       }
 
-      _camera.Follow(((Sprite)GameComponents[0]).Position);
+      _camera.Update();
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
       {
@@ -380,15 +390,15 @@ namespace TopDown.States
         { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkUp"), 4) },
       };
 
-      Player = new TopDown.Sprites.Player(playerAnimations)
-      {
-        Layer = 0.9f,
-        Position = new Vector2(512, 320),
-      };
+      //Player = new TopDown.Sprites.Player(playerAnimations)
+      //{
+      //  Layer = 0.9f,
+      //  Position = new Vector2(512, 320),
+      //};
 
       GameComponents = new List<Component>()
       {
-        Player,
+        //Player,
       };
 
       var map = TmxMap.Load("Content/Maps/Level01.tmx");
@@ -486,7 +496,7 @@ namespace TopDown.States
         Mouse,
         MessageBox,
         new TopToolbar(this),
-        new BottomToolbar(this),
+        //new BottomToolbar(this),
         new ResourceView(Resources),
         _buildMenu,
         CraftingMenu,
@@ -650,7 +660,7 @@ namespace TopDown.States
         }
       }
 
-      _camera.Follow(((Sprite)GameComponents[0]).Position);
+      _camera.Update();
 
       if (Keyboard.IsKeyPressed(Keys.B))
       {
@@ -705,7 +715,7 @@ namespace TopDown.States
         }
       }
 
-      _camera.Follow(((Sprite)GameComponents[0]).Position);
+      _camera.Update();
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
       {
@@ -745,7 +755,7 @@ namespace TopDown.States
         }
       }
 
-      _camera.Follow(((Sprite)GameComponents[0]).Position);
+      _camera.Update();
 
       if (Keyboard.IsKeyPressed(Keys.P))
         State = GameStates.Paused;

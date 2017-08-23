@@ -14,6 +14,7 @@ using TopDown.FX;
 using Engine.Sprites;
 using static TopDown.Logic.Pathfinder;
 using TopDown.Sprites;
+using Engine.Controls;
 
 namespace TopDown.Buildings
 {
@@ -52,6 +53,8 @@ namespace TopDown.Buildings
 
     protected float _buildTimer;
 
+    protected float _buttonTimer;
+
     protected Sprite _spriteOutside;
 
     protected GameScreen _gameScreen;
@@ -69,6 +72,8 @@ namespace TopDown.Buildings
     protected List<Sprite> _particles;
 
     protected Texture2D _pixel;
+
+    protected bool _showButtons;
 
     protected Sprite _spriteInside;
 
@@ -88,6 +93,8 @@ namespace TopDown.Buildings
     private bool _updated = false;
 
     protected Texture2D _woodChipTexture;
+
+    public List<Button> _buttons;
 
     public Color Color { get; set; }
 
@@ -220,7 +227,7 @@ namespace TopDown.Buildings
                 {
                   if (new Vector2(doorLocation.Position.X - 32, doorLocation.Position.Y) == actualPosition)
                   {
-                    searchNode.Neighbors[4] = null;
+                    searchNode.Neighbors[3] = null;
                   }
                 }
               }
@@ -290,7 +297,7 @@ namespace TopDown.Buildings
       foreach (var component in _particles)
         component.Update(gameTime);
     }
-    
+
     public void BuildEvent(NPC npc, GameTime gameTime)
     {
       var doorLocation = DoorLocations.Where(c => c.IsValid).FirstOrDefault().Position;
@@ -408,6 +415,8 @@ namespace TopDown.Buildings
           foreach (var component in Components)
             component.Draw(gameTime, spriteBatch);
 
+          DrawButtons(gameTime, spriteBatch);
+
           //foreach (var rec in CollisionRectangles)
           //  spriteBatch.Draw(_t, rec, Color.Red);
           break;
@@ -422,12 +431,37 @@ namespace TopDown.Buildings
           foreach (var component in Components)
             component.Draw(gameTime, spriteBatch);
 
+          DrawButtons(gameTime, spriteBatch);
+
           //foreach (var rec in CollisionRectangles)
           //  spriteBatch.Draw(texture: _t, destinationRectangle: rec, color: Color.Red, layerDepth: 1f);
           break;
 
         default:
           break;
+      }
+    }
+
+    private void DrawButtons(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      if (!_showButtons)
+        return;
+
+      var buttonHeight = _buttons.Sum(c => c.Rectangle.Height + 5);
+
+      var y = _spriteInside.Rectangle.Y;
+
+      foreach (var button in _buttons)
+      {
+        var x = _spriteInside.Rectangle.X + (_spriteInside.Rectangle.Width / 2) - (button.Rectangle.Width / 2);
+
+        y -= button.Rectangle.Height + 5;
+
+        button.Position = new Vector2(x, y);
+        button.Layer = 0.83f;
+
+
+        button.Draw(gameTime, spriteBatch);
       }
     }
 
@@ -459,6 +493,11 @@ namespace TopDown.Buildings
       _woodChipTexture = content.Load<Texture2D>("FX/WoodChip");
 
       Components = new List<Component>();
+
+      _buttons = new List<Button>();
+
+      foreach (var button in _buttons)
+        button.LoadContent(content);
     }
 
     protected virtual void SetDoorLocations()
@@ -490,64 +529,17 @@ namespace TopDown.Buildings
     {
       _updated = true;
 
+      if (GameScreen.Mouse.LeftClicked)
+      {
+        if (!GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
+          _showButtons = false;
+      }
+
       switch (State)
       {
         case BuildingStates.Placing:
 
-          _spriteInside.Position = new Vector2(
-            (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
-            (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
-
-          SetDoorLocations();
-
-          bool canPlace = false;
-
-          _spriteInside.Color = Color.White;
-
-          foreach (var component in _gameScreen.PathComponents)
-          {
-            if (component.Rectangle.Intersects(_spriteInside.Rectangle))
-            {
-              canPlace = false;
-              GameScreen.MessageBox.Show("Trying to build over path", false);
-              break;
-            }
-
-            DoorLocations.ForEach(c =>
-            {
-              if (c.Position == component.Position)
-              {
-                canPlace = true;
-                c.IsValid = true;
-              }
-            });
-          }
-
-          if (!canPlace && !GameScreen.MessageBox.IsVisible)
-            GameScreen.MessageBox.Show("Door needs to connect to path", false);
-
-          if (canPlace)
-          {
-            foreach (var component in _gameScreen.CollidableComponents)
-            {
-              if (component.CollisionRectangles.Any(c => c.Intersects(this.Rectangle)))
-              {
-                canPlace = false;
-                GameScreen.MessageBox.Show("Trying to build over object", false);
-                break;
-              }
-            }
-          }
-
-          if (!canPlace)
-            _spriteInside.Color = Color.Red;
-
-          if (GameScreen.Mouse.LeftClicked && canPlace)
-          {
-            _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
-            State = BuildingStates.Placed;
-            _gameScreen.State = States.GameStates.ItemMenu;
-          }
+          PlacingUpdate();
 
           break;
         case BuildingStates.Placed:
@@ -561,7 +553,7 @@ namespace TopDown.Buildings
 
           break;
         case BuildingStates.Building:
-          
+
           if (NPCBuilder != null)
           {
             if (NPCBuilder.IsWorking)
@@ -599,10 +591,13 @@ namespace TopDown.Buildings
             component.Update(gameTime);
           }
 
-          if (_gameScreen.Player.IsIn(_spriteInside.Rectangle) ||
-            (_gameScreen.SelectedPathBuilder != null && _gameScreen.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
-          {
+          if (GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
             _state = BuildingStates.Built_In;
+
+          if (_showButtons)
+          {
+            foreach (var button in _buttons)
+              button.Update(gameTime);
           }
 
           break;
@@ -619,16 +614,85 @@ namespace TopDown.Buildings
             furniture.Update(gameTime);
           }
 
-          if (!_gameScreen.Player.IsIn(_spriteInside.Rectangle) &&
-            !(_gameScreen.SelectedPathBuilder != null && _gameScreen.SelectedPathBuilder.State == Builders.PathBuilderStates.Placing))
-          {
+          if (!GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
             _state = BuildingStates.Built_Out;
+          else
+          {
+            if (GameScreen.Mouse.LeftClicked)
+            {
+              _showButtons = !_showButtons;
+            }
           }
+
+          if (_showButtons)
+          {
+            foreach (var button in _buttons)
+              button.Update(gameTime);
+          }
+
 
           break;
 
         default:
           break;
+      }
+    }
+
+    private void PlacingUpdate()
+    {
+      _spriteInside.Position = new Vector2(
+        (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.X / 32) * 32,
+        (float)Math.Floor((decimal)GameScreen.Mouse.PositionWithCamera.Y / 32) * 32);
+
+      SetDoorLocations();
+
+      bool canPlace = false;
+
+      _spriteInside.Color = Color.White;
+
+      foreach (var component in _gameScreen.PathComponents)
+      {
+        if (component.Rectangle.Intersects(_spriteInside.Rectangle))
+        {
+          canPlace = false;
+          GameScreen.MessageBox.Show("Trying to build over path", false);
+          break;
+        }
+
+        DoorLocations.ForEach(c =>
+        {
+          if (c.Position == component.Position)
+          {
+            canPlace = true;
+            c.IsValid = true;
+          }
+        });
+      }
+
+      if (!canPlace && !GameScreen.MessageBox.IsVisible)
+        GameScreen.MessageBox.Show("Door needs to connect to path", false);
+
+      if (canPlace)
+      {
+        foreach (var component in _gameScreen.CollidableComponents)
+        {
+          if (component.CollisionRectangles.Any(c => c.Intersects(this.Rectangle)))
+          {
+            canPlace = false;
+            GameScreen.MessageBox.Show("Trying to build over object", false);
+            break;
+          }
+        }
+      }
+
+      if (!canPlace)
+        _spriteInside.Color = Color.Red;
+
+      if (GameScreen.Mouse.LeftClicked && canPlace)
+      {
+        _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+        State = BuildingStates.Placed;
+        _gameScreen.State = States.GameStates.ItemMenu;
       }
     }
 

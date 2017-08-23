@@ -35,7 +35,6 @@ namespace TopDown
       //base.IsFixedTimeStep = false;
 
       //this.graphics.SynchronizeWithVerticalRetrace = false;
-
       ScreenHeight = _graphics.PreferredBackBufferHeight;
 
       ScreenWidth = _graphics.PreferredBackBufferWidth;

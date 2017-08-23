@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Engine.Controls;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -133,6 +135,30 @@ namespace TopDown.Buildings.Labour
         npc.CraftingItems.Remove(npc.CraftingItem);
         npc.CraftingItem = null;
       }
+    }
+
+    public override void LoadContent(ContentManager content)
+    {
+      base.LoadContent(content);
+
+      var inspectButton = new Engine.Controls.Button(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
+      {
+        Text = "Inspect",
+      };
+
+      var demolishButton = new Engine.Controls.Button(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
+      {
+        Text = "Demolish",
+      };
+
+      _buttons = new List<Engine.Controls.Button>()
+      {
+        demolishButton,
+        inspectButton ,
+      };
+
+      foreach (var button in _buttons)
+        button.LoadContent(content);
     }
 
     protected override void SetDoorLocations()
