@@ -230,11 +230,13 @@ namespace TopDown.States
       //_graphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
       _graphicsDevice.Clear(Color.Green);
 
+      var scale = Matrix.CreateScale(Game1.ScreenWidth / (float)Game1.ScreenHeight, Game1.ScreenWidth / (float)Game1.ScreenHeight, 1);
+
       _spriteBatch.Begin(
         SpriteSortMode.FrontToBack,
         BlendState.AlphaBlend,
         SamplerState.PointWrap, null, null, null,
-        _camera.Transform);
+        _camera.Transform);// * scale);
 
       foreach (var component in GameComponents)
         component.Draw(gameTime, _spriteBatch);
@@ -254,7 +256,7 @@ namespace TopDown.States
 
       //_spriteBatch.End();
 
-      DrawGui(gameTime);  
+      DrawGui(gameTime);
     }
 
     public void DrawGui(GameTime gameTime)
