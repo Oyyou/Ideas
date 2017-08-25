@@ -73,7 +73,7 @@ namespace TopDown.Buildings.Housing
       }
     }
 
-    public Tavern(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
+    public Tavern(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom) : base(gameState, textureInside, textureOutsideTop, textureOutsideBottom)
     {
     }
 

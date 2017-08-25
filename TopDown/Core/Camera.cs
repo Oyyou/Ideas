@@ -60,8 +60,6 @@ namespace TopDown.Core
       else if (_previousScrollValue > _currentScrollValue)
         Scale -= 0.05f;
 
-      Console.WriteLine(Mouse.GetState().ScrollWheelValue);
-
       Transform = Matrix.CreateTranslation(-Position.X, -Position.Y, 0) *
         Matrix.CreateScale(Scale) *
          Matrix.CreateTranslation((GameEngine.ScreenWidth / 2), (GameEngine.ScreenHeight / 2), 0);

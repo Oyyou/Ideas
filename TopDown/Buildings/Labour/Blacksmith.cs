@@ -118,7 +118,7 @@ namespace TopDown.Buildings.Labour
       }
     }
 
-    public Blacksmith(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
+    public Blacksmith(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom) : base(gameState, textureInside, textureOutsideTop, textureOutsideBottom)
     {
       Name = "Blacksmith";
     }
@@ -129,6 +129,8 @@ namespace TopDown.Buildings.Labour
 
       if (npc.CraftingItem.CraftingTime >= npc.CraftingItem.CraftTime)
       {
+        _gameScreen.Notifications.Add(_gameScreen.Time, $"{npc.CraftingItem.Name} crafted by {npc.Name} at [BlacksmitheryName]");
+
         npc.Skills.Blacksmith.Experience += npc.CraftingItem.ExperienceValue;
 
         _gameScreen.InventoryItems.Add(npc.CraftingItem);

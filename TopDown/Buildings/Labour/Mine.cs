@@ -94,7 +94,7 @@ namespace TopDown.Buildings.Labour
         button.LoadContent(content);
     }
 
-    public Mine(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
+    public Mine(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom) : base(gameState, textureInside, textureOutsideTop, textureOutsideBottom)
     {
       Name = "Mine";
     }

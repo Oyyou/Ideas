@@ -126,6 +126,8 @@ namespace TopDown.States
       }
     }
 
+    public Notifications Notifications { get; private set; }
+
     public IEnumerable<NPC> NPCComponents
     {
       get
@@ -211,7 +213,7 @@ namespace TopDown.States
       {
         Position = doorPosition,
         IsCollidable = false,
-        Layer = Building.DefaultLayer + 0.001f,
+        Layer = Building.DefaultLayer + 0.0075f,
         Home = house,
       };
 
@@ -382,6 +384,8 @@ namespace TopDown.States
 
       Mouse = new TopDown.Controls.Mouse(_camera);
 
+      Notifications = new Notifications();
+
       Resources = new Models.Resources();
 
       var playerAnimations = new Dictionary<string, Animation>()
@@ -410,13 +414,13 @@ namespace TopDown.States
       //{
       //  for (int x = 0; x < 100; x++)
       //  {
-          GameComponents.Add(new Sprite(dot)
-          {
-            IsCollidable = false,
-            IsEnabled = false, // So we don't update
-            Position = new Vector2(0, 0),
-            Scale = 10000,
-          });
+      GameComponents.Add(new Sprite(dot)
+      {
+        IsCollidable = false,
+        IsEnabled = false, // So we don't update
+        Position = new Vector2(0, 0),
+        Scale = 10000,
+      });
       //  }
       //}
 
@@ -522,6 +526,7 @@ namespace TopDown.States
         InventoryMenu,
         JobMenu,
         ItemMenu,
+        Notifications,
       };
 
       foreach (var component in GameComponents)
@@ -538,7 +543,8 @@ namespace TopDown.States
 
             var blacksmith = new Blacksmith(this,
               _content.Load<Texture2D>("Buildings/Blacksmith/In"),
-              _content.Load<Texture2D>("Buildings/Blacksmith/Out"));
+              _content.Load<Texture2D>("Buildings/Blacksmith/Out_Top"),
+              _content.Load<Texture2D>("Buildings/Blacksmith/Out_Bottom"));
 
             blacksmith.LoadContent(_content);
 
@@ -581,7 +587,8 @@ namespace TopDown.States
 
             var smallHouse = new SmallHouse(this,
               _content.Load<Texture2D>("Buildings/SmallHouse/In"),
-              _content.Load<Texture2D>("Buildings/SmallHouse/Out"));
+              _content.Load<Texture2D>("Buildings/SmallHouse/Out_Top"),
+              _content.Load<Texture2D>("Buildings/SmallHouse/Out_Bottom"));
 
             smallHouse.LoadContent(_content);
 
@@ -889,6 +896,9 @@ namespace TopDown.States
 
     public override void Update(GameTime gameTime)
     {
+      if (Keyboard.IsKeyPressed(Keys.T))
+        Notifications.Add(Time, "This is a test notification");
+
       // TODO: Might be an idea to 'hard-code' the darkness for different times of the day.
       //  I can't see how maths can be used for daylight. Yes.
       float someMaths = (float)Math.Sin((-MathHelper.PiOver2 + 2 * Math.PI * (Time.Hour + (Time.Minute / 60))) / 48);

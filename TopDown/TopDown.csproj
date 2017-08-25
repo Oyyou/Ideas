@@ -51,6 +51,7 @@
     <Compile Include="Controls\JobMenu\JobMenuSubButton.cs" />
     <Compile Include="Controls\JobMenu\JobMenuWindow.cs" />
     <Compile Include="Controls\MenuWindow.cs" />
+    <Compile Include="Controls\Notifications.cs" />
     <Compile Include="Controls\Toolbars\Toolbar.cs" />
     <Compile Include="Controls\Toolbars\BottomToolbar.cs" />
     <Compile Include="Controls\Toolbars\TopToolbar.cs" />

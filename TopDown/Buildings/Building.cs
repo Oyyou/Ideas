@@ -55,8 +55,6 @@ namespace TopDown.Buildings
 
     protected float _buttonTimer;
 
-    protected Sprite _spriteOutside;
-
     protected GameScreen _gameScreen;
 
     protected float _hitTimer;
@@ -76,6 +74,10 @@ namespace TopDown.Buildings
     protected bool _showButtons;
 
     protected Sprite _spriteInside;
+
+    protected Sprite _spriteOutsideTop;
+
+    protected Sprite _spriteOutsideBottom;
 
     protected SoundEffect _soundEffect;
 
@@ -114,11 +116,12 @@ namespace TopDown.Buildings
 
     public override Vector2 Position
     {
-      get { return _spriteOutside.Position; }
+      get { return _spriteOutsideTop.Position; }
       set
       {
         _spriteInside.Position = value;
-        _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+        _spriteOutsideTop.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+        _spriteOutsideBottom.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
 
         SetDoorLocations();
       }
@@ -325,6 +328,8 @@ namespace TopDown.Buildings
 
         if (_buildTimer > _maxBuildTimer)
         {
+          _gameScreen.Notifications.Add(_gameScreen.Time, $"{npc.Name} finished building {this.Name}");
+
           State = BuildingStates.Built_Out;
           _gameScreen.State = States.GameStates.Playing;
           _gameScreen.UpdateMap();
@@ -337,21 +342,24 @@ namespace TopDown.Buildings
       }
     }
 
-    public Building(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside)
+    public Building(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom)
     {
       _gameScreen = gameState;
 
       _textureInside = textureInside;
 
-      _textureOutside = textureOutside;
-
       _particles = new List<Sprite>();
 
       IsCollidable = true;
 
-      _spriteOutside = new Sprite(_textureOutside)
+      _spriteOutsideTop = new Sprite(textureOutsideTop)
       {
-        Layer = DefaultLayer,
+        Layer = DefaultLayer + 0.01f,
+      };
+
+      _spriteOutsideBottom = new Sprite(textureOutsideBottom)
+      {
+        Layer = DefaultLayer + 0.005f,
       };
 
       _spriteInside = new Sprite(_textureInside)
@@ -425,7 +433,9 @@ namespace TopDown.Buildings
 
           _spriteInside.Draw(gameTime, spriteBatch);
 
-          _spriteOutside.Draw(gameTime, spriteBatch);
+          _spriteOutsideTop.Draw(gameTime, spriteBatch);
+
+          _spriteOutsideBottom.Draw(gameTime, spriteBatch);
 
 
           foreach (var component in Components)
@@ -514,8 +524,9 @@ namespace TopDown.Buildings
 
     public override void UnloadContent()
     {
-      _spriteOutside?.UnloadContent();
       _spriteInside?.UnloadContent();
+      _spriteOutsideTop.UnloadContent();
+      _spriteOutsideBottom.UnloadContent();
 
       _soundEffect?.Dispose();
 
@@ -582,12 +593,9 @@ namespace TopDown.Buildings
 
           _particles.Clear();
 
-          _spriteInside.Layer = DefaultLayer;
-          _spriteOutside.Layer = DefaultLayer + 0.002f;
-
           foreach (var component in Components)
           {
-            component.Layer = _spriteOutside.Layer - 0.001f;
+            component.Layer = _spriteOutsideBottom.Layer - 0.001f;
             component.Update(gameTime);
           }
 
@@ -690,7 +698,8 @@ namespace TopDown.Buildings
 
       if (GameScreen.Mouse.LeftClicked && canPlace)
       {
-        _spriteOutside.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+        _spriteOutsideTop.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+        _spriteOutsideBottom.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
         State = BuildingStates.Placed;
         _gameScreen.State = States.GameStates.ItemMenu;
       }
