@@ -82,9 +82,9 @@ namespace TopDown.Buildings.Labour
     {
       base.LoadContent(content);
 
-      _buttons = new List<Engine.Controls.Button>()
+      _buttons = new List<OptionsButton>()
       {
-        new Engine.Controls.Button(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
+        new OptionsButton(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
         {
           Text = "Demolish",
         },

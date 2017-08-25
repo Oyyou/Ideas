@@ -55,7 +55,11 @@ namespace TopDown.Buildings
 
     protected float _buttonTimer;
 
+    protected OptionsButton _fireButton;
+
     protected GameScreen _gameScreen;
+
+    protected OptionsButton _hireButton;
 
     protected float _hitTimer;
 
@@ -96,7 +100,7 @@ namespace TopDown.Buildings
 
     protected Texture2D _woodChipTexture;
 
-    public List<Button> _buttons;
+    public List<OptionsButton> _buttons;
 
     public Color Color { get; set; }
 
@@ -504,10 +508,42 @@ namespace TopDown.Buildings
 
       Components = new List<Component>();
 
-      _buttons = new List<Button>();
+      var buttonTexture = content.Load<Texture2D>("Controls/Button");
+      var buttonFont = content.Load<SpriteFont>("Fonts/Font");
+
+      _fireButton = new OptionsButton(buttonTexture, buttonFont);
+      _fireButton.Text = "Fire";
+      _fireButton.LoadContent(content);
+      _fireButton.Click += FireButton_Click;
+
+      _hireButton = new OptionsButton(buttonTexture, buttonFont);
+      _hireButton.Text = "Hire";
+      _hireButton.LoadContent(content);
+      _hireButton.Click += HireButton_Click; ;
+
+      _buttons = new List<OptionsButton>();
 
       foreach (var button in _buttons)
         button.LoadContent(content);
+    }
+
+    private void HireButton_Click(object sender, EventArgs e)
+    {
+      _gameScreen.State = GameStates.JobMenu;
+
+      _gameScreen.JobMenu.SetButtons();
+      _gameScreen.JobMenu.JobButton = _gameScreen.JobMenu.Buttons.Where(c => c.JobBuilding == this).FirstOrDefault();
+      _gameScreen.JobMenu.JobButton.IsSelected = true;
+    }
+
+    private void FireButton_Click(object sender, EventArgs e)
+    {
+      var npc = _gameScreen.NPCComponents.Where(c => c.Workplace == this).FirstOrDefault();
+
+      if (npc == null)
+        return;
+
+      npc.Unemploy();
     }
 
     protected virtual void SetDoorLocations()
@@ -539,12 +575,6 @@ namespace TopDown.Buildings
     public override void Update(GameTime gameTime)
     {
       _updated = true;
-
-      if (GameScreen.Mouse.LeftClicked)
-      {
-        if (!GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
-          _showButtons = false;
-      }
 
       switch (State)
       {
@@ -643,6 +673,12 @@ namespace TopDown.Buildings
 
         default:
           break;
+      }
+
+      if (GameScreen.Mouse.LeftClicked)
+      {
+        if (!GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
+          _showButtons = false;
       }
     }
 

@@ -16,13 +16,13 @@ namespace TopDown.Controls.JobMenu
 {
   public class JobMenuWindow : MenuWindow
   {
-    private List<JobMenuButton> _buttons;
-
     private Texture2D _buttonTexture;
 
     private List<JobMenuSubButton> _subButtons;
 
     private Texture2D _subButtonTexture;
+
+    public List<JobMenuButton> Buttons;
 
     /// <summary>
     /// The job currently clicked
@@ -42,7 +42,7 @@ namespace TopDown.Controls.JobMenu
       foreach (var component in Components)
         component.Draw(gameTime, spriteBatch);
 
-      foreach (var component in _buttons)
+      foreach (var component in Buttons)
         component.Draw(gameTime, spriteBatch);
 
       foreach (var component in _subButtons)
@@ -61,7 +61,7 @@ namespace TopDown.Controls.JobMenu
     {
       base.LoadContent(content);
 
-      _buttons = new List<JobMenuButton>();
+      Buttons = new List<JobMenuButton>();
 
       _subButtons = new List<JobMenuSubButton>();
 
@@ -81,7 +81,7 @@ namespace TopDown.Controls.JobMenu
     {
       if (_gameScreen.State != States.GameStates.JobMenu)
       {
-        _buttons.Clear();
+        Buttons.Clear();
         _subButtons.Clear();
 
         return;
@@ -94,7 +94,7 @@ namespace TopDown.Controls.JobMenu
       foreach (var component in Components)
         component.Update(gameTime);
 
-      foreach (var button in _buttons)
+      foreach (var button in Buttons)
         button.Update(gameTime);
 
       foreach (var subButton in _subButtons)
@@ -114,9 +114,9 @@ namespace TopDown.Controls.JobMenu
       }
     }
 
-    private void SetButtons()
+    public void SetButtons()
     {
-      if (_buttons.Count > 0)
+      if (Buttons.Count > 0)
         return;
 
       var x = Position.X + 11;
@@ -136,7 +136,7 @@ namespace TopDown.Controls.JobMenu
 
         button.LoadContent(_content);
 
-        _buttons.Add(button);
+        Buttons.Add(button);
 
         y += button.Rectangle.Height + 5;
       }
@@ -144,7 +144,7 @@ namespace TopDown.Controls.JobMenu
 
     private void Button_Click(object sender, EventArgs e)
     {
-      foreach (var component in _buttons)
+      foreach (var component in Buttons)
         component.IsSelected = false;
 
       var button = sender as JobMenuButton;

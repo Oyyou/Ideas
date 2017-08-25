@@ -143,20 +143,22 @@ namespace TopDown.Buildings.Labour
     {
       base.LoadContent(content);
 
-      var inspectButton = new Engine.Controls.Button(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
+      var inspectButton = new OptionsButton(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
       {
         Text = "Inspect",
       };
 
-      var demolishButton = new Engine.Controls.Button(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
+      var demolishButton = new OptionsButton(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
       {
         Text = "Demolish",
       };
 
-      _buttons = new List<Engine.Controls.Button>()
+      _buttons = new List<OptionsButton>()
       {
         demolishButton,
-        inspectButton ,
+        inspectButton,
+        _fireButton,
+        _hireButton,
       };
 
       foreach (var button in _buttons)

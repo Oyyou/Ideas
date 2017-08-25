@@ -224,7 +224,7 @@ namespace TopDown.Sprites
 
       foreach (var building in _gameScreen.BuildingComponents)
       {
-        if (new Rectangle(Rectangle.Left, Rectangle.Bottom - (Rectangle.Height - 32), 32, 32).Intersects(building.Rectangle)) // Need to add 'IsIn'
+        if (new Rectangle((int)Position.X, (int)Position.Y, 32, 32).Intersects(building.Rectangle)) // Need to add 'IsIn'
         {
           Layer = Building.DefaultLayer + 0.0025f;
         }

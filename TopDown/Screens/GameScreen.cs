@@ -678,6 +678,11 @@ namespace TopDown.States
       foreach (var component in GameComponents)
         component.Update(gameTime);
 
+      foreach (var building in BuildingComponents)
+      {
+        building.State = BuildingStates.Built_In;
+      }
+
       for (int i = 0; i < GameComponents.Count; i++)
       {
         for (int j = i + 1; j < GameComponents.Count; j++)
