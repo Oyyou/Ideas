@@ -228,9 +228,9 @@ namespace TopDown.States
       //_graphicsDevice.SetRenderTarget(_renderTarget);
 
       //_graphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
-      _graphicsDevice.Clear(Color.Green);
+      _graphicsDevice.Clear(Color.Black);
 
-      var scale = Matrix.CreateScale(Game1.ScreenWidth / (float)Game1.ScreenHeight, Game1.ScreenWidth / (float)Game1.ScreenHeight, 1);
+      //var scale = Matrix.CreateScale(Game1.ScreenWidth / (float)Game1.ScreenHeight, Game1.ScreenWidth / (float)Game1.ScreenHeight, 1);
 
       _spriteBatch.Begin(
         SpriteSortMode.FrontToBack,
@@ -402,6 +402,23 @@ namespace TopDown.States
       {
         //Player,
       };
+
+      var dot = new Texture2D(_graphicsDevice, 1, 1);
+      dot.SetData(new Color[] { new Color(0, 200, 0), });
+
+      //for (int y = 0; y < 10; y++)
+      //{
+      //  for (int x = 0; x < 100; x++)
+      //  {
+          GameComponents.Add(new Sprite(dot)
+          {
+            IsCollidable = false,
+            IsEnabled = false, // So we don't update
+            Position = new Vector2(0, 0),
+            Scale = 10000,
+          });
+      //  }
+      //}
 
       var map = TmxMap.Load("Content/Maps/Level01.tmx");
 
