@@ -990,6 +990,12 @@ namespace TopDown.States
       _guiComponents.Clear();
     }
 
+    public Vector2 GetMouseWithCameraPosition()
+    {
+      Matrix inverseTransform = Matrix.Invert(globalTransformation);
+
+      return Vector2.Transform(new Vector2(Mouse.PositionWithCamera.X, Mouse.PositionWithCamera.Y), inverseTransform);
+    }
     
     public override void Update(GameTime gameTime)
     {
@@ -997,12 +1003,10 @@ namespace TopDown.States
         Notifications.Add(Time, "This is a test notification");
 
 
-      Matrix inverseTransform = Matrix.Invert(globalTransformation);
-
-      Vector2 mouseInWorld = Vector2.Transform(new Vector2(Mouse.PositionWithCamera.X, Mouse.PositionWithCamera.Y), inverseTransform);
+      
 
 
-      penumbra.Lights[1].Position = mouseInWorld;
+      penumbra.Lights[1].Position = GetMouseWithCameraPosition();
 
       double randomNumber = new Random().NextDouble();
       penumbra.Lights[0].Intensity = MathHelper.Lerp(0, 1.5f, (float)randomNumber);
