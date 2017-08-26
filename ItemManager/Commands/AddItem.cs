@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using TopDown.Items;
 using TopDown.Models;
@@ -29,7 +30,7 @@ namespace ItemManager.Commands
 
     public bool CanExecute(object parameter)
     {
-      if (string.IsNullOrEmpty(_viewModel.Name))
+      if (string.IsNullOrWhiteSpace(_viewModel.Name))
       {
         _viewModel.Status = "Need to assign 'Name'";
         return false;
@@ -47,7 +48,9 @@ namespace ItemManager.Commands
         return false;
       }
 
-      if (!float.TryParse(_viewModel.ExperienceValue, out float experienceValue))
+      float experienceValue = 0f;
+
+      if (!float.TryParse(_viewModel.ExperienceValue, out experienceValue))
       {
         _viewModel.Status = "'ExperienceValue' needs to be a number";
         return false;
@@ -58,7 +61,9 @@ namespace ItemManager.Commands
         return false;
       }
 
-      if (!float.TryParse(_viewModel.CraftTime, out float craftTime))
+      float craftTime = 0f;
+
+      if (!float.TryParse(_viewModel.CraftTime, out craftTime))
       {
         _viewModel.Status = "'CraftTime' needs to be a number";
         return false;
@@ -81,17 +86,6 @@ namespace ItemManager.Commands
         return false;
       }
 
-      //var itemHeader = _viewModel.ItemHeaders.Where(c => c.Category == _viewModel.Category).FirstOrDefault();
-
-      //if (itemHeader != null)
-      //{
-      //  if (itemHeader.Items.Any(c => string.Equals(c.Name.Trim(), _viewModel.Name.Trim(), StringComparison.OrdinalIgnoreCase)))
-      //  {
-      //    _viewModel.Status = "Item already exists";
-      //    return false;
-      //  }
-      //}
-
       _viewModel.Status = "Ready";
       return true;
     }
@@ -100,49 +94,110 @@ namespace ItemManager.Commands
     {
       var itemHeaders = _viewModel.ItemHeaders;
 
-      foreach (var itemHeader in itemHeaders)
+      var category = (ItemCategories)Enum.Parse(typeof(ItemCategories), _viewModel.Category);
+
+      var material = (ItemMaterials)Enum.Parse(typeof(ItemMaterials), _viewModel.Material);
+
+      if (_viewModel.ItemHeaders != null && _viewModel.ItemHeaders.Count > 0)
       {
-        if (itemHeader.Category == _viewModel.Category)
+        var header = _viewModel.ItemHeaders.Where(c => c.Category == _viewModel.Category).FirstOrDefault();
+        ItemV2 item = null;
+
+        if (header != null)
         {
-          var newItems = itemHeader.Items.ToList();
+          item = header.Items.Where(c => string.Equals(c.Name.Trim(), _viewModel.Name.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
-          var category = (ItemCategories)Enum.Parse(typeof(ItemCategories), _viewModel.Category);
-
-          var material = (ItemMaterials)Enum.Parse(typeof(ItemMaterials), _viewModel.Material);
-
-          switch (category)
+          if (item != null)
           {
-            case ItemCategories.Weapon:
-              newItems.Add(new Weapon()
-              {
-                Name = _viewModel.Name,
-                Category = category,
-                Material = material,
+            var result = MessageBox.Show("Item already exists. Are you sure you'd like to override?", "Message", MessageBoxButton.YesNo);
 
-              });
-              break;
-            case ItemCategories.Armour:
-              break;
-            case ItemCategories.Tool:
-              break;
-            case ItemCategories.Clothing:
-              break;
-            case ItemCategories.Jewellery:
-              break;
-            case ItemCategories.Medicine:
-              break;
-            default:
-              break;
+            if (result != MessageBoxResult.Yes)
+              return;
           }
+        }
 
-          _viewModel.ItemHeaders.Remove(itemHeader);
-          _viewModel.ItemHeaders.Add(new Models.ItemHeader()
+        foreach (var itemHeader in itemHeaders)
+        {
+          if (itemHeader.Category == _viewModel.Category)
           {
-            Category = category.ToString(),
+            var newItems = itemHeader.Items.ToList();
+
+            if (item != null)
+              newItems.Remove(item);
+
+            AddNewItem(newItems);
+
+            if (!_viewModel.ImagesToCopy.ContainsKey(category))
+            {
+              _viewModel.ImagesToCopy.Add(category, new List<Tuple<string, string>>());
+            }
+
+            _viewModel.ImagesToCopy[category].Add(new Tuple<string, string>(_viewModel.Name, _viewModel.ImagePath));
+
+            _viewModel.ItemHeaders.Remove(itemHeader);
+            _viewModel.ItemHeaders.Add(new Models.ItemHeader()
+            {
+              Category = _viewModel.Category.ToString(),
+              Items = newItems,
+            });
+            break;
+          }
+        }
+      }
+      else
+      {
+        var newItems = new List<ItemV2>();
+
+        AddNewItem(newItems);
+
+        if (!_viewModel.ImagesToCopy.ContainsKey(category))
+        {
+          _viewModel.ImagesToCopy.Add(category, new List<Tuple<string, string>>());
+        }
+
+        _viewModel.ImagesToCopy[category].Add(new Tuple<string, string>(_viewModel.Name, _viewModel.ImagePath));
+
+        _viewModel.ItemHeaders = new System.Collections.ObjectModel.ObservableCollection<Models.ItemHeader>()
+        {
+          new Models.ItemHeader()
+          {
+            Category = _viewModel.Category.ToString(),
             Items = newItems,
+          },
+        };
+      }
+    }
+
+    private void AddNewItem(List<ItemV2> newItems)
+    {
+      var category = (ItemCategories)Enum.Parse(typeof(ItemCategories), _viewModel.Category);
+
+      var material = (ItemMaterials)Enum.Parse(typeof(ItemMaterials), _viewModel.Material);
+
+      switch (category)
+      {
+        case ItemCategories.Weapon:
+          newItems.Add(new Weapon()
+          {
+            Name = _viewModel.Name,
+            Category = category,
+            Material = material,
+            ExperienceValue = float.Parse(_viewModel.ExperienceValue),
+            CraftTime = float.Parse(_viewModel.CraftTime),
           });
           break;
-        }
+        case ItemCategories.Armour:
+          break;
+        case ItemCategories.Tool:
+          break;
+        case ItemCategories.Clothing:
+          break;
+        case ItemCategories.Jewellery:
+          break;
+        case ItemCategories.Medicine:
+          break;
+        default:
+          break;
       }
     }
   }

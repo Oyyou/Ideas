@@ -36,6 +36,11 @@ namespace TopDown.Controls
 
     }
 
+    public bool IsKeyDown(Microsoft.Xna.Framework.Input.Keys key)
+    {
+      return _currentKey.IsKeyDown(key);
+    }
+
     public bool IsKeyPressed(Microsoft.Xna.Framework.Input.Keys key)
     {
       return _currentKey.IsKeyUp(key) && _previousKey.IsKeyDown(key);

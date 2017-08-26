@@ -24,7 +24,7 @@ namespace TopDown.Models
     /// <summary>
     /// Base amount of experience gained when crafted
     /// </summary>
-    public int ExperienceValue { get; set; }
+    public float ExperienceValue { get; set; }
 
     public ItemMaterials Material { get; set; }
 

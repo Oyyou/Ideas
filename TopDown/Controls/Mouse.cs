@@ -61,7 +61,7 @@ namespace TopDown.Controls
       }
     }
 
-    public Vector2 Position
+    public override Vector2 Position
     {
       get
       {
@@ -89,12 +89,17 @@ namespace TopDown.Controls
     {
       get
       {
-        return new Rectangle(
-          _currentMouse.X + ((int)_camera.Position.X - (GameEngine.ScreenWidth / 2)),
-          _previousMouse.Y + ((int)_camera.Position.Y - (GameEngine.ScreenHeight / 2)),
+        var scale = Matrix.Invert(_camera.Transform).Scale;
+        var translation = _camera.Transform.Translation;
+
+        var rectangle = new Rectangle(
+          (int)((_currentMouse.X - translation.X) * scale.X),
+          (int)((_currentMouse.Y - translation.Y) * scale.Y),
           1,
           1
         );
+
+        return rectangle;
       }
     }
 

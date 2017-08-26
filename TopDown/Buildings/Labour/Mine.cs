@@ -11,6 +11,7 @@ using Engine;
 using TopDown.Buildings;
 using Microsoft.Xna.Framework.Graphics;
 using TopDown.Sprites;
+using Microsoft.Xna.Framework.Content;
 
 namespace TopDown.Buildings.Labour
 {
@@ -77,7 +78,23 @@ namespace TopDown.Buildings.Labour
       }
     }
 
-    public Mine(GameScreen gameState, Texture2D textureInside, Texture2D textureOutside) : base(gameState, textureInside, textureOutside)
+    public override void LoadContent(ContentManager content)
+    {
+      base.LoadContent(content);
+
+      _buttons = new List<OptionsButton>()
+      {
+        new OptionsButton(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
+        {
+          Text = "Demolish",
+        },
+      };
+
+      foreach (var button in _buttons)
+        button.LoadContent(content);
+    }
+
+    public Mine(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom) : base(gameState, textureInside, textureOutsideTop, textureOutsideBottom)
     {
       Name = "Mine";
     }
@@ -95,6 +112,14 @@ namespace TopDown.Buildings.Labour
           if (x == -32 || y == -32 ||
             x == Rectangle.Width || y == Rectangle.Height)
           {
+            if ((x == -32 && y == -32) || 
+              (x == -32 && y == Rectangle.Height) ||
+              (x == Rectangle.Width && y == -32) ||
+              (x == Rectangle.Width && y == Rectangle.Height))
+            {
+              continue;
+            }
+
             DoorLocations.Add(new DoorLocation()
             {
               Position = position,

@@ -136,7 +136,7 @@ namespace TopDown.Controls.BuildMenu
       _buildSubOptions = new List<BuildMenuSubButton>()
       {
         GetSmallHouse(),
-        GetTavern(),
+        //GetTavern(),
       };
 
       foreach (var component in _buildSubOptions)
@@ -147,7 +147,7 @@ namespace TopDown.Controls.BuildMenu
     {
       var smallHouse = new BuildMenuSubButton(_subButtonTexture, _font)
       {
-        Building = new SmallHouse(_gameScreen, _content.Load<Texture2D>("Buildings/SmallHouse/In"), _content.Load<Texture2D>("Buildings/SmallHouse/Out"))
+        Building = new SmallHouse(_gameScreen, _content.Load<Texture2D>("Buildings/SmallHouse/In"), _content.Load<Texture2D>("Buildings/SmallHouse/Out_Top"), _content.Load<Texture2D>("Buildings/SmallHouse/Out_Bottom"))
         {
           State = Buildings.BuildingStates.Placing,
         },
@@ -205,7 +205,7 @@ namespace TopDown.Controls.BuildMenu
     {
       var tavern = new BuildMenuSubButton(_subButtonTexture, _font)
       {
-        Building = new Tavern(_gameScreen, _content.Load<Texture2D>("Buildings/Tavern/In"), _content.Load<Texture2D>("Buildings/Tavern/Out"))
+        Building = new Tavern(_gameScreen, _content.Load<Texture2D>("Buildings/Tavern/In"), _content.Load<Texture2D>("Buildings/Tavern/Out_Top"), _content.Load<Texture2D>("Buildings/Tavern/Out_Bottom"))
         {
           State = Buildings.BuildingStates.Placing,
         },
@@ -296,7 +296,7 @@ namespace TopDown.Controls.BuildMenu
     {
       var blacksmith = new BuildMenuSubButton(_subButtonTexture, _font)
       {
-        Building = new Blacksmith(_gameScreen, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out"))
+        Building = new Blacksmith(_gameScreen, _content.Load<Texture2D>("Buildings/Blacksmith/In"), _content.Load<Texture2D>("Buildings/Blacksmith/Out_Top"), _content.Load<Texture2D>("Buildings/Blacksmith/Out_Bottom"))
         {
           State = Buildings.BuildingStates.Placing,
         },
@@ -333,25 +333,25 @@ namespace TopDown.Controls.BuildMenu
         anvil,
       };
 
-      var mine = new BuildMenuSubButton(_subButtonTexture, _font)
-      {
-        Building = new Mine(_gameScreen, _content.Load<Texture2D>("Buildings/Mine/In"), _content.Load<Texture2D>("Buildings/Mine/Out"))
-        {
-          State = Buildings.BuildingStates.Placing,
-        },
-        Text = "Mine",
-        Layer = 0.99f,
-        GameScreenSetValue = States.GameStates.PlacingBuilding,
-        ResourceCost = new Models.Resources()
-        {
-          Food = 15,
-          Gold = 10,
-          Wood = 30,
-          Stone = 40,
-        },
-      };
+      //var mine = new BuildMenuSubButton(_subButtonTexture, _font)
+      //{
+      //  Building = new Mine(_gameScreen, _content.Load<Texture2D>("Buildings/Mine/In"), _content.Load<Texture2D>("Buildings/Mine/Out_Top"), _content.Load<Texture2D>("Buildings/Mine/Out_Bottom"))
+      //  {
+      //    State = Buildings.BuildingStates.Placing,
+      //  },
+      //  Text = "Mine",
+      //  Layer = 0.99f,
+      //  GameScreenSetValue = States.GameStates.PlacingBuilding,
+      //  ResourceCost = new Models.Resources()
+      //  {
+      //    Food = 15,
+      //    Gold = 10,
+      //    Wood = 30,
+      //    Stone = 40,
+      //  },
+      //};
 
-      mine.Click += SubButton_Click;
+      //mine.Click += SubButton_Click;
 
       _buildSubOptions = new List<BuildMenuSubButton>()
       {
@@ -382,7 +382,7 @@ namespace TopDown.Controls.BuildMenu
             Stone = 40,
           },
         },
-        mine,
+        //mine,
       };
 
       foreach (var component in _buildSubOptions)

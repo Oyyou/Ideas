@@ -44,6 +44,7 @@
     <Compile Include="Builders\PathBuilder.cs" />
     <Compile Include="Buildings\Building.cs" />
     <Compile Include="Buildings\Labour\Mine.cs" />
+    <Compile Include="Buildings\OptionsButton.cs" />
     <Compile Include="Controls\CraftingMenu\CraftingMenuSubButton.cs" />
     <Compile Include="Controls\CraftingMenu\CraftingMenuWindow.cs" />
     <Compile Include="Controls\InventoryMenu\InventoryMenuWindow.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Controls\JobMenu\JobMenuSubButton.cs" />
     <Compile Include="Controls\JobMenu\JobMenuWindow.cs" />
     <Compile Include="Controls\MenuWindow.cs" />
+    <Compile Include="Controls\Notifications.cs" />
     <Compile Include="Controls\Toolbars\Toolbar.cs" />
     <Compile Include="Controls\Toolbars\BottomToolbar.cs" />
     <Compile Include="Controls\Toolbars\TopToolbar.cs" />

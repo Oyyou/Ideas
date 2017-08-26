@@ -83,36 +83,36 @@ namespace TopDown.Resources
 
       if (GameScreen.Mouse.RectangleWithCamera.Intersects(this.Rectangle))
       {
-        if (Vector2.Distance(this.Position, _gameScreen.Player.Position) < 100)
-        {
-          Color = Color.Yellow;
+        //if (Vector2.Distance(this.Position, _gameScreen.Player.Position) < 100)
+        //{
+        //  Color = Color.Yellow;
 
-          if (GameScreen.Mouse.LeftDown)
-          {
-            _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        //  if (GameScreen.Mouse.LeftDown)
+        //  {
+        //    _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (_timer > _hitTimer)
-            {
-              var positions = new List<Vector2>();
+        //    if (_timer > _hitTimer)
+        //    {
+        //      var positions = new List<Vector2>();
 
-              for (int i = 0; i < 4; i++)
-              {
-                GenerateRockParticle(_hitTimer);
-              }
+        //      for (int i = 0; i < 4; i++)
+        //      {
+        //        GenerateRockParticle(_hitTimer);
+        //      }
 
-              _timer = 0f;
+        //      _timer = 0f;
 
-              _soundEffect.Play();
+        //      _soundEffect.Play();
 
-              Resources.Stone--;
-              _gameScreen.Resources.Stone++;
+        //      Resources.Stone--;
+        //      _gameScreen.Resources.Stone++;
 
-              if (Resources.Stone == 0)
-                IsRemoved = true;
-            }
-          }
-        }
-        else
+        //      if (Resources.Stone == 0)
+        //        IsRemoved = true;
+        //    }
+        //  }
+        //}
+        //else
         {
           Color = Color.Red;
           _timer = 0;

@@ -29,6 +29,8 @@ namespace TopDown.Sprites
 
     #region Fields
 
+    private float? _defaultLayer;
+
     private GameScreen _gameScreen;
 
     /// <summary>
@@ -215,6 +217,19 @@ namespace TopDown.Sprites
 
     public override void Update(GameTime gameTime)
     {
+      if (_defaultLayer == null)
+        _defaultLayer = Layer;
+
+      Layer = _defaultLayer.Value;
+
+      foreach (var building in _gameScreen.BuildingComponents)
+      {
+        if (new Rectangle((int)Position.X, (int)Position.Y, 32, 32).Intersects(building.Rectangle)) // Need to add 'IsIn'
+        {
+          Layer = Building.DefaultLayer + 0.0025f;
+        }
+      }
+
       if (_walkingPath.Count > 0)
       {
         if (_walkingPath[0] == Position)

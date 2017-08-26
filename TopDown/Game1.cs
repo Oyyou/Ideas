@@ -36,12 +36,28 @@ namespace TopDown
       //base.IsFixedTimeStep = false;
 
       //this.graphics.SynchronizeWithVerticalRetrace = false;
+      Window.AllowUserResizing = true;
+
+      _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
+
+      _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+
+      _graphics.ApplyChanges();
 
       ScreenHeight = _graphics.PreferredBackBufferHeight;
 
       ScreenWidth = _graphics.PreferredBackBufferWidth;
 
+      Window.ClientSizeChanged += Window_ClientSizeChanged;
+
       base.Initialize();
+    }
+
+    private void Window_ClientSizeChanged(object sender, EventArgs e)
+    {
+      ScreenHeight = _graphics.PreferredBackBufferHeight;
+
+      ScreenWidth = _graphics.PreferredBackBufferWidth;
     }
 
     /// <summary>
