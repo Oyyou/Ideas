@@ -13,6 +13,7 @@ namespace TopDown
   /// </summary>
   public class Game1 : GameEngine
   {
+    
     public Game1()
     {
       Random = new System.Random();
@@ -55,6 +56,7 @@ namespace TopDown
       _gameModel = new Engine.Models.GameModel(Content, this, _graphics.GraphicsDevice, _spriteBatch);
 
       _currentState = new GameScreen();
+      
       _currentState.LoadContent(_gameModel);
     }
 

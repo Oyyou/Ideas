@@ -1,6 +1,5 @@
 sampler TextureSampler : register(s0);
 Texture2D  myTex2D;
-
 float DarknessLevel;
 
 cbuffer cbPerLight : register(c1)
@@ -36,8 +35,8 @@ float4 GetComputedColor(float alpha)
 {
 	alpha = abs(alpha);
 	float3 lightColor = LightColor * alpha;
-	lightColor = pow(lightColor, LightIntensity);
-	return float4(lightColor, 0.5);
+	lightColor = pow(abs(lightColor), LightIntensity);
+	return float4(lightColor, 0.8);
 }
 
 
@@ -45,9 +44,11 @@ float4 PSPointLight(float4 pos : SV_POSITION, float4 color1 : COLOR0, float2 tex
 {	
     float4 tex;
 	tex = myTex2D.Sample(TextureSampler, texCoord.xy);
-	float halfMagnitude = length(texCoord - float2(0.5, 0.5));
-	float alpha = saturate(1.0 - halfMagnitude * 2.0);
-	return tex*GetComputedColor(alpha);
+	
+
+	float halfMagnitude = length(texCoord - float2(0.5,0.5));
+	float alpha = saturate(1.0 - halfMagnitude*2.0);
+	return tex;
 }
 
 

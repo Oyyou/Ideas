@@ -31,6 +31,7 @@ using TopDown.Logic;
 using TopDown.Resources;
 using TopDown.Sprites;
 using static TopDown.Logic.Pathfinder;
+using Penumbra;
 
 namespace TopDown.States
 {
@@ -60,6 +61,13 @@ namespace TopDown.States
     private List<Component> _guiComponents;
 
     private RenderTarget2D _renderTarget;
+
+    private PenumbraComponent penumbra;
+    Vector2 baseScreenSize = new Vector2(800, 480);
+    private Matrix globalTransformation;
+
+    
+    Hull hull;
 
     public IEnumerable<Building> BuildingComponents
     {
@@ -210,6 +218,7 @@ namespace TopDown.States
 
       GameComponents.Add(npc);
     }
+    
 
     public override void Draw(GameTime gameTime)
     {
@@ -228,20 +237,26 @@ namespace TopDown.States
 
       foreach (var component in GameComponents)
         component.Draw(gameTime, _spriteBatch);
+      
 
       _spriteBatch.End();
+
 
       // Drop the render target
       _graphicsDevice.SetRenderTarget(null);
 
+      // Everything after this call will be affected by the lighting system.
+      penumbra.BeginDraw();
+
       _graphicsDevice.Clear(Color.Black);
 
-      _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied,
+      _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
                   SamplerState.LinearClamp, DepthStencilState.None,
                   RasterizerState.CullNone, _effect);
 
       _spriteBatch.Draw(_renderTarget, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.White);
-
+      // Draw the actual lit scene.
+      penumbra.Draw(gameTime);
       _spriteBatch.End();
 
       DrawGui(gameTime);  
@@ -618,6 +633,45 @@ namespace TopDown.States
       }
 
       UpdateMap();
+
+      //-----------------------------------------------------------------------------------------------------------
+      //Work out how much we need to scale our graphics to fill the screen
+      float horScaling = _graphicsDevice.PresentationParameters.BackBufferWidth / baseScreenSize.X;
+      float verScaling = _graphicsDevice.PresentationParameters.BackBufferHeight / baseScreenSize.Y;
+      Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
+      globalTransformation = Matrix.CreateScale(screenScalingFactor);
+
+
+
+      // Create our lighting component and register it as a service so that subsystems can access it.--------------
+      penumbra = new PenumbraComponent(_game)
+      {
+        AmbientColor = new Color(new Vector3(0.1f))
+      };
+      // Create sample light source and shadow hull.
+      Light light = new PointLight
+      {
+        Scale = new Vector2(360), // Range of the light source (how far the light will travel)
+        ShadowType = ShadowType.Solid, // Will not lit hulls themselves
+        Position = new Vector2(400,240)
+      };
+
+      hull = new Hull(new Vector2(1.0f), new Vector2(-1.0f, 1.0f), new Vector2(-1.0f), new Vector2(1.0f, -1.0f))
+      {
+        Position = new Vector2(350f, 300f),
+        Scale = new Vector2(10f)
+      };
+
+    
+      penumbra.Lights.Add(light);
+      penumbra.Hulls.Add(hull);
+      _game.Services.AddService(penumbra);
+      //-----------------------------------------------------------------------------------------------------------
+
+      // Load penumbra
+      penumbra.Initialize();
+      penumbra.Transform = globalTransformation;
+
     }
 
     private void MenuUpdate(GameTime gameTime, Keys menuKey)
@@ -788,6 +842,7 @@ namespace TopDown.States
         }
 
         State = GameStates.CraftingMenu;
+     
       }
 
       if (Keyboard.IsKeyPressed(Keys.I))
@@ -864,7 +919,6 @@ namespace TopDown.States
       //  I can't see how maths can be used for daylight. Yes.
       float someMaths = (float)Math.Sin((-MathHelper.PiOver2 + 2 * Math.PI * (Time.Hour + (Time.Minute / 60))) / 48);
       float DarknessLevel = Math.Abs(MathHelper.SmoothStep(12f, 2f, someMaths));
-
       //var Position = new Vector2(50, 50);
       //var Scale = new Vector2(50);
       //var Origin = new Vector2(50.0f, 50.5f);
@@ -876,8 +930,8 @@ namespace TopDown.States
       //Matrix.Multiply(ref LocalToWorld, ref cvp, out wvp);
 
       //_effect.Parameters["WorldViewProjection"].SetValue(wvp);
-      _effect.Parameters["LightColor"].SetValue(new Vector3(1, 1, 1));
-      _effect.Parameters["LightIntensity"].SetValue(1.5f);
+      //_effect.Parameters["LightColor"].SetValue(new Vector3(1, 1, 1));
+      //_effect.Parameters["LightIntensity"].SetValue(1.5f);
       // _effect.Parameters["DarknessLevel"].SetValue(1f);
 
       switch (State)
