@@ -45,14 +45,17 @@ namespace TopDown.Core
 
       var speed = 5f;
 
-      if (GameScreen.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.A))
+      if (GameScreen.Keyboard.IsKeyDown(Keys.LeftShift))
+        speed *= 2;
+
+      if (GameScreen.Keyboard.IsKeyDown(Keys.A))
         Position.X -= speed;
-      else if (GameScreen.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D))
+      else if (GameScreen.Keyboard.IsKeyDown(Keys.D))
         Position.X += speed;
 
-      if (GameScreen.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.W))
+      if (GameScreen.Keyboard.IsKeyDown(Keys.W))
         Position.Y -= speed;
-      else if (GameScreen.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
+      else if (GameScreen.Keyboard.IsKeyDown(Keys.S))
         Position.Y += speed;
 
       if (_previousScrollValue < _currentScrollValue)

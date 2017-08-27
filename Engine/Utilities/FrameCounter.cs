@@ -55,7 +55,8 @@ namespace Engine.Utilities
     {
       var fps = string.Format("FPS: {0}", AverageFramesPerSecond);
 
-      spriteBatch.DrawString(_font, fps, new Vector2(5, 460), Color.Black);
+
+      spriteBatch.DrawString(_font, fps, new Vector2(5, GameEngine.ScreenHeight - 20), Color.Black);
 
       // other draw code here
     }

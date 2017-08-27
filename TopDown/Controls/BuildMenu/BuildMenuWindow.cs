@@ -25,6 +25,8 @@ namespace TopDown.Controls.BuildMenu
   {
     private List<BuildMenuSubButton> _buildSubOptions;
 
+    private List<Button> _buttons;
+
     private Texture2D _mainButtonTexture;
 
     private Texture2D _subButtonTexture;
@@ -70,6 +72,17 @@ namespace TopDown.Controls.BuildMenu
 
       foreach (var component in Components)
         component.Draw(gameTime, spriteBatch);
+
+      var y = _windowSprite.Position.Y + 56;
+
+      foreach (var component in _buttons)
+      {
+        component.Position = new Vector2(_windowSprite.Position.X + 11, y);
+
+        y += component.Rectangle.Height + 5;
+
+        component.Draw(gameTime, spriteBatch);
+      }
 
       foreach (var component in _buildSubOptions)
         component.Draw(gameTime, spriteBatch);
@@ -432,10 +445,16 @@ namespace TopDown.Controls.BuildMenu
 
       miscButton.Click += MiscButton_Click;
 
-      Components.Add(housingButton);
-      Components.Add(labourButton);
-      Components.Add(artsButton);
-      Components.Add(miscButton);
+      _buttons = new List<Button>()
+      {
+        housingButton,
+        labourButton,
+        artsButton,
+        miscButton,
+      };
+
+      foreach (var button in _buttons)
+        button.LoadContent(content);
 
       foreach (var component in Components)
         component.LoadContent(content);
@@ -519,13 +538,18 @@ namespace TopDown.Controls.BuildMenu
       if (_gameScreen.State != States.GameStates.BuildMenu)
         return;
 
+      base.Update(gameTime);
+
       foreach (var component in Components)
         component.Update(gameTime);
 
-      var x = Position.X + 196;
+      foreach (var button in _buttons)
+        button.Update(gameTime);
+
+      var x = _windowSprite.Position.X + 196;
       var xIncrement = 0;
 
-      var y = Position.Y + 56;
+      var y = _windowSprite.Position.Y + 56;
 
       foreach (var component in _buildSubOptions)
       {
@@ -533,7 +557,7 @@ namespace TopDown.Controls.BuildMenu
 
         xIncrement += component.Rectangle.Width + 5;
 
-        if (x + xIncrement > 708)
+        if (x + xIncrement > _windowSprite.Rectangle.Right - 12)
         {
           y += component.Rectangle.Height + 5;
           xIncrement = 0;

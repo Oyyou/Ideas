@@ -38,7 +38,6 @@ namespace TopDown.Controls.Toolbars
     public override void LoadContent(ContentManager content)
     {
       _toolbarSprite = new Sprite(content.Load<Texture2D>("Controls/Toolbar_Top"));
-      _toolbarSprite.Position = new Vector2((GameEngine.ScreenWidth / 2) - (_toolbarSprite.Rectangle.Width / 2), 20);
 
       var buildButton = new Button(content.Load<Texture2D>("Controls/Icons/Build"));
       buildButton.Click += BuildButton_Click;
@@ -76,6 +75,8 @@ namespace TopDown.Controls.Toolbars
 
       foreach (var icon in _icons)
         icon.Update(gameTime);
+      
+      _toolbarSprite.Position = new Vector2((GameEngine.ScreenWidth / 2) - (_toolbarSprite.Rectangle.Width / 2), 20);
     }
   }
 }

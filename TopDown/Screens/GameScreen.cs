@@ -300,8 +300,6 @@ namespace TopDown.States
         }
       }
 
-      _camera.Update();
-
       if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
       {
         State = GameStates.BuildMenu;
@@ -353,7 +351,7 @@ namespace TopDown.States
         _graphicsDevice.PresentationParameters.BackBufferFormat,
         DepthFormat.Depth24);
 
-      _effect = _content.Load<Effect>("Effect/BlackAndWhite");
+      //_effect = _content.Load<Effect>("Effect/BlackAndWhite");
 
       _font = _content.Load<SpriteFont>("Fonts/Font");
 
@@ -691,8 +689,6 @@ namespace TopDown.States
         }
       }
 
-      _camera.Update();
-
       if (Keyboard.IsKeyPressed(Keys.B))
       {
         State = GameStates.BuildMenu;
@@ -738,6 +734,11 @@ namespace TopDown.States
       foreach (var component in GameComponents)
         component.Update(gameTime);
 
+      foreach (var building in BuildingComponents)
+      {
+        building.State = BuildingStates.Built_In;
+      }
+
       for (int i = 0; i < GameComponents.Count; i++)
       {
         for (int j = i + 1; j < GameComponents.Count; j++)
@@ -745,8 +746,6 @@ namespace TopDown.States
           GameComponents[i].CheckCollision(GameComponents[j]);
         }
       }
-
-      _camera.Update();
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
       {
@@ -785,8 +784,6 @@ namespace TopDown.States
           GameComponents[i].CheckCollision(GameComponents[j]);
         }
       }
-
-      _camera.Update();
 
       if (Keyboard.IsKeyPressed(Keys.P))
         State = GameStates.Paused;
@@ -904,6 +901,8 @@ namespace TopDown.States
       if (Keyboard.IsKeyPressed(Keys.T))
         Notifications.Add(Time, "This is a test notification");
 
+      _camera.Update();
+
       // TODO: Might be an idea to 'hard-code' the darkness for different times of the day.
       //  I can't see how maths can be used for daylight. Yes.
       float someMaths = (float)Math.Sin((-MathHelper.PiOver2 + 2 * Math.PI * (Time.Hour + (Time.Minute / 60))) / 48);
@@ -920,8 +919,8 @@ namespace TopDown.States
       //Matrix.Multiply(ref LocalToWorld, ref cvp, out wvp);
 
       //_effect.Parameters["WorldViewProjection"].SetValue(wvp);
-      _effect.Parameters["LightColor"].SetValue(new Vector3(1, 1, 1));
-      _effect.Parameters["LightIntensity"].SetValue(1.5f);
+      //_effect.Parameters["LightColor"].SetValue(new Vector3(1, 1, 1));
+      //_effect.Parameters["LightIntensity"].SetValue(1.5f);
       // _effect.Parameters["DarknessLevel"].SetValue(1f);
 
       switch (State)

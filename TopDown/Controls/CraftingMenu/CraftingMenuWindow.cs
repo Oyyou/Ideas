@@ -35,6 +35,40 @@ namespace TopDown.Controls.CraftingMenu
 
     private Texture2D _subButtonTexture;
 
+    private void ArmourButton_Click(object sender, EventArgs e)
+    {
+      var category = ItemCategories.Armour;
+
+      var woodenChestPieceButton = new CraftingMenuSubButton(_subButtonTexture, _font,
+        new Item(_content.Load<Texture2D>("Items/WoodenChestPiece"), 3, "Wooden Chest Piece", category)
+        {
+          ExperienceValue = 3,
+          ResourceCost = new Models.Resources()
+          {
+            Wood = 5,
+          },
+          Stats = new ArmourStats()
+          {
+            ArmourGained = 2,
+          }
+        })
+      {
+        Layer = 0.99f,
+      };
+
+      woodenChestPieceButton.Click += Item_Click;
+
+      _subButtons = new List<CraftingMenuSubButton>()
+      {
+        woodenChestPieceButton,
+      };
+
+      foreach (var component in _subButtons)
+        component.LoadContent(_content);
+
+      _professionRequired = "Blacksmith";
+    }
+
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       if (_gameScreen.State != States.GameStates.CraftingMenu)
@@ -76,14 +110,14 @@ namespace TopDown.Controls.CraftingMenu
 
             x += increment;
           }
-          else if(i == list.Count - 1) // if it's the last, let the player know how many other items are being crafted
+          else if (i == list.Count - 1) // if it's the last, let the player know how many other items are being crafted
           {
             var text = "+" + extraCount;
 
             var newX = x + 20 - (_font.MeasureString(text).X / 2);
             var newY = y + 20 - (_font.MeasureString(text).Y / 2);
 
-            spriteBatch.DrawString(_font, text , new Vector2(newX, newY), Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.99f);
+            spriteBatch.DrawString(_font, text, new Vector2(newX, newY), Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.99f);
           }
         }
       }
@@ -109,10 +143,7 @@ namespace TopDown.Controls.CraftingMenu
     {
       base.LoadContent(content);
 
-      _queueSprite = new Sprite(content.Load<Texture2D>("Controls/CraftingQueue"))
-      {
-        Position = new Vector2(_windowSprite.Rectangle.X, _windowSprite.Rectangle.Bottom + 5),
-      };
+      _queueSprite = new Sprite(content.Load<Texture2D>("Controls/CraftingQueue"));
 
       _mainButtonTexture = content.Load<Texture2D>("Controls/BuildMenuMainOptionButton"); _subButtonTexture = content.Load<Texture2D>("Controls/BuildMenuSubOptionButton");
 
@@ -121,7 +152,6 @@ namespace TopDown.Controls.CraftingMenu
       var weaponsButton = new Button(_mainButtonTexture, _font)
       {
         Text = "Weapons",
-        Position = new Vector2(Position.X + 11, Position.Y + 56),
         Layer = 0.99f,
       };
 
@@ -130,7 +160,6 @@ namespace TopDown.Controls.CraftingMenu
       var armourButton = new Button(_mainButtonTexture, _font)
       {
         Text = "Armour",
-        Position = new Vector2(weaponsButton.Position.X, weaponsButton.Rectangle.Bottom + 5),
         Layer = 0.99f,
       };
 
@@ -139,7 +168,6 @@ namespace TopDown.Controls.CraftingMenu
       var medicineButton = new Button(_mainButtonTexture, _font)
       {
         Text = "Medicine",
-        Position = new Vector2(armourButton.Position.X, armourButton.Rectangle.Bottom + 5),
         Layer = 0.99f,
       };
 
@@ -167,7 +195,6 @@ namespace TopDown.Controls.CraftingMenu
       foreach (var component in _mainButtons)
         component.LoadContent(content);
 
-      ComboBox.Position = new Vector2(_closeButton.Position.X - ComboBox.Width - 5, _closeButton.Position.Y);
       ComboBox.Layer = _closeButton.Layer;
 
       _subButtons = new List<CraftingMenuSubButton>();
@@ -180,40 +207,6 @@ namespace TopDown.Controls.CraftingMenu
       _subButtons = new List<CraftingMenuSubButton>();
 
       _professionRequired = "Doctor";
-    }
-
-    private void ArmourButton_Click(object sender, EventArgs e)
-    {
-      var category = ItemCategories.Armour;
-
-      var woodenChestPieceButton = new CraftingMenuSubButton(_subButtonTexture, _font,
-        new Item(_content.Load<Texture2D>("Items/WoodenChestPiece"), 3, "Wooden Chest Piece", category)
-        {
-          ExperienceValue = 3,
-          ResourceCost = new Models.Resources()
-          {
-            Wood = 5,
-          },
-          Stats = new ArmourStats()
-          {
-            ArmourGained = 2,
-          }
-        })
-      {
-        Layer = 0.99f,
-      };
-
-      woodenChestPieceButton.Click += Item_Click;
-
-      _subButtons = new List<CraftingMenuSubButton>()
-      {
-        woodenChestPieceButton,
-      };
-
-      foreach (var component in _subButtons)
-        component.LoadContent(_content);
-
-      _professionRequired = "Blacksmith";
     }
 
     private void WeaponsButton_Click(object sender, EventArgs e)
@@ -279,11 +272,19 @@ namespace TopDown.Controls.CraftingMenu
       if (_gameScreen.State != States.GameStates.CraftingMenu)
         return;
 
+      base.Update(gameTime);
+
       ComboBox.IsEnabled = false;
       ComboBox.IsVisible = false;
 
+      var buttonY = _windowSprite.Position.Y + 56;
+
       foreach (var component in _mainButtons)
       {
+        component.Position = new Vector2(_windowSprite.Position.X + 11, buttonY);
+
+        buttonY += component.Rectangle.Height + 5;
+
         // Sets the colour of the selected button
         if (component.IsClicked)
         {
@@ -295,7 +296,7 @@ namespace TopDown.Controls.CraftingMenu
           component.IsSelected = true;
         }
 
-        if(component.IsSelected)
+        if (component.IsSelected)
         {
           ComboBox.IsEnabled = true;
           ComboBox.IsVisible = true;
@@ -304,24 +305,27 @@ namespace TopDown.Controls.CraftingMenu
         component.Update(gameTime);
       }
 
+      ComboBox.Position = new Vector2(_closeButton.Position.X - ComboBox.Width - 5, _closeButton.Position.Y);
+      _queueSprite.Position = new Vector2(_windowSprite.Rectangle.X, _windowSprite.Rectangle.Bottom + 5);
+
       foreach (var component in Components)
         component.Update(gameTime);
 
-      var x = Position.X + 196;
-      var xIncrement = 0;
+      var subButtonX = _windowSprite.Position.X + 196;
+      var subButtonXIncrement = 0;
 
-      var y = Position.Y + 56;
+      var subButtonY = _windowSprite.Position.Y + 56;
 
       foreach (var component in _subButtons)
       {
-        component.Position = new Vector2(x + xIncrement, y);
+        component.Position = new Vector2(subButtonX + subButtonXIncrement, subButtonY);
 
-        xIncrement += component.Rectangle.Width + 5;
+        subButtonXIncrement += component.Rectangle.Width + 5;
 
-        if (x + xIncrement > 708)
+        if (subButtonX + subButtonXIncrement > 708)
         {
-          y += component.Rectangle.Height + 5;
-          xIncrement = 0;
+          subButtonY += component.Rectangle.Height + 5;
+          subButtonXIncrement = 0;
         }
 
         component.Update(gameTime);

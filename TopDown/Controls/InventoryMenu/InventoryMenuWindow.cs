@@ -126,11 +126,20 @@ namespace TopDown.Controls.InventoryMenu
         return;
       }
 
+      base.Update(gameTime);
+
       foreach (var component in Components)
         component.Update(gameTime);
 
+      var mainX = _windowSprite.Position.X + 11;
+      var mainY= _windowSprite.Position.Y + 56;
+      var mainYIncrement = _mainButtonTexture.Height + 5;
+
       foreach (var component in _mainButtons)
       {
+        component.Position = new Vector2(mainX, mainY);
+        mainY += mainYIncrement;
+
         // Sets the colour of the selected button
         if (component.IsClicked)
         {
@@ -145,10 +154,10 @@ namespace TopDown.Controls.InventoryMenu
         component.Update(gameTime);
       }
 
-      var x = Position.X + 196;
+      var x = _windowSprite.Position.X + 196;
       var xIncrement = 0;
 
-      var y = Position.Y + 56;
+      var y = _windowSprite.Position.Y + 56;
 
       foreach (var component in _items)
       {

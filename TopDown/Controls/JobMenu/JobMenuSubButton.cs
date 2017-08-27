@@ -54,7 +54,11 @@ namespace TopDown.Controls.JobMenu
       DrawNPCIcon(gameTime, spriteBatch);
 
       foreach (var component in Components)
+      {
+        var position = new Vector2(Rectangle.Right - component.Rectangle.Width - 5, Rectangle.Top + 5);
+        component.Position = position;
         component.Draw(gameTime, spriteBatch);
+      }
 
       if (_font != null)
       {
@@ -94,11 +98,8 @@ namespace TopDown.Controls.JobMenu
 
       var minusTexture = content.Load<Texture2D>("Controls/Minus");
 
-      var position = new Vector2(Rectangle.Right - addTexture.Width - 5, Rectangle.Top + 5);
-
       Add = new Button(addTexture)
       {
-        Position = position,
         Layer = Layer + 0.001f,
       };
 
@@ -106,7 +107,6 @@ namespace TopDown.Controls.JobMenu
 
       Minus = new Button(minusTexture)
       {
-        Position = position,
         Layer = Layer + 0.001f,
         IsVisible = false,
       };

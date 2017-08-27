@@ -29,6 +29,18 @@ namespace TopDown.Controls.JobMenu
     /// </summary>
     public JobMenuButton JobButton;
 
+    private void Button_Click(object sender, EventArgs e)
+    {
+      foreach (var component in Buttons)
+        component.IsSelected = false;
+
+      var button = sender as JobMenuButton;
+
+      button.IsSelected = true;
+
+      JobButton = button;
+    }
+
     public override void CheckCollision(Component component)
     {
 
@@ -42,11 +54,37 @@ namespace TopDown.Controls.JobMenu
       foreach (var component in Components)
         component.Draw(gameTime, spriteBatch);
 
+      var x = _windowSprite.Position.X + 11;
+      var y = _windowSprite.Position.Y + 56;
+
       foreach (var component in Buttons)
+      {
+        component.Position = new Vector2(x, y);
+
+        y += component.Rectangle.Height + 5;
+
         component.Draw(gameTime, spriteBatch);
+      }
+
+      var subButtonX = _windowSprite.Position.X + 196;
+      var subButtonXIncrement = 0;
+
+      var subButtonY = _windowSprite.Position.Y + 56;
 
       foreach (var component in _subButtons)
+      {
+        component.Position = new Vector2(subButtonX + subButtonXIncrement, subButtonY);
+
+        subButtonXIncrement += component.Rectangle.Width + 5;
+
+        if (subButtonX + subButtonXIncrement > _windowSprite.Rectangle.Right - 12)
+        {
+          subButtonY += component.Rectangle.Height + 5;
+          subButtonXIncrement = 0;
+        }
+
         component.Draw(gameTime, spriteBatch);
+      }
 
       spriteBatch.DrawString(base._font, "Jobs", _fontPosition, Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.99f);
     }
@@ -87,6 +125,8 @@ namespace TopDown.Controls.JobMenu
         return;
       }
 
+      base.Update(gameTime);
+
       SetButtons();
 
       SetSubButton();
@@ -119,16 +159,12 @@ namespace TopDown.Controls.JobMenu
       if (Buttons.Count > 0)
         return;
 
-      var x = Position.X + 11;
-      var y = Position.Y + 56;
-
       foreach (var component in _gameScreen.Workplaces)
       {
         var button = new JobMenuButton(_buttonTexture, base._font)
         {
           Layer = 0.99f,
           Text = component.Name,
-          Position = new Vector2(x, y),
           JobBuilding = component,
         };
 
@@ -137,21 +173,7 @@ namespace TopDown.Controls.JobMenu
         button.LoadContent(_content);
 
         Buttons.Add(button);
-
-        y += button.Rectangle.Height + 5;
       }
-    }
-
-    private void Button_Click(object sender, EventArgs e)
-    {
-      foreach (var component in Buttons)
-        component.IsSelected = false;
-
-      var button = sender as JobMenuButton;
-
-      button.IsSelected = true;
-
-      JobButton = button;
     }
 
     private void SetSubButton()
@@ -159,26 +181,12 @@ namespace TopDown.Controls.JobMenu
       if (_subButtons.Count > 0)
         return;
 
-      var x = Position.X + 196;
-      var xIncrement = 0;
-
-      var y = Position.Y + 56;
-
       foreach (var npc in _gameScreen.NPCComponents)
       {
         var button = new JobMenuSubButton(_subButtonTexture, _font, (NPC)npc)
         {
           Layer = 0.99f,
-          Position = new Vector2(x + xIncrement, y)
         };
-
-        xIncrement += button.Rectangle.Width + 5;
-
-        if (x + xIncrement > 708)
-        {
-          y += button.Rectangle.Height + 5;
-          xIncrement = 0;
-        }
 
         button.LoadContent(_content);
 

@@ -37,9 +37,13 @@ namespace TopDown
       //this.graphics.SynchronizeWithVerticalRetrace = false;
       Window.AllowUserResizing = true;
 
-      _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
+      var height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
 
-      _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+      var width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+
+      _graphics.PreferredBackBufferHeight = Math.Max(height, 480);
+
+      _graphics.PreferredBackBufferWidth = Math.Max(width, 800);
 
       _graphics.ApplyChanges();
 

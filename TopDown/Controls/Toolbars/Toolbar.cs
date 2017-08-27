@@ -34,27 +34,27 @@ namespace TopDown.Controls.Toolbars
 
       _toolbarSprite.Draw(gameTime, spriteBatch);
 
-      foreach (var icon in _icons)
-        icon.Draw(gameTime, spriteBatch);
-    }
-
-    protected void InitializeIcons(ContentManager content)
-    {
       var x = _toolbarSprite.Position.X;
 
       foreach (var icon in _icons)
       {
-        icon.LoadContent(content);
-
         icon.Position = new Vector2(x, _toolbarSprite.Position.Y);
 
         x += icon.Rectangle.Width;
+
+        icon.Draw(gameTime, spriteBatch);
       }
+    }
+
+    protected void InitializeIcons(ContentManager content)
+    {
+      foreach (var icon in _icons)
+        icon.LoadContent(content);
     }
 
     public override void LoadContent(ContentManager content)
     {
-      
+
     }
 
     public Toolbar(GameScreen gameScreen)
