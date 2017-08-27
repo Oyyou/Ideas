@@ -31,6 +31,7 @@ using TopDown.Logic;
 using TopDown.Resources;
 using TopDown.Sprites;
 using static TopDown.Logic.Pathfinder;
+using Penumbra;
 
 namespace TopDown.States
 {
@@ -71,6 +72,13 @@ namespace TopDown.States
     private List<Component> _guiComponents;
 
     private RenderTarget2D _renderTarget;
+
+    private PenumbraComponent penumbra;
+    Vector2 baseScreenSize = Vector2.Zero;
+    private Matrix globalTransformation;
+
+    List<Hull> HullList = new List<Hull>();
+    Hull hull;
 
     public IEnumerable<Building> BuildingComponents
     {
@@ -223,40 +231,50 @@ namespace TopDown.States
 
       GameComponents.Add(npc);
     }
+    
 
     public override void Draw(GameTime gameTime)
     {
+      if(baseScreenSize == Vector2.Zero)
+        SetGlobalTransform();
+
       // Set the render target
-      //_graphicsDevice.SetRenderTarget(_renderTarget);
+      _graphicsDevice.SetRenderTarget(_renderTarget);
 
       //_graphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
       _graphicsDevice.Clear(Color.Black);
-
+      penumbra.BeginDraw();
       //var scale = Matrix.CreateScale(Game1.ScreenWidth / (float)Game1.ScreenHeight, Game1.ScreenWidth / (float)Game1.ScreenHeight, 1);
 
       _spriteBatch.Begin(
         SpriteSortMode.FrontToBack,
         BlendState.AlphaBlend,
         SamplerState.PointWrap, null, null, null,
-        _camera.Transform);// * scale);
+       globalTransformation);// * scale);
 
       foreach (var component in GameComponents)
         component.Draw(gameTime, _spriteBatch);
+      
 
       _spriteBatch.End();
+      // Draw the actual lit scene.
+      penumbra.Draw(gameTime);
 
       // Drop the render target
-      //_graphicsDevice.SetRenderTarget(null);
+      _graphicsDevice.SetRenderTarget(null);
 
-      //_graphicsDevice.Clear(Color.Black);
+    
 
-      //_spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied,
-      //            SamplerState.LinearClamp, DepthStencilState.None,
-      //            RasterizerState.CullNone, _effect);
+      _graphicsDevice.Clear(Color.Black);
 
-      //_spriteBatch.Draw(_renderTarget, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.White);
+      _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
+                  SamplerState.LinearClamp, DepthStencilState.None,
+                  RasterizerState.CullNone, _effect,  _camera.Transform);
 
-      //_spriteBatch.End();
+      _spriteBatch.Draw(_renderTarget, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.White);
+     
+      _spriteBatch.End();
+
 
       DrawGui(gameTime);
     }
@@ -464,37 +482,37 @@ namespace TopDown.States
             switch (data.GID)
             {
               case 8:
-                GameComponents.Add(
-                  new Rock(texture, this)
-                  {
-                    Layer = 0.1f,
-                    Position = position,
-                    SourceRectangle = sourceRectangle,
-                  }
-                );
-                break;
+              GameComponents.Add(
+                new Rock(texture, this)
+                {
+                  Layer = 0.1f,
+                  Position = position,
+                  SourceRectangle = sourceRectangle,
+                }
+              );
+              break;
 
               case 9:
-                GameComponents.Add(
-                  new Path(texture)
-                  {
-                    Layer = 0.1f,
-                    Position = position,
-                    SourceRectangle = sourceRectangle,
-                  }
-                );
-                break;
+              GameComponents.Add(
+                new Path(texture)
+                {
+                  Layer = 0.1f,
+                  Position = position,
+                  SourceRectangle = sourceRectangle,
+                }
+              );
+              break;
 
               default:
-                GameComponents.Add(
-                  new Sprite(texture)
-                  {
-                    Layer = 0.1f,
-                    Position = position,
-                    SourceRectangle = sourceRectangle,
-                  }
-                );
-                break;
+              GameComponents.Add(
+                new Sprite(texture)
+                {
+                  Layer = 0.1f,
+                  Position = position,
+                  SourceRectangle = sourceRectangle,
+                }
+              );
+              break;
             }
           }
 
@@ -539,119 +557,222 @@ namespace TopDown.States
         {
           case "Blacksmith":
 
-            var blacksmith = new Blacksmith(this,
-              _content.Load<Texture2D>("Buildings/Blacksmith/In"),
-              _content.Load<Texture2D>("Buildings/Blacksmith/Out_Top"),
-              _content.Load<Texture2D>("Buildings/Blacksmith/Out_Bottom"));
+          var blacksmith = new Blacksmith(this,
+            _content.Load<Texture2D>("Buildings/Blacksmith/In"),
+            _content.Load<Texture2D>("Buildings/Blacksmith/Out_Top"),
+            _content.Load<Texture2D>("Buildings/Blacksmith/Out_Bottom"));
 
-            blacksmith.LoadContent(_content);
+          blacksmith.LoadContent(_content);
 
-            foreach (var collisionObject in objectGroup.CollisionObjects)
+          foreach (var collisionObject in objectGroup.CollisionObjects)
+          {
+            var position = new Vector2(collisionObject.X, collisionObject.Y);
+
+            switch (collisionObject.Name)
             {
-              var position = new Vector2(collisionObject.X, collisionObject.Y);
+              case "Building":
 
-              switch (collisionObject.Name)
+              blacksmith.Position = position;
+
+              break;
+
+              case "Anvil":
+              var anvil = new Furniture(_content.Load<Texture2D>("Furniture/Anvil"), this)
               {
-                case "Building":
+                Position = position,
+                State = PlacableObjectStates.Placed,
+              };
 
-                  blacksmith.Position = position;
+              anvil.LoadContent(_content);
 
-                  break;
+              blacksmith.Components.Add(anvil);
 
-                case "Anvil":
-                  var anvil = new Furniture(_content.Load<Texture2D>("Furniture/Anvil"), this)
-                  {
-                    Position = position,
-                    State = PlacableObjectStates.Placed,
-                  };
+              break;
 
-                  anvil.LoadContent(_content);
-
-                  blacksmith.Components.Add(anvil);
-
-                  break;
-
-                default:
-                  throw new Exception("Unknown object: " + collisionObject.Name);
-              }
+              default:
+              throw new Exception("Unknown object: " + collisionObject.Name);
             }
+          }
 
-            blacksmith.State = BuildingStates.Built_Out;
-            GameComponents.Add(blacksmith);
+          blacksmith.State = BuildingStates.Built_Out;
+          GameComponents.Add(blacksmith);
 
-            break;
+          break;
 
           case "SmallHouse":
 
-            var smallHouse = new SmallHouse(this,
-              _content.Load<Texture2D>("Buildings/SmallHouse/In"),
-              _content.Load<Texture2D>("Buildings/SmallHouse/Out_Top"),
-              _content.Load<Texture2D>("Buildings/SmallHouse/Out_Bottom"));
+          var smallHouse = new SmallHouse(this,
+            _content.Load<Texture2D>("Buildings/SmallHouse/In"),
+            _content.Load<Texture2D>("Buildings/SmallHouse/Out_Top"),
+            _content.Load<Texture2D>("Buildings/SmallHouse/Out_Bottom"));
 
-            smallHouse.LoadContent(_content);
+          smallHouse.LoadContent(_content);
 
-            foreach (var collisionObject in objectGroup.CollisionObjects)
+          foreach (var collisionObject in objectGroup.CollisionObjects)
+          {
+            var position = new Vector2(collisionObject.X, collisionObject.Y);
+
+            switch (collisionObject.Name)
             {
-              var position = new Vector2(collisionObject.X, collisionObject.Y);
+              case "Building":
 
-              switch (collisionObject.Name)
+              smallHouse.Position = position;
+
+              break;
+
+              case "Bed":
+              var bed = new Furniture(_content.Load<Texture2D>("Furniture/Bed"), this)
               {
-                case "Building":
+                Position = position,
+                State = PlacableObjectStates.Placed,
+              };
 
-                  smallHouse.Position = position;
+              bed.LoadContent(_content);
 
-                  break;
+              smallHouse.Components.Add(bed);
 
-                case "Bed":
-                  var bed = new Furniture(_content.Load<Texture2D>("Furniture/Bed"), this)
-                  {
-                    Position = position,
-                    State = PlacableObjectStates.Placed,
-                  };
+              break;
 
-                  bed.LoadContent(_content);
-
-                  smallHouse.Components.Add(bed);
-
-                  break;
-
-                default:
-                  throw new Exception("Unknown object: " + collisionObject.Name);
-              }
+              default:
+              throw new Exception("Unknown object: " + collisionObject.Name);
             }
+          }
 
-            smallHouse.State = BuildingStates.Built_Out;
-            GameComponents.Add(smallHouse);
+          smallHouse.State = BuildingStates.Built_Out;
+          GameComponents.Add(smallHouse);
 
-            break;
+          break;
 
           case "NPCs":
 
-            foreach (var collisionObject in objectGroup.CollisionObjects)
+          foreach (var collisionObject in objectGroup.CollisionObjects)
+          {
+            var position = new Vector2(collisionObject.X, collisionObject.Y);
+
+            var npc = new NPC(playerAnimations, this)
             {
-              var position = new Vector2(collisionObject.X, collisionObject.Y);
+              Position = position,
+              IsCollidable = false,
+              Layer = Building.DefaultLayer + 0.001f,
+            };
 
-              var npc = new NPC(playerAnimations, this)
-              {
-                Position = position,
-                IsCollidable = false,
-                Layer = Building.DefaultLayer + 0.001f,
-              };
+            npc.LoadContent(_content);
 
-              npc.LoadContent(_content);
+            GameComponents.Add(npc);
+          }
 
-              GameComponents.Add(npc);
-            }
-
-            break;
+          break;
 
           default:
-            //throw new Exception("Unknown group: " + objectGroup.Name);
-            break;
+          //throw new Exception("Unknown group: " + objectGroup.Name);
+          break;
         }
       }
 
       UpdateMap();
+
+
+      // Create our lighting component and register it as a service so that subsystems can access it.--------------
+      penumbra = new PenumbraComponent(_game)
+      {
+        AmbientColor = new Color(new Vector3(0.1f))
+      };
+      // Create sample light source and shadow hull.
+      Light light = new PointLight
+      {
+        Color = new Color(255,140,0),
+        Scale = new Vector2(360), // Range of the light source (how far the light will travel)
+        ShadowType = ShadowType.Solid, // Will not lit hulls themselves
+        Position = new Vector2(550, 240),
+        Intensity = 1.5f
+
+      };
+
+      Light light2 = new PointLight
+      {
+        Scale = new Vector2(360), // Range of the light source (how far the light will travel)
+        ShadowType = ShadowType.Solid, // Will not lit hulls themselves
+        
+      };
+
+      hull = new Hull(new Vector2(1.0f), new Vector2(-1.0f, 1.0f), new Vector2(-1.0f), new Vector2(1.0f, -1.0f))
+      {
+        Position = new Vector2(400f, 400f),
+        Scale = new Vector2(50)
+      };
+
+
+      penumbra.Hulls.Add(hull);
+
+      hull = new Hull(new Vector2(1.0f), new Vector2(-1.0f, 1.0f), new Vector2(-1.0f), new Vector2(1.0f, -1.0f))
+      {
+        Position = new Vector2(400f, 600f),
+        Scale = new Vector2(50)
+      };
+
+
+      penumbra.Hulls.Add(hull);
+
+      hull = new Hull(new Vector2(1.0f), new Vector2(-1.0f, 1.0f), new Vector2(-1.0f), new Vector2(1.0f, -1.0f))
+      {
+        Position = new Vector2(600f, 600f),
+        Scale = new Vector2(50)
+      };
+
+
+      penumbra.Hulls.Add(hull);
+
+      hull = new Hull(new Vector2(1.0f), new Vector2(-1.0f, 1.0f), new Vector2(-1.0f), new Vector2(1.0f, -1.0f))
+      {
+        Position = new Vector2(400f, 750f),
+        Scale = new Vector2(50)
+      };
+
+
+      penumbra.Hulls.Add(hull);
+
+      hull = new Hull(new Vector2(1.0f), new Vector2(-1.0f, 1.0f), new Vector2(-1.0f), new Vector2(1.0f, -1.0f))
+      {
+        Position = new Vector2(400f, 900f),
+        Scale = new Vector2(50)
+      };
+
+      //create all the hulls unsing the CollisionRectangles
+      foreach (var collisionRectangle in GameComponents.SelectMany(a=> a.CollisionRectangles))
+      {
+        Hull tempHull = new Hull(new Vector2(collisionRectangle.Right, collisionRectangle.Top), new Vector2(collisionRectangle.Left, collisionRectangle.Top), new Vector2(collisionRectangle.Right, collisionRectangle.Bottom), new Vector2(collisionRectangle.Left, collisionRectangle.Bottom))
+        {
+          Position = collisionRectangle.Location.ToVector2(),
+          Scale = new Vector2(collisionRectangle.Width*collisionRectangle.Height)
+
+        };
+
+        HullList.Add(tempHull);
+      }
+
+
+      penumbra.Lights.Add(light);
+      penumbra.Lights.Add(light2);
+      penumbra.Hulls.Add(hull);
+      penumbra.Hulls.AddRange(HullList);
+      _game.Services.AddService(penumbra);
+      //-----------------------------------------------------------------------------------------------------------
+
+      // Load penumbra
+      penumbra.Initialize();
+
+    }
+
+    private void SetGlobalTransform()
+    {
+      baseScreenSize = new Vector2(_graphicsDevice.DisplayMode.Width, _graphicsDevice.DisplayMode.Height);
+      //-----------------------------------------------------------------------------------------------------------
+      //Work out how much we need to scale our graphics to fill the screen
+      float horScaling = _graphicsDevice.PresentationParameters.BackBufferWidth / baseScreenSize.X;
+      float verScaling = _graphicsDevice.PresentationParameters.BackBufferHeight / baseScreenSize.Y;
+      Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
+      globalTransformation = Matrix.CreateScale(screenScalingFactor);
+      penumbra.Transform = globalTransformation;
     }
 
     private void MenuUpdate(GameTime gameTime, Keys menuKey)
@@ -826,6 +947,7 @@ namespace TopDown.States
         }
 
         State = GameStates.CraftingMenu;
+     
       }
 
       if (Keyboard.IsKeyPressed(Keys.I))
@@ -865,48 +987,38 @@ namespace TopDown.States
       _guiComponents.Clear();
     }
 
-    public static void Transform(ref Vector2 position, ref Vector2 origin, ref Vector2 scale, float rotation,
-            out Matrix transform)
+    public Vector2 GetMouseWithCameraPosition()
     {
-      var cos = (float)Math.Cos(rotation);
-      var sin = (float)Math.Sin(rotation);
+      Matrix inverseTransform = Matrix.Invert(globalTransformation);
 
-      Vector2 scaledOrigin;
-      Vector2.Multiply(ref origin, ref scale, out scaledOrigin);
-
-      Vector2 transformedOrigin;
-      transformedOrigin.X = scaledOrigin.X * cos - scaledOrigin.Y * sin;
-      transformedOrigin.Y = scaledOrigin.X * sin + scaledOrigin.Y * cos;
-
-      transform.M11 = scale.X * cos;
-      transform.M12 = scale.X * sin;
-      transform.M13 = 0.0f;
-      transform.M14 = 0.0f;
-      transform.M21 = scale.Y * -sin;
-      transform.M22 = scale.Y * cos;
-      transform.M23 = 0.0f;
-      transform.M24 = 0.0f;
-      transform.M31 = 0.0f;
-      transform.M32 = 0.0f;
-      transform.M33 = 1.0f;
-      transform.M34 = 0.0f;
-      transform.M41 = position.X - transformedOrigin.X;
-      transform.M42 = position.Y - transformedOrigin.Y;
-      transform.M43 = 0.0f;
-      transform.M44 = 1.0f;
+      return Vector2.Transform(new Vector2(Mouse.PositionWithCamera.X, Mouse.PositionWithCamera.Y), inverseTransform);
     }
-
+    
     public override void Update(GameTime gameTime)
     {
       if (Keyboard.IsKeyPressed(Keys.T))
         Notifications.Add(Time, "This is a test notification");
 
+<<<<<<< HEAD
       _camera.Update();
 
+=======
+
+      
+
+
+      penumbra.Lights[1].Position = GetMouseWithCameraPosition();
+
+      double randomNumber = new Random().NextDouble();
+      penumbra.Lights[0].Intensity = MathHelper.Lerp(0, 1.5f, (float)randomNumber);
+
+      
+>>>>>>> origin/master
       // TODO: Might be an idea to 'hard-code' the darkness for different times of the day.
       //  I can't see how maths can be used for daylight. Yes.
       float someMaths = (float)Math.Sin((-MathHelper.PiOver2 + 2 * Math.PI * (Time.Hour + (Time.Minute / 60))) / 48);
       float DarknessLevel = Math.Abs(MathHelper.SmoothStep(12f, 2f, someMaths));
+<<<<<<< HEAD
 
       //var Position = new Vector2(50, 50);
       //var Scale = new Vector2(50);
@@ -922,6 +1034,9 @@ namespace TopDown.States
       //_effect.Parameters["LightColor"].SetValue(new Vector3(1, 1, 1));
       //_effect.Parameters["LightIntensity"].SetValue(1.5f);
       // _effect.Parameters["DarknessLevel"].SetValue(1f);
+=======
+      
+>>>>>>> origin/master
 
       switch (State)
       {
