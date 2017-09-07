@@ -39,7 +39,17 @@ namespace TopDown.Controls
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      throw new NotImplementedException();
+      _windowSprite.Position = new Vector2(
+        (GameEngine.ScreenWidth / 2) - (_windowSprite.Rectangle.Width / 2),
+        25f);
+
+      _fontPosition = new Vector2(
+        _windowSprite.Position.X + 5,
+        _windowSprite.Position.Y + 5);
+
+      _closeButton.Position = new Vector2(
+          _windowSprite.Rectangle.Right - _closeButton.Rectangle.Width - 5,
+          _windowSprite.Rectangle.Top + 5);
     }
 
     public override void LoadContent(ContentManager content)
@@ -92,17 +102,7 @@ namespace TopDown.Controls
 
     public override void Update(GameTime gameTime)
     {
-      _windowSprite.Position = new Vector2(
-   (GameEngine.ScreenWidth / 2) - (_windowSprite.Rectangle.Width / 2),
-   25f);
-
-      _fontPosition = new Vector2(
-        _windowSprite.Position.X + 5,
-        _windowSprite.Position.Y + 5);
-
-      _closeButton.Position = new Vector2(
-          _windowSprite.Rectangle.Right - _closeButton.Rectangle.Width - 5,
-          _windowSprite.Rectangle.Top + 5);
+      throw new NotImplementedException();
     }
   }
 }

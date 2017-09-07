@@ -35,6 +35,9 @@ namespace Engine.Sprites
     {
       get
       {
+        if (!IsCollidable)
+          return new List<Rectangle>();
+
         return new List<Rectangle>()
         {
           Rectangle,

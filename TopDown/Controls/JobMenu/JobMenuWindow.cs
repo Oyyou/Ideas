@@ -51,6 +51,8 @@ namespace TopDown.Controls.JobMenu
       if (_gameScreen.State != States.GameStates.JobMenu)
         return;
 
+      base.Draw(gameTime, spriteBatch);
+
       foreach (var component in Components)
         component.Draw(gameTime, spriteBatch);
 
@@ -124,8 +126,6 @@ namespace TopDown.Controls.JobMenu
 
         return;
       }
-
-      base.Update(gameTime);
 
       SetButtons();
 

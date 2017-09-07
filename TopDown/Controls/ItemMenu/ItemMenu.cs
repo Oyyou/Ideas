@@ -74,7 +74,7 @@ namespace TopDown.Controls.ItemMenu
 
       if (_gameScreen.SelectedBuilding != null)
       {
-        _gameScreen.SelectedBuilding.State = BuildingStates.Building;
+        _gameScreen.SelectedBuilding.State = BuildingStates.Constructing;
         _gameScreen.SelectedBuilding = null;
       }
 

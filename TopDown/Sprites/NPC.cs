@@ -43,9 +43,9 @@ namespace TopDown.Sprites
     #region Properties
 
     /// <summary>
-    /// Build a building
+    /// Construct a building
     /// </summary>
-    public event WorkEvent Build;
+    public event WorkEvent Construct;
 
     /// <summary>
     /// We don't need the NPCs to collide with anything
@@ -66,6 +66,11 @@ namespace TopDown.Sprites
     public List<Item> CraftingItems { get; set; }
 
     /// <summary>
+    /// Demolish a building
+    /// </summary>
+    public event WorkEvent Demolish;
+
+    /// <summary>
     /// The image shown on the "Job Menu"
     /// </summary>
     public Sprite DisplaySprite { get; private set; }
@@ -75,7 +80,7 @@ namespace TopDown.Sprites
     /// </summary>
     public Building Home { get; set; }
 
-    public bool IsBuilding { get { return Build != null; } }
+    public bool IsBuilding { get { return Construct != null; } }
 
     public bool IsWorking { get { return Work != null; } }
 
@@ -134,8 +139,11 @@ namespace TopDown.Sprites
 
       Work += Workplace.Work;
 
-      if (Build != null)
-        Build -= Build;
+      if (Construct != null)
+        Construct -= Construct;
+
+      if (Demolish != null)
+        Demolish -= Demolish;
     }
 
     public override void LoadContent(ContentManager content)
@@ -238,7 +246,8 @@ namespace TopDown.Sprites
 
       var isWorkHours = _gameScreen.Time.Hour >= 8 && _gameScreen.Time.Hour < 17;
       var goWork = Work != null && isWorkHours;
-      var build = Build != null && isWorkHours;
+      var build = Construct != null && isWorkHours;
+      var demolish = Demolish != null && isWorkHours;
 
       if (goWork)
       {
@@ -246,7 +255,11 @@ namespace TopDown.Sprites
       }
       else if (build)
       {
-        Build(this, gameTime);
+        Construct(this, gameTime);
+      }
+      else if (demolish)
+      {
+        Demolish(this, gameTime);
       }
       else
       {

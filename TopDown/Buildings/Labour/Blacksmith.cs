@@ -34,7 +34,7 @@ namespace TopDown.Buildings.Labour
             CollisionRectangles = new List<Rectangle>();
             break;
           case BuildingStates.Placed:
-          case BuildingStates.Building:
+          case BuildingStates.Constructing:
             CollisionRectangles = new List<Rectangle>()
             {
               _spriteInside.Rectangle,
@@ -148,14 +148,9 @@ namespace TopDown.Buildings.Labour
         Text = "Inspect",
       };
 
-      var demolishButton = new OptionsButton(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
-      {
-        Text = "Demolish",
-      };
-
       _buttons = new List<OptionsButton>()
       {
-        demolishButton,
+        _demloshButton,
         inspectButton,
         _fireButton,
         _hireButton,

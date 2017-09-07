@@ -22,9 +22,10 @@ namespace TopDown.Buildings
   {
     Placing,
     Placed,
-    Building,
+    Constructing,
     Built_Out,
     Built_In,
+    Demolishing,
   }
 
   public class Building : Component
@@ -51,9 +52,13 @@ namespace TopDown.Buildings
       public Vector2 Position { get; set; }
     }
 
-    protected float _buildTimer;
-
     protected float _buttonTimer;
+
+    protected float _constructTimer;
+
+    protected OptionsButton _demloshButton;
+
+    protected float _demolishTimer;
 
     protected OptionsButton _fireButton;
 
@@ -63,7 +68,9 @@ namespace TopDown.Buildings
 
     protected float _hitTimer;
 
-    protected const float _maxBuildTimer = 2.5f;
+    protected const float _maxConstructTimer = 2.5f;
+
+    protected const float _maxDemolishTimer = 2.5f;
 
     protected const float _maxHitTimer = 0.3f;
 
@@ -275,7 +282,7 @@ namespace TopDown.Buildings
         {
           case BuildingStates.Placing:
           case BuildingStates.Placed:
-          case BuildingStates.Building:
+          case BuildingStates.Constructing:
             CollisionRectangles = new List<Rectangle>();
             break;
         }
@@ -305,47 +312,6 @@ namespace TopDown.Buildings
         component.Update(gameTime);
     }
 
-    public void BuildEvent(NPC npc, GameTime gameTime)
-    {
-      var doorLocation = DoorLocations.Where(c => c.IsValid).FirstOrDefault().Position;
-
-      // Walk to the door if we're not there
-      if (npc.Position != doorLocation)
-      {
-        npc.WalkTo(doorLocation);
-        return;
-      }
-
-      // Otherwise we wanna build it!
-      _hitTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-      if (_hitTimer > _maxHitTimer)
-      {
-        var positions = new List<Vector2>();
-
-        for (int i = 0; i < 10; i++)
-        {
-          GenerateParticle(_maxHitTimer);
-        }
-
-        _buildTimer += _hitTimer;
-
-        if (_buildTimer > _maxBuildTimer)
-        {
-          _gameScreen.Notifications.Add(_gameScreen.Time, $"{npc.Name} finished building {this.Name}");
-
-          State = BuildingStates.Built_Out;
-          _gameScreen.State = States.GameStates.Playing;
-          _gameScreen.UpdateMap();
-          npc.Build -= this.BuildEvent;
-        }
-
-        _hitTimer = 0f;
-
-        _soundEffectInstance.Play();
-      }
-    }
-
     public Building(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom)
     {
       _gameScreen = gameState;
@@ -372,9 +338,150 @@ namespace TopDown.Buildings
       };
     }
 
+    protected virtual bool CanPlace()
+    {
+      bool canPlace = false;
+
+      foreach (var component in _gameScreen.PathComponents)
+      {
+        if (component.Rectangle.Intersects(_spriteInside.Rectangle))
+        {
+          canPlace = false;
+          GameScreen.MessageBox.Show("Trying to build over path", false);
+          break;
+        }
+
+        DoorLocations.ForEach(c =>
+        {
+          if (c.Position == component.Position)
+          {
+            canPlace = true;
+            c.IsValid = true;
+          }
+        });
+      }
+
+      if (!canPlace && !GameScreen.MessageBox.IsVisible)
+        GameScreen.MessageBox.Show("Door needs to connect to path", false);
+
+      if (canPlace)
+      {
+        foreach (var component in _gameScreen.CollidableComponents)
+        {
+          if (component.CollisionRectangles.Any(c => c.Intersects(this.Rectangle)))
+          {
+            canPlace = false;
+            GameScreen.MessageBox.Show("Trying to build over object", false);
+            break;
+          }
+        }
+      }
+
+      return canPlace;
+    }
+
     public override void CheckCollision(Component component)
     {
 
+    }
+
+    /// <summary>
+    /// Construct the building
+    /// </summary>
+    /// <param name="npc">Who will be constructing</param>
+    /// <param name="gameTime"></param>
+    public void Construct(NPC npc, GameTime gameTime)
+    {
+      var doorLocation = DoorLocations.Where(c => c.IsValid).FirstOrDefault().Position;
+
+      // Walk to the door if we're not there
+      if (npc.Position != doorLocation)
+      {
+        npc.WalkTo(doorLocation);
+        return;
+      }
+
+      // Otherwise we wanna build it!
+      _hitTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+      if (_hitTimer > _maxHitTimer)
+      {
+        var positions = new List<Vector2>();
+
+        for (int i = 0; i < 10; i++)
+        {
+          GenerateParticle(_maxHitTimer);
+        }
+
+        _constructTimer += _hitTimer;
+
+        if (_constructTimer > _maxConstructTimer)
+        {
+          _gameScreen.Notifications.Add(_gameScreen.Time, $"{npc.Name} finished building {this.Name}");
+
+          State = BuildingStates.Built_Out;
+          _gameScreen.State = States.GameStates.Playing;
+          _gameScreen.UpdateMap();
+          npc.Construct -= this.Construct;
+        }
+
+        _hitTimer = 0f;
+
+        _soundEffectInstance.Play();
+      }
+    }
+
+    /// <summary>
+    /// Demolish the building
+    /// </summary>
+    /// <param name="npc">Who will be demolishing</param>
+    /// <param name="gameTime"></param>
+    public void Demolish(NPC npc, GameTime gameTime)
+    {
+      var doorLocation = DoorLocations.Where(c => c.IsValid).FirstOrDefault().Position;
+
+      // Walk to the door if we're not there
+      if (npc.Position != doorLocation)
+      {
+        npc.WalkTo(doorLocation);
+        return;
+      }
+
+      // Otherwise we wanna demolish it!
+      _hitTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+      if (_hitTimer > _maxHitTimer)
+      {
+        var positions = new List<Vector2>();
+
+        for (int i = 0; i < 10; i++)
+        {
+          GenerateParticle(_maxHitTimer);
+        }
+
+        _demolishTimer += _hitTimer;
+
+        if (_demolishTimer > _maxDemolishTimer)
+        {
+          _gameScreen.Notifications.Add(_gameScreen.Time, $"{npc.Name} finished demolishing {this.Name}");
+
+          IsRemoved = true;
+
+          State = BuildingStates.Built_Out;
+          _gameScreen.State = States.GameStates.Playing;
+          _gameScreen.UpdateMap();
+          npc.Demolish -= this.Demolish;
+        }
+
+        _hitTimer = 0f;
+
+        _soundEffectInstance.Play();
+      }
+    }
+
+    private void DemloshButton_Click(object sender, EventArgs e)
+    {
+      //State = BuildingStates.Demolishing;
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -410,7 +517,7 @@ namespace TopDown.Buildings
 
           break;
 
-        case BuildingStates.Building:
+        case BuildingStates.Constructing:
           _spriteInside.Draw(gameTime, spriteBatch);
 
           foreach (var particle in _particles)
@@ -434,6 +541,24 @@ namespace TopDown.Buildings
           break;
 
         case BuildingStates.Built_Out:
+
+          _spriteInside.Draw(gameTime, spriteBatch);
+
+          _spriteOutsideTop.Draw(gameTime, spriteBatch);
+
+          _spriteOutsideBottom.Draw(gameTime, spriteBatch);
+
+
+          foreach (var component in Components)
+            component.Draw(gameTime, spriteBatch);
+
+          DrawButtons(gameTime, spriteBatch);
+
+          //foreach (var rec in CollisionRectangles)
+          //  spriteBatch.Draw(texture: _t, destinationRectangle: rec, color: Color.Red, layerDepth: 1f);
+          break;
+
+        case BuildingStates.Demolishing:
 
           _spriteInside.Draw(gameTime, spriteBatch);
 
@@ -508,23 +633,31 @@ namespace TopDown.Buildings
 
       Components = new List<Component>();
 
-      var buttonTexture = content.Load<Texture2D>("Controls/Button");
-      var buttonFont = content.Load<SpriteFont>("Fonts/Font");
-
-      _fireButton = new OptionsButton(buttonTexture, buttonFont);
-      _fireButton.Text = "Fire";
-      _fireButton.LoadContent(content);
-      _fireButton.Click += FireButton_Click;
-
-      _hireButton = new OptionsButton(buttonTexture, buttonFont);
-      _hireButton.Text = "Hire";
-      _hireButton.LoadContent(content);
-      _hireButton.Click += HireButton_Click; ;
+      LoadButtons(content);
 
       _buttons = new List<OptionsButton>();
 
       foreach (var button in _buttons)
         button.LoadContent(content);
+    }
+
+    private void LoadButtons(ContentManager content)
+    {
+      var buttonTexture = content.Load<Texture2D>("Controls/Button");
+      var buttonFont = content.Load<SpriteFont>("Fonts/Font");
+
+      _demloshButton = new OptionsButton(buttonTexture, buttonFont);
+      _demloshButton.Text = "Demolish";
+      _demloshButton.Click += DemloshButton_Click;
+
+
+      _fireButton = new OptionsButton(buttonTexture, buttonFont);
+      _fireButton.Text = "Fire";
+      _fireButton.Click += FireButton_Click;
+
+      _hireButton = new OptionsButton(buttonTexture, buttonFont);
+      _hireButton.Text = "Hire";
+      _hireButton.Click += HireButton_Click;
     }
 
     private void HireButton_Click(object sender, EventArgs e)
@@ -593,7 +726,7 @@ namespace TopDown.Buildings
 
 
           break;
-        case BuildingStates.Building:
+        case BuildingStates.Constructing:
 
           if (NPCBuilder != null)
           {
@@ -613,7 +746,7 @@ namespace TopDown.Buildings
 
             NPCBuilder = npc;
 
-            NPCBuilder.Build += BuildEvent;
+            NPCBuilder.Construct += Construct;
           }
 
           Build(gameTime);
@@ -670,6 +803,31 @@ namespace TopDown.Buildings
 
 
           break;
+        case BuildingStates.Demolishing:
+
+          if (NPCBuilder != null)
+          {
+            if (NPCBuilder.IsWorking)
+              NPCBuilder = null;
+          }
+
+          if (NPCBuilder == null)
+          {
+            var npc = _gameScreen.NPCComponents
+              .Where(c => !c.IsBuilding && !c.IsWorking)
+              .OrderBy(c =>
+                Vector2.Distance(
+                  c.Home.DoorLocations.FirstOrDefault().Position,
+                  this.DoorLocations.Where(v => v.IsValid).FirstOrDefault().Position))
+              .FirstOrDefault();
+
+            NPCBuilder = npc;
+
+            NPCBuilder.Demolish += Demolish;
+          }
+
+          Build(gameTime);
+          break;
 
         default:
           break;
@@ -690,44 +848,9 @@ namespace TopDown.Buildings
 
       SetDoorLocations();
 
-      bool canPlace = false;
+      bool canPlace = CanPlace();
 
       _spriteInside.Color = Color.White;
-
-      foreach (var component in _gameScreen.PathComponents)
-      {
-        if (component.Rectangle.Intersects(_spriteInside.Rectangle))
-        {
-          canPlace = false;
-          GameScreen.MessageBox.Show("Trying to build over path", false);
-          break;
-        }
-
-        DoorLocations.ForEach(c =>
-        {
-          if (c.Position == component.Position)
-          {
-            canPlace = true;
-            c.IsValid = true;
-          }
-        });
-      }
-
-      if (!canPlace && !GameScreen.MessageBox.IsVisible)
-        GameScreen.MessageBox.Show("Door needs to connect to path", false);
-
-      if (canPlace)
-      {
-        foreach (var component in _gameScreen.CollidableComponents)
-        {
-          if (component.CollisionRectangles.Any(c => c.Intersects(this.Rectangle)))
-          {
-            canPlace = false;
-            GameScreen.MessageBox.Show("Trying to build over object", false);
-            break;
-          }
-        }
-      }
 
       if (!canPlace)
         _spriteInside.Color = Color.Red;

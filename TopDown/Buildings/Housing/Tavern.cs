@@ -32,7 +32,7 @@ namespace TopDown.Buildings.Housing
             CollisionRectangles = new List<Rectangle>();
             break;
           case BuildingStates.Placed:
-          case BuildingStates.Building:
+          case BuildingStates.Constructing:
             CollisionRectangles = new List<Rectangle>()
             {
               _spriteInside.Rectangle,

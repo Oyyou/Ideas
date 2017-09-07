@@ -74,14 +74,44 @@ namespace TopDown.Controls.CraftingMenu
       if (_gameScreen.State != States.GameStates.CraftingMenu)
         return;
 
+      base.Draw(gameTime, spriteBatch);
+
+      ComboBox.Position = new Vector2(_closeButton.Position.X - ComboBox.Width - 5, _closeButton.Position.Y);
+      _queueSprite.Position = new Vector2(_windowSprite.Rectangle.X, _windowSprite.Rectangle.Bottom + 5);
+
       foreach (var component in Components)
         component.Draw(gameTime, spriteBatch);
 
+      var buttonY = _windowSprite.Position.Y + 56;
+
       foreach (var component in _mainButtons)
+      {
+        component.Position = new Vector2(_windowSprite.Position.X + 11, buttonY);
+
+        buttonY += component.Rectangle.Height + 5;
+
         component.Draw(gameTime, spriteBatch);
+      }
+
+      var subButtonX = _windowSprite.Position.X + 196;
+      var subButtonXIncrement = 0;
+
+      var subButtonY = _windowSprite.Position.Y + 56;
 
       foreach (var component in _subButtons)
+      {
+        component.Position = new Vector2(subButtonX + subButtonXIncrement, subButtonY);
+
+        subButtonXIncrement += component.Rectangle.Width + 5;
+
+        if (subButtonX + subButtonXIncrement > 708)
+        {
+          subButtonY += component.Rectangle.Height + 5;
+          subButtonXIncrement = 0;
+        }
+
         component.Draw(gameTime, spriteBatch);
+      }
 
       if (ComboBox.SelectedItem != null)
       {
@@ -272,19 +302,11 @@ namespace TopDown.Controls.CraftingMenu
       if (_gameScreen.State != States.GameStates.CraftingMenu)
         return;
 
-      base.Update(gameTime);
-
       ComboBox.IsEnabled = false;
       ComboBox.IsVisible = false;
 
-      var buttonY = _windowSprite.Position.Y + 56;
-
       foreach (var component in _mainButtons)
       {
-        component.Position = new Vector2(_windowSprite.Position.X + 11, buttonY);
-
-        buttonY += component.Rectangle.Height + 5;
-
         // Sets the colour of the selected button
         if (component.IsClicked)
         {
@@ -305,31 +327,11 @@ namespace TopDown.Controls.CraftingMenu
         component.Update(gameTime);
       }
 
-      ComboBox.Position = new Vector2(_closeButton.Position.X - ComboBox.Width - 5, _closeButton.Position.Y);
-      _queueSprite.Position = new Vector2(_windowSprite.Rectangle.X, _windowSprite.Rectangle.Bottom + 5);
-
       foreach (var component in Components)
         component.Update(gameTime);
 
-      var subButtonX = _windowSprite.Position.X + 196;
-      var subButtonXIncrement = 0;
-
-      var subButtonY = _windowSprite.Position.Y + 56;
-
       foreach (var component in _subButtons)
-      {
-        component.Position = new Vector2(subButtonX + subButtonXIncrement, subButtonY);
-
-        subButtonXIncrement += component.Rectangle.Width + 5;
-
-        if (subButtonX + subButtonXIncrement > 708)
-        {
-          subButtonY += component.Rectangle.Height + 5;
-          subButtonXIncrement = 0;
-        }
-
         component.Update(gameTime);
-      }
 
       if (ComboBox.SelectedItem != null)
       {

@@ -471,6 +471,8 @@ namespace TopDown.Logic
 
         Console.WriteLine();
       }
+
+      Console.WriteLine();
     }
 
     public void UpdateMap(List<SearchNode> pathPositions)

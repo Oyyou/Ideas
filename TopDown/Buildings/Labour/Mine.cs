@@ -37,7 +37,7 @@ namespace TopDown.Buildings.Labour
             CollisionRectangles = new List<Rectangle>();
             break;
           case BuildingStates.Placed:
-          case BuildingStates.Building:
+          case BuildingStates.Constructing:
             CollisionRectangles = new List<Rectangle>()
             {
               _spriteInside.Rectangle,
@@ -78,6 +78,27 @@ namespace TopDown.Buildings.Labour
       }
     }
 
+    protected override bool CanPlace()
+    {
+      var canPlace = base.CanPlace();
+
+      if (!canPlace)
+        return false;
+
+      // Check to see if the mine is on minerals
+      var validMineralPositions = new List<Vector2>()
+      {
+        new Vector2(Position.X + 32, Position.Y + 32),
+        new Vector2(Position.X + 64, Position.Y + 32),
+        new Vector2(Position.X + 32, Position.Y + 64),
+        new Vector2(Position.X + 64, Position.Y + 64),
+      };
+
+
+
+      return true;
+    }
+
     public override void LoadContent(ContentManager content)
     {
       base.LoadContent(content);
@@ -112,7 +133,7 @@ namespace TopDown.Buildings.Labour
           if (x == -32 || y == -32 ||
             x == Rectangle.Width || y == Rectangle.Height)
           {
-            if ((x == -32 && y == -32) || 
+            if ((x == -32 && y == -32) ||
               (x == -32 && y == Rectangle.Height) ||
               (x == Rectangle.Width && y == -32) ||
               (x == Rectangle.Width && y == Rectangle.Height))

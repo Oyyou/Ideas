@@ -36,14 +36,40 @@ namespace TopDown.Controls.InventoryMenu
       if (_gameScreen.State != States.GameStates.InventoryMenu)
         return;
 
+      base.Draw(gameTime, spriteBatch);
+
       foreach (var component in Components)
         component.Draw(gameTime, spriteBatch);
 
+      var mainX = _windowSprite.Position.X + 11;
+      var mainY = _windowSprite.Position.Y + 56;
+      var mainYIncrement = _mainButtonTexture.Height + 5;
+
       foreach (var component in _mainButtons)
+      {
+        component.Position = new Vector2(mainX, mainY);
+        mainY += mainYIncrement;
+
         component.Draw(gameTime, spriteBatch);
+      }
+
+      var x = _windowSprite.Position.X + 196;
+      var xIncrement = 0;
+
+      var y = _windowSprite.Position.Y + 56;
 
       foreach (var component in _items)
       {
+        component.Position = new Vector2(x + xIncrement, y);
+
+        xIncrement += component.Rectangle.Width + 5;
+
+        if (x + xIncrement > 708)
+        {
+          y += component.Rectangle.Height + 5;
+          xIncrement = 0;
+        }
+
         component.Layer = 0.99f;
         component.Draw(gameTime, spriteBatch);
       }
@@ -126,20 +152,11 @@ namespace TopDown.Controls.InventoryMenu
         return;
       }
 
-      base.Update(gameTime);
-
       foreach (var component in Components)
         component.Update(gameTime);
 
-      var mainX = _windowSprite.Position.X + 11;
-      var mainY= _windowSprite.Position.Y + 56;
-      var mainYIncrement = _mainButtonTexture.Height + 5;
-
       foreach (var component in _mainButtons)
       {
-        component.Position = new Vector2(mainX, mainY);
-        mainY += mainYIncrement;
-
         // Sets the colour of the selected button
         if (component.IsClicked)
         {
@@ -154,25 +171,8 @@ namespace TopDown.Controls.InventoryMenu
         component.Update(gameTime);
       }
 
-      var x = _windowSprite.Position.X + 196;
-      var xIncrement = 0;
-
-      var y = _windowSprite.Position.Y + 56;
-
       foreach (var component in _items)
-      {
-        component.Position = new Vector2(x + xIncrement, y);
-
-        xIncrement += component.Rectangle.Width + 5;
-
-        if (x + xIncrement > 708)
-        {
-          y += component.Rectangle.Height + 5;
-          xIncrement = 0;
-        }
-
         component.Update(gameTime);
-      }
     }
   }
 }

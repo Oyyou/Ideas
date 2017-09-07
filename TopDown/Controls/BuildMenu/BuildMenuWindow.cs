@@ -70,22 +70,41 @@ namespace TopDown.Controls.BuildMenu
       if (_gameScreen.State != States.GameStates.BuildMenu)
         return;
 
+      base.Draw(gameTime, spriteBatch);
+
       foreach (var component in Components)
         component.Draw(gameTime, spriteBatch);
 
-      var y = _windowSprite.Position.Y + 56;
+      var buttonY = _windowSprite.Position.Y + 56;
 
       foreach (var component in _buttons)
       {
-        component.Position = new Vector2(_windowSprite.Position.X + 11, y);
+        component.Position = new Vector2(_windowSprite.Position.X + 11, buttonY);
 
-        y += component.Rectangle.Height + 5;
+        buttonY += component.Rectangle.Height + 5;
 
         component.Draw(gameTime, spriteBatch);
       }
 
+      var x = _windowSprite.Position.X + 196;
+      var xIncrement = 0;
+
+      var y = _windowSprite.Position.Y + 56;
+
       foreach (var component in _buildSubOptions)
+      {
+        component.Position = new Vector2(x + xIncrement, y);
+
+        xIncrement += component.Rectangle.Width + 5;
+
+        if (x + xIncrement > _windowSprite.Rectangle.Right - 12)
+        {
+          y += component.Rectangle.Height + 5;
+          xIncrement = 0;
+        }
+
         component.Draw(gameTime, spriteBatch);
+      }
 
       spriteBatch.DrawString(_font, "Build", _fontPosition, Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.99f);
     }
@@ -346,25 +365,25 @@ namespace TopDown.Controls.BuildMenu
         anvil,
       };
 
-      //var mine = new BuildMenuSubButton(_subButtonTexture, _font)
-      //{
-      //  Building = new Mine(_gameScreen, _content.Load<Texture2D>("Buildings/Mine/In"), _content.Load<Texture2D>("Buildings/Mine/Out_Top"), _content.Load<Texture2D>("Buildings/Mine/Out_Bottom"))
-      //  {
-      //    State = Buildings.BuildingStates.Placing,
-      //  },
-      //  Text = "Mine",
-      //  Layer = 0.99f,
-      //  GameScreenSetValue = States.GameStates.PlacingBuilding,
-      //  ResourceCost = new Models.Resources()
-      //  {
-      //    Food = 15,
-      //    Gold = 10,
-      //    Wood = 30,
-      //    Stone = 40,
-      //  },
-      //};
+      var mine = new BuildMenuSubButton(_subButtonTexture, _font)
+      {
+        Building = new Mine(_gameScreen, _content.Load<Texture2D>("Buildings/Mine/In"), _content.Load<Texture2D>("Buildings/Mine/Out_Top"), _content.Load<Texture2D>("Buildings/Mine/Out_Bottom"))
+        {
+          State = Buildings.BuildingStates.Placing,
+        },
+        Text = "Mine",
+        Layer = 0.99f,
+        GameScreenSetValue = States.GameStates.PlacingBuilding,
+        ResourceCost = new Models.Resources()
+        {
+          Food = 15,
+          Gold = 10,
+          Wood = 30,
+          Stone = 40,
+        },
+      };
 
-      //mine.Click += SubButton_Click;
+      mine.Click += SubButton_Click;
 
       _buildSubOptions = new List<BuildMenuSubButton>()
       {
@@ -395,7 +414,7 @@ namespace TopDown.Controls.BuildMenu
             Stone = 40,
           },
         },
-        //mine,
+        mine,
       };
 
       foreach (var component in _buildSubOptions)
@@ -538,31 +557,14 @@ namespace TopDown.Controls.BuildMenu
       if (_gameScreen.State != States.GameStates.BuildMenu)
         return;
 
-      base.Update(gameTime);
-
       foreach (var component in Components)
         component.Update(gameTime);
 
       foreach (var button in _buttons)
         button.Update(gameTime);
 
-      var x = _windowSprite.Position.X + 196;
-      var xIncrement = 0;
-
-      var y = _windowSprite.Position.Y + 56;
-
       foreach (var component in _buildSubOptions)
       {
-        component.Position = new Vector2(x + xIncrement, y);
-
-        xIncrement += component.Rectangle.Width + 5;
-
-        if (x + xIncrement > _windowSprite.Rectangle.Right - 12)
-        {
-          y += component.Rectangle.Height + 5;
-          xIncrement = 0;
-        }
-
         component.Update(gameTime);
 
         if (component.IsClicked)
