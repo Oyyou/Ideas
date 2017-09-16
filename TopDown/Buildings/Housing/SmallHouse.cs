@@ -11,9 +11,9 @@ namespace TopDown.Buildings.Housing
 {
   public class SmallHouse : Building
   {
-    protected override int _outsideExtraHeight => 128;
+    protected override int _outsideExtraHeight => 15;
 
-    protected override int _outsideExtraWidth => 40;
+    protected override int _outsideExtraWidth => 0;
 
     public const int MaxResidents = 2;
 

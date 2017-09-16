@@ -14,9 +14,9 @@ namespace TopDown.Buildings.Labour
 {
   public class Blacksmith : Building
   {
-    protected override int _outsideExtraHeight => 64;
+    protected override int _outsideExtraHeight => 15;
 
-    protected override int _outsideExtraWidth => 40;
+    protected override int _outsideExtraWidth => 0;
 
     public override BuildingStates State
     {

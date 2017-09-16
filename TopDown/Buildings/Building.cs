@@ -762,8 +762,10 @@ namespace TopDown.Buildings
             component.Update(gameTime);
           }
 
-          if (GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
-            _state = BuildingStates.Built_In;
+          if (GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle) && GameScreen.Mouse.LeftClicked)
+          {
+            _showButtons = !_showButtons;
+          }
 
           if (_showButtons)
           {
@@ -784,17 +786,6 @@ namespace TopDown.Buildings
             furniture.Layer = _spriteInside.Layer + 0.001f;
             furniture.Update(gameTime);
           }
-
-          if (!GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
-            _state = BuildingStates.Built_Out;
-          else
-          {
-            if (GameScreen.Mouse.LeftClicked)
-            {
-              _showButtons = !_showButtons;
-            }
-          }
-
           if (_showButtons)
           {
             foreach (var button in _buttons)
