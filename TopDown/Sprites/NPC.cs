@@ -281,14 +281,16 @@ namespace TopDown.Sprites
 
       var targetPosition = _walkingPath.Count > 0 ? _walkingPath.FirstOrDefault() : Position;
 
+      var speed = 1f * Engine.States.State.GameSpeed;
+
       if (Position.X < targetPosition.X)
-        Velocity.X = 1;
+        Velocity.X = speed;
       else if (Position.X > targetPosition.X)
-        Velocity.X = -1;
+        Velocity.X = -speed;
       else if (Position.Y < targetPosition.Y)
-        Velocity.Y = 1;
+        Velocity.Y = speed;
       else if (Position.Y > targetPosition.Y)
-        Velocity.Y = -1;
+        Velocity.Y = -speed;
     }
 
     #endregion

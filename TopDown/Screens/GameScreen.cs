@@ -31,7 +31,7 @@ using TopDown.Logic;
 using TopDown.Resources;
 using TopDown.Sprites;
 using static TopDown.Logic.Pathfinder;
-using Penumbra;
+//using Penumbra;
 
 namespace TopDown.States
 {
@@ -73,7 +73,7 @@ namespace TopDown.States
 
     private RenderTarget2D _renderTarget;
 
-    private PenumbraComponent penumbra;
+    //private PenumbraComponent penumbra;
     Vector2 baseScreenSize = Vector2.Zero;
     private Matrix globalTransformation;
 
@@ -230,8 +230,7 @@ namespace TopDown.States
 
       GameComponents.Add(npc);
     }
-
-
+    
     public override void Draw(GameTime gameTime)
     {
       //if (baseScreenSize == Vector2.Zero)
@@ -299,7 +298,7 @@ namespace TopDown.States
 
     private void ItemMenuUpdate(GameTime gameTime)
     {
-      Time = Time.AddSeconds(30);
+      Time = Time.AddSeconds(10 * GameSpeed);
 
       foreach (var component in _guiComponents)
         component.Update(gameTime);
@@ -357,6 +356,8 @@ namespace TopDown.States
     public override void LoadContent(GameModel gameModel)
     {
       base.LoadContent(gameModel);
+
+      GameSpeed = 1f;
 
       _renderTarget = new RenderTarget2D(
         _graphicsDevice,
@@ -552,6 +553,7 @@ namespace TopDown.States
         JobMenu,
         ItemMenu,
         Notifications,
+        new Sprite(_content.Load<Texture2D>("Controls/Icons/Speed_1")),
       };
 
       foreach (var component in GameComponents)
@@ -682,21 +684,21 @@ namespace TopDown.States
 
 
       // Create our lighting component and register it as a service so that subsystems can access it.--------------
-      penumbra = new PenumbraComponent(_game)
-      {
-        AmbientColor = new Color(new Vector3(0.1f))
-      };
+      //penumbra = new PenumbraComponent(_game)
+      //{
+      //  AmbientColor = new Color(new Vector3(0.1f))
+      //};
 
-      // Create sample light source and shadow hull.
-      Light light = new PointLight
-      {
-        Color = new Color(255, 140, 0),
-        Scale = new Vector2(9000), // Range of the light source (how far the light will travel)
-        ShadowType = ShadowType.Solid, // Will not lit hulls themselves
-        Position = new Vector2(-500, 1000),
-        Intensity = 1.5f,
-        Radius = 100,
-      };
+      //// Create sample light source and shadow hull.
+      //Light light = new PointLight
+      //{
+      //  Color = new Color(255, 140, 0),
+      //  Scale = new Vector2(9000), // Range of the light source (how far the light will travel)
+      //  ShadowType = ShadowType.Solid, // Will not lit hulls themselves
+      //  Position = new Vector2(-500, 1000),
+      //  Intensity = 1.5f,
+      //  Radius = 100,
+      //};
 
       //create all the hulls unsing the CollisionRectangles
       foreach (var collisionRectangle in BuildingComponents.SelectMany(a => a.CollisionRectangles))
@@ -704,25 +706,25 @@ namespace TopDown.States
         AddHull(collisionRectangle);
       }
 
-      penumbra.Lights.Add(light);
-      _game.Services.AddService(penumbra);
+      //penumbra.Lights.Add(light);
+      //_game.Services.AddService(penumbra);
 
 
       // Load penumbra
-      penumbra.Initialize();
+      //penumbra.Initialize();
 
     }
 
     private void AddHull(Rectangle collisionRectangle)
     {
-      var hull = new Hull(new Vector2(0, 0), new Vector2(collisionRectangle.Width, 0), new Vector2(collisionRectangle.Width, collisionRectangle.Height), new Vector2(0, collisionRectangle.Height))
-      {
-        Position = collisionRectangle.Location.ToVector2() * 2,
-        Scale = new Vector2(2),
-        Origin = new Vector2(0),
-      };
+      //var hull = new Hull(new Vector2(0, 0), new Vector2(collisionRectangle.Width, 0), new Vector2(collisionRectangle.Width, collisionRectangle.Height), new Vector2(0, collisionRectangle.Height))
+      //{
+      //  Position = collisionRectangle.Location.ToVector2() * 2,
+      //  Scale = new Vector2(2),
+      //  Origin = new Vector2(0),
+      //};
 
-      penumbra.Hulls.Add(hull);
+      //penumbra.Hulls.Add(hull);
     }
 
     private void SetGlobalTransform()
@@ -734,7 +736,7 @@ namespace TopDown.States
       float verScaling = _graphicsDevice.PresentationParameters.BackBufferHeight / baseScreenSize.Y;
       Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
       globalTransformation = Matrix.CreateScale(screenScalingFactor);
-      penumbra.Transform = globalTransformation;
+      //penumbra.Transform = globalTransformation;
     }
 
     private void MenuUpdate(GameTime gameTime, Keys menuKey)
@@ -751,7 +753,7 @@ namespace TopDown.States
 
     private void PlacingBuildingUpdate(GameTime gameTime)
     {
-      Time = Time.AddSeconds(30);
+      Time = Time.AddSeconds(10 * GameSpeed);
 
       foreach (var component in _guiComponents)
         component.Update(gameTime);
@@ -809,7 +811,7 @@ namespace TopDown.States
 
     private void PlacingItemsUpdate(GameTime gameTime)
     {
-      Time = Time.AddSeconds(30);
+      Time = Time.AddSeconds(10 * GameSpeed);
 
       foreach (var component in _guiComponents)
         component.Update(gameTime);
@@ -850,7 +852,7 @@ namespace TopDown.States
 
     private void PlayingUpdate(GameTime gameTime)
     {
-      Time = Time.AddSeconds(30);
+      Time = Time.AddSeconds(10 * GameSpeed);
 
       AddNPC();
 
@@ -936,6 +938,29 @@ namespace TopDown.States
       }
     }
 
+    public void SetGameSpeed()
+    {
+      // For the time being - the GameSpeed needs to be a multiple of 32
+
+      if (Keyboard.IsKeyDown(Keys.D1))
+      {
+        GameSpeed = 1f;
+        State = GameStates.Playing;
+      }
+      else if (Keyboard.IsKeyDown(Keys.D2))
+      {
+        GameSpeed = 2f;
+        State = GameStates.Playing;
+      }
+      else if (Keyboard.IsKeyDown(Keys.D3))
+      {
+        GameSpeed = 4f;
+        State = GameStates.Playing;
+      }
+
+
+    }
+
     public override void UnloadContent()
     {
       foreach (var component in GameComponents)
@@ -962,41 +987,8 @@ namespace TopDown.States
         Notifications.Add(Time, "This is a test notification");
 
       _camera.Update();
-
-
-      penumbra.Lights[0].Position = GetMouseWithCameraPosition();
-
-      penumbra.Lights[0].ShadowType = ShadowType.Occluded;
-
-      if (Keyboard.IsKeyDown(Keys.Left))
-        penumbra.Lights[0].Radius -= 10;
-      else if (Keyboard.IsKeyDown(Keys.Right))
-        penumbra.Lights[0].Radius += 10;
-
-      if (Keyboard.IsKeyDown(Keys.Down))
-        penumbra.Lights[0].Scale -= new Vector2(10);
-      else if (Keyboard.IsKeyDown(Keys.Up))
-        penumbra.Lights[0].Scale += new Vector2(10);
-
-      // TODO: Might be an idea to 'hard-code' the darkness for different times of the day.
-      //  I can't see how maths can be used for daylight. Yes.
-      float someMaths = (float)Math.Sin((-MathHelper.PiOver2 + 2 * Math.PI * (Time.Hour + (Time.Minute / 60))) / 48);
-      float DarknessLevel = Math.Abs(MathHelper.SmoothStep(12f, 2f, someMaths));
-
-      //var Position = new Vector2(50, 50);
-      //var Scale = new Vector2(50);
-      //var Origin = new Vector2(50.0f, 50.5f);
-      //var Rotation = MathHelper.Pi - MathHelper.PiOver2 * 0.75f;
-      //Matrix LocalToWorld;
-      //Transform(ref Position, ref Origin, ref Scale, Rotation, out LocalToWorld);
-      //var cvp = Matrix.Identity;
-      //Matrix wvp;
-      //Matrix.Multiply(ref LocalToWorld, ref cvp, out wvp);
-
-      //_effect.Parameters["WorldViewProjection"].SetValue(wvp);
-      //_effect.Parameters["LightColor"].SetValue(new Vector3(1, 1, 1));
-      //_effect.Parameters["LightIntensity"].SetValue(1.5f);
-      // _effect.Parameters["DarknessLevel"].SetValue(1f);
+      
+      SetGameSpeed();
 
       switch (State)
       {

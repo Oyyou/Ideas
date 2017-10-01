@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Engine.Models;
 using Engine.Managers;
+using Engine.States;
 
 namespace Engine.Sprites
 {
@@ -354,7 +355,7 @@ namespace Engine.Sprites
 
     public override void Update(GameTime gameTime)
     {
-      _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+      _timer += (float)gameTime.ElapsedGameTime.TotalSeconds * State.GameSpeed;
 
       if (LifeTimer != null && _timer >= LifeTimer)
       {

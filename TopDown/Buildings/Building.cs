@@ -402,7 +402,7 @@ namespace TopDown.Buildings
       }
 
       // Otherwise we wanna build it!
-      _hitTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+      _hitTimer += (float)gameTime.ElapsedGameTime.TotalSeconds * Engine.States.State.GameSpeed;
 
       if (_hitTimer > _maxHitTimer)
       {

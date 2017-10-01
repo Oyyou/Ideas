@@ -37,6 +37,11 @@ namespace Engine.States
     }
 
     #endregion
+    
+    /// <summary>
+    /// How quickly everything goes
+    /// </summary>
+    public static float GameSpeed { get; protected set; }
 
     #region Methods
 
