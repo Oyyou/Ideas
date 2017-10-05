@@ -50,6 +50,7 @@
     <Compile Include="Buildings\OptionsButton.cs" />
     <Compile Include="Controls\CraftingMenu\CraftingMenuSubButton.cs" />
     <Compile Include="Controls\CraftingMenu\CraftingMenuWindow.cs" />
+    <Compile Include="Controls\GameSpeedController.cs" />
     <Compile Include="Controls\InventoryMenu\InventoryMenuWindow.cs" />
     <Compile Include="Controls\JobMenu\JobMenuButton.cs" />
     <Compile Include="Controls\JobMenu\JobMenuSubButton.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Controls\Toolbars\Toolbar.cs" />
     <Compile Include="Controls\Toolbars\BottomToolbar.cs" />
     <Compile Include="Controls\Toolbars\TopToolbar.cs" />
+    <Compile Include="Furnitures\Bed.cs" />
     <Compile Include="Furnitures\Bar.cs" />
     <Compile Include="Furnitures\Furniture.cs" />
     <Compile Include="Buildings\Housing\SmallHouse.cs" />

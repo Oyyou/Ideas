@@ -11,10 +11,6 @@ namespace TopDown.Buildings.Housing
 {
   public class SmallHouse : Building
   {
-    protected override int _outsideExtraHeight => 15;
-
-    protected override int _outsideExtraWidth => 0;
-
     public const int MaxResidents = 2;
 
     public int ResidentCount { get; set; }
@@ -41,7 +37,7 @@ namespace TopDown.Buildings.Housing
               _spriteInside.Rectangle,
             };
             break;
-          case BuildingStates.Built_Out:
+          case BuildingStates.Built:
 
             var height = _spriteInside.Rectangle.Height;
             var width = _spriteInside.Rectangle.Width;

@@ -95,11 +95,11 @@ namespace TopDown.Sprites
     {
       get
       {
-        return base.Position + new Vector2(0, 24);
+        return base.Position + new Vector2(0, _animationManager.FrameHeight  - 32);
       }
       set
       {
-        base.Position = value - new Vector2(0, 24);
+        base.Position = value - new Vector2(0, _animationManager.FrameHeight  - 32);
       }
     }
 
@@ -282,6 +282,11 @@ namespace TopDown.Sprites
       var targetPosition = _walkingPath.Count > 0 ? _walkingPath.FirstOrDefault() : Position;
 
       var speed = 1f * Engine.States.State.GameSpeed;
+
+      while ((Position.X + speed) % speed != 0)
+        speed--;
+      while ((Position.Y + speed) % speed != 0)
+        speed--;
 
       if (Position.X < targetPosition.X)
         Velocity.X = speed;

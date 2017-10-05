@@ -53,10 +53,10 @@ namespace Engine.Utilities
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      var fps = string.Format("FPS: {0}", AverageFramesPerSecond);
+      var fps = string.Format("FPS: {0:00}", AverageFramesPerSecond);
 
 
-      spriteBatch.DrawString(_font, fps, new Vector2(5, GameEngine.ScreenHeight - 20), Color.Black);
+      spriteBatch.DrawString(_font, fps, new Vector2(GameEngine.ScreenWidth - 100, GameEngine.ScreenHeight - 20), Color.Black);
 
       // other draw code here
     }

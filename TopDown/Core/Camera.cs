@@ -38,12 +38,12 @@ namespace TopDown.Core
       Transform = Matrix.CreateTranslation(-Position.X + (GameEngine.ScreenWidth / 2), -Position.Y + (GameEngine.ScreenHeight / 2), 0);
     }
 
-    public void Update()
+    public void Update(GameTime gameTime)
     {
       _previousScrollValue = _currentScrollValue;
       _currentScrollValue = Mouse.GetState().ScrollWheelValue;
 
-      var speed = 5f;
+      var speed = 250f * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
       if (GameScreen.Keyboard.IsKeyDown(Keys.LeftShift))
         speed *= 2;

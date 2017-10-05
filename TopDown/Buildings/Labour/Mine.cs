@@ -17,10 +17,6 @@ namespace TopDown.Buildings.Labour
 {
   public class Mine : Building
   {
-    protected override int _outsideExtraHeight => 32;
-
-    protected override int _outsideExtraWidth => 0;
-
     public override BuildingStates State
     {
       get { return _state; }
@@ -43,7 +39,7 @@ namespace TopDown.Buildings.Labour
               _spriteInside.Rectangle,
             };
             break;
-          case BuildingStates.Built_Out:
+          case BuildingStates.Built:
 
             var height = _spriteInside.Rectangle.Height;
             var width = _spriteInside.Rectangle.Width;

@@ -106,7 +106,7 @@ namespace Engine.Managers
     {
       _updated = true;
 
-      _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+      _timer += (float)gameTime.ElapsedGameTime.TotalSeconds * States.State.GameSpeed;
 
       PreviousFrame = CurrentFrame;
 

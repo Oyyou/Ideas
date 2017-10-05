@@ -100,10 +100,20 @@ namespace TopDown.Furnitures
 
     private bool IsInParent()
     {
-      return this.Rectangle.Left >= Building.Rectangle.Left &&
-        this.Rectangle.Top >= Building.Rectangle.Top &&
-        this.Rectangle.Right <= Building.Rectangle.Right &&
-        this.Rectangle.Bottom <= Building.Rectangle.Bottom;
+      var isIn = true;
+
+      foreach (var rectangle in CollisionRectangles)
+      {
+        if (!(rectangle.Left >= Building.Rectangle.Left &&
+          rectangle.Top >= Building.Rectangle.Top &&
+          rectangle.Right <= Building.Rectangle.Right &&
+          rectangle.Bottom <= Building.Rectangle.Bottom))
+        {
+          isIn = false;
+        }
+      }
+
+      return isIn;
     }
   }
 }

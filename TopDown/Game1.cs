@@ -13,7 +13,7 @@ namespace TopDown
   /// </summary>
   public class Game1 : GameEngine
   {
-    
+
     public Game1()
     {
       Random = new System.Random();
@@ -76,7 +76,7 @@ namespace TopDown
       _gameModel = new Engine.Models.GameModel(Content, this, _graphics.GraphicsDevice, _spriteBatch);
 
       _currentState = new GameScreen();
-      
+
       _currentState.LoadContent(_gameModel);
     }
 
@@ -95,7 +95,7 @@ namespace TopDown
     /// </summary>
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Update(GameTime gameTime)
-    {
+    { 
       _currentState.Update(gameTime);
 
       _currentState.PostUpdate(gameTime);

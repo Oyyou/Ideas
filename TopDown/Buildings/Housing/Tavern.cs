@@ -12,10 +12,6 @@ namespace TopDown.Buildings.Housing
 {
   public class Tavern : Building
   {
-    protected override int _outsideExtraHeight => 128;
-
-    protected override int _outsideExtraWidth => 64;
-
     public override BuildingStates State
     {
       get { return _state; }
@@ -38,7 +34,7 @@ namespace TopDown.Buildings.Housing
               _spriteInside.Rectangle,
             };
             break;
-          case BuildingStates.Built_Out:
+          case BuildingStates.Built:
 
             var height = _spriteInside.Rectangle.Height;
             var width = _spriteInside.Rectangle.Width;

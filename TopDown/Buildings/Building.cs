@@ -23,8 +23,7 @@ namespace TopDown.Buildings
     Placing,
     Placed,
     Constructing,
-    Built_Out,
-    Built_In,
+    Built,
     Demolishing,
   }
 
@@ -74,9 +73,7 @@ namespace TopDown.Buildings
 
     protected const float _maxHitTimer = 0.3f;
 
-    protected virtual int _outsideExtraHeight { get; }
-
-    protected virtual int _outsideExtraWidth { get; }
+    protected int _outsideExtraHeight { get { return _spriteOutsideTop.Rectangle.Height - _spriteInside.Rectangle.Height; } }
 
     protected List<Sprite> _particles;
 
@@ -131,8 +128,8 @@ namespace TopDown.Buildings
       set
       {
         _spriteInside.Position = value;
-        _spriteOutsideTop.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
-        _spriteOutsideBottom.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+        _spriteOutsideTop.Position = new Vector2(_spriteInside.Position.X, _spriteInside.Position.Y - _outsideExtraHeight);
+        _spriteOutsideBottom.Position = new Vector2(_spriteInside.Position.X , _spriteInside.Position.Y - _outsideExtraHeight);
 
         SetDoorLocations();
       }
@@ -419,7 +416,7 @@ namespace TopDown.Buildings
         {
           _gameScreen.Notifications.Add(_gameScreen.Time, $"{npc.Name} finished building {this.Name}");
 
-          State = BuildingStates.Built_Out;
+          State = BuildingStates.Built;
           _gameScreen.State = States.GameStates.Playing;
           _gameScreen.UpdateMap();
           npc.Construct -= this.Construct;
@@ -467,7 +464,7 @@ namespace TopDown.Buildings
 
           IsRemoved = true;
 
-          State = BuildingStates.Built_Out;
+          State = BuildingStates.Built;
           _gameScreen.State = States.GameStates.Playing;
           _gameScreen.UpdateMap();
           npc.Demolish -= this.Demolish;
@@ -528,26 +525,13 @@ namespace TopDown.Buildings
 
           break;
 
-        case BuildingStates.Built_In:
-          _spriteInside.Draw(gameTime, spriteBatch);
-
-          foreach (var component in Components)
-            component.Draw(gameTime, spriteBatch);
-
-          DrawButtons(gameTime, spriteBatch);
-
-          //foreach (var rec in CollisionRectangles)
-          //  spriteBatch.Draw(_t, rec, Color.Red);
-          break;
-
-        case BuildingStates.Built_Out:
+        case BuildingStates.Built:
 
           _spriteInside.Draw(gameTime, spriteBatch);
 
           _spriteOutsideTop.Draw(gameTime, spriteBatch);
 
           _spriteOutsideBottom.Draw(gameTime, spriteBatch);
-
 
           foreach (var component in Components)
             component.Draw(gameTime, spriteBatch);
@@ -744,6 +728,9 @@ namespace TopDown.Buildings
                   this.DoorLocations.Where(v => v.IsValid).FirstOrDefault().Position))
               .FirstOrDefault();
 
+            if (npc == null)
+              return;
+
             NPCBuilder = npc;
 
             NPCBuilder.Construct += Construct;
@@ -752,7 +739,7 @@ namespace TopDown.Buildings
           Build(gameTime);
           break;
 
-        case BuildingStates.Built_Out:
+        case BuildingStates.Built:
 
           _particles.Clear();
 
@@ -772,26 +759,6 @@ namespace TopDown.Buildings
             foreach (var button in _buttons)
               button.Update(gameTime);
           }
-
-          break;
-
-        case BuildingStates.Built_In:
-
-          _particles.Clear();
-
-          _spriteInside.Layer = Building.DefaultLayer;
-
-          foreach (var furniture in Components)
-          {
-            furniture.Layer = _spriteInside.Layer + 0.001f;
-            furniture.Update(gameTime);
-          }
-          if (_showButtons)
-          {
-            foreach (var button in _buttons)
-              button.Update(gameTime);
-          }
-
 
           break;
         case BuildingStates.Demolishing:
@@ -848,8 +815,8 @@ namespace TopDown.Buildings
 
       if (GameScreen.Mouse.LeftClicked && canPlace)
       {
-        _spriteOutsideTop.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
-        _spriteOutsideBottom.Position = new Vector2(_spriteInside.Position.X - (_outsideExtraWidth / 2), _spriteInside.Position.Y - _outsideExtraHeight);
+        _spriteOutsideTop.Position = new Vector2(_spriteInside.Position.X, _spriteInside.Position.Y - _outsideExtraHeight);
+        _spriteOutsideBottom.Position = new Vector2(_spriteInside.Position.X, _spriteInside.Position.Y - _outsideExtraHeight);
         State = BuildingStates.Placed;
         _gameScreen.State = States.GameStates.ItemMenu;
       }

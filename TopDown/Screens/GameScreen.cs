@@ -82,7 +82,7 @@ namespace TopDown.States
       get
       {
         return GameComponents.Where(c => c is Building && !c.IsRemoved).Cast<Building>()
-          .Where(c => c.State == BuildingStates.Built_In || c.State == BuildingStates.Built_Out);
+          .Where(c => c.State == BuildingStates.Built);
       }
     }
 
@@ -127,7 +127,7 @@ namespace TopDown.States
     {
       get
       {
-        return GameComponents.Where(c => c is SmallHouse && (((SmallHouse)c).State == BuildingStates.Built_In || ((SmallHouse)c).State == BuildingStates.Built_Out)).Count() * SmallHouse.MaxResidents;
+        return GameComponents.Where(c => c is SmallHouse && ((SmallHouse)c).State == BuildingStates.Built).Count() * SmallHouse.MaxResidents;
       }
     }
 
@@ -209,14 +209,47 @@ namespace TopDown.States
         { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkUp"), 4) },
       };
 
-      var house = HouseComponents.Where(c => c.ResidentCount < SmallHouse.MaxResidents && (c.State == BuildingStates.Built_In || c.State == BuildingStates.Built_Out)).FirstOrDefault();
+      var house = HouseComponents.Where(c => c.ResidentCount < SmallHouse.MaxResidents && (c.State == BuildingStates.Built)).FirstOrDefault();
 
       if (house == null)
         return;
 
       var doorPosition = house.DoorLocations.FirstOrDefault().Position;
 
-      var npc = new NPC(playerAnimations, this)
+      var pigAnimations = new Dictionary<string, Animation>()
+      {
+        { "WalkDown", new Animation(_content.Load<Texture2D>("Sprites/NPCs/PigWalkingDown"), 4) },
+        { "WalkLeft", new Animation(_content.Load<Texture2D>("Sprites/NPCs/PigWalkingLeft"), 4) },
+        { "WalkRight", new Animation(_content.Load<Texture2D>("Sprites/NPCs/PigWalkingRight"), 4) },
+        { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/NPCs/PigWalkingUp"), 4) },
+      };
+
+      var butterflyAnimations = new Dictionary<string, Animation>()
+      {
+        { "WalkDown", new Animation(_content.Load<Texture2D>("Sprites/NPCs/ButterflyWalkingDown"), 4) },
+        { "WalkLeft", new Animation(_content.Load<Texture2D>("Sprites/NPCs/ButterflyWalkingLeft"), 4) },
+        { "WalkRight", new Animation(_content.Load<Texture2D>("Sprites/NPCs/ButterflyWalkingRight"), 4) },
+        { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/NPCs/ButterflyWalkingUp"), 4) },
+      };
+
+      var chickenAnimations = new Dictionary<string, Animation>()
+      {
+        { "WalkDown", new Animation(_content.Load<Texture2D>("Sprites/NPCs/ChickenWalkingDown"), 4) },
+        { "WalkLeft", new Animation(_content.Load<Texture2D>("Sprites/NPCs/ChickenWalkingLeft"), 4) },
+        { "WalkRight", new Animation(_content.Load<Texture2D>("Sprites/NPCs/ChickenWalkingRight"), 4) },
+        { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/NPCs/ChickenWalkingUp"), 4) },
+      };
+
+      var animations = new List<Dictionary<string, Animation>>()
+      {
+        playerAnimations,
+        pigAnimations,
+        butterflyAnimations,
+        chickenAnimations,
+      };
+
+
+      var npc = new NPC(animations[GameEngine.Random.Next(0, animations.Count)], this)
       {
         Position = doorPosition,
         IsCollidable = false,
@@ -553,7 +586,7 @@ namespace TopDown.States
         JobMenu,
         ItemMenu,
         Notifications,
-        new Sprite(_content.Load<Texture2D>("Controls/Icons/Speed_1")),
+        new GameSpeedController(),
       };
 
       foreach (var component in GameComponents)
@@ -605,7 +638,7 @@ namespace TopDown.States
               }
             }
 
-            blacksmith.State = BuildingStates.Built_Out;
+            blacksmith.State = BuildingStates.Built;
             GameComponents.Add(blacksmith);
 
             break;
@@ -632,7 +665,7 @@ namespace TopDown.States
                   break;
 
                 case "Bed":
-                  var bed = new Furniture(_content.Load<Texture2D>("Furniture/Bed"), this)
+                  var bed = new Bed(_content.Load<Texture2D>("Furniture/Bed"), this)
                   {
                     Position = position,
                     State = PlacableObjectStates.Placed,
@@ -649,7 +682,7 @@ namespace TopDown.States
               }
             }
 
-            smallHouse.State = BuildingStates.Built_Out;
+            smallHouse.State = BuildingStates.Built;
             GameComponents.Add(smallHouse);
 
             break;
@@ -660,7 +693,15 @@ namespace TopDown.States
             {
               var position = new Vector2(collisionObject.X, collisionObject.Y);
 
-              var npc = new NPC(playerAnimations, this)
+              var pigAnimations = new Dictionary<string, Animation>()
+              {
+                { "WalkDown", new Animation(_content.Load<Texture2D>("Sprites/NPCs/PigWalkingDown"), 4) },
+                { "WalkLeft", new Animation(_content.Load<Texture2D>("Sprites/NPCs/PigWalkingLeft"), 4) },
+                { "WalkRight", new Animation(_content.Load<Texture2D>("Sprites/NPCs/PigWalkingRight"), 4) },
+                { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/NPCs/PigWalkingUp"), 4) },
+              };
+
+              var npc = new NPC(pigAnimations, this)
               {
                 Position = position,
                 IsCollidable = false,
@@ -761,10 +802,10 @@ namespace TopDown.States
       foreach (var component in GameComponents)
         component.Update(gameTime);
 
-      foreach (var building in BuildingComponents)
-      {
-        building.State = BuildingStates.Built_In;
-      }
+      //foreach (var building in BuildingComponents)
+      //{
+      //  building.State = BuildingStates.Built_In;
+      //}
 
       for (int i = 0; i < GameComponents.Count; i++)
       {
@@ -818,11 +859,6 @@ namespace TopDown.States
 
       foreach (var component in GameComponents)
         component.Update(gameTime);
-
-      foreach (var building in BuildingComponents)
-      {
-        building.State = BuildingStates.Built_In;
-      }
 
       for (int i = 0; i < GameComponents.Count; i++)
       {
@@ -957,8 +993,6 @@ namespace TopDown.States
         GameSpeed = 4f;
         State = GameStates.Playing;
       }
-
-
     }
 
     public override void UnloadContent()
@@ -986,7 +1020,7 @@ namespace TopDown.States
       if (Keyboard.IsKeyPressed(Keys.T))
         Notifications.Add(Time, "This is a test notification");
 
-      _camera.Update();
+      _camera.Update(gameTime);
       
       SetGameSpeed();
 
