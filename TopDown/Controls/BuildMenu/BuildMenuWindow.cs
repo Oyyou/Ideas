@@ -199,7 +199,7 @@ namespace TopDown.Controls.BuildMenu
       {
         Text = "Bed",
         Parent = smallHouse,
-        IsRequired = false,
+        IsRequired = true,
         PlacingObject = new Bed(_content.Load<Texture2D>("Furniture/Bed"), _gameScreen)
         {
           State = PlacableObjectStates.Placing,
@@ -365,6 +365,26 @@ namespace TopDown.Controls.BuildMenu
         anvil,
       };
 
+      var farm = new BuildMenuSubButton(_subButtonTexture, _font)
+      {
+        Building = new Farm(_gameScreen, _content.Load<Texture2D>("Buildings/Farm/In"), _content.Load<Texture2D>("Buildings/Farm/Out_Top"), _content.Load<Texture2D>("Buildings/Farm/Out_Bottom"))
+        {
+          State = BuildingStates.Placing,
+        },
+        Text = "Farm",
+        Layer = 0.99f,
+        GameScreenSetValue = GameStates.PlacingBuilding,
+        ResourceCost = new Models.Resources()
+        {
+          Food = 15,
+          Gold = 10,
+          Wood = 30,
+          Stone = 40,
+        },
+      };
+
+      farm.Click += SubButton_Click;
+
       var mine = new BuildMenuSubButton(_subButtonTexture, _font)
       {
         Building = new Mine(_gameScreen, _content.Load<Texture2D>("Buildings/Mine/In"), _content.Load<Texture2D>("Buildings/Mine/Out_Top"), _content.Load<Texture2D>("Buildings/Mine/Out_Bottom"))
@@ -388,19 +408,7 @@ namespace TopDown.Controls.BuildMenu
       _buildSubOptions = new List<BuildMenuSubButton>()
       {
         blacksmith,
-        new BuildMenuSubButton(_subButtonTexture, _font)
-        {
-          Text = "Farm",
-          Layer =  0.99f,
-          GameScreenSetValue = States.GameStates.PlacingBuilding,
-          ResourceCost = new Models.Resources()
-          {
-            Food = 15,
-            Gold = 10,
-            Wood = 30,
-            Stone = 40,
-          },
-        },
+        farm,
         new BuildMenuSubButton(_subButtonTexture, _font)
         {
           Text = "Lumber Mill",

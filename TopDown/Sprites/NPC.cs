@@ -13,6 +13,7 @@ using TopDown.Items;
 using Microsoft.Xna.Framework.Content;
 using TopDown.Models;
 using TopDown.Skills;
+using TopDown.Furnitures;
 
 namespace TopDown.Sprites
 {
@@ -261,9 +262,18 @@ namespace TopDown.Sprites
       {
         Demolish(this, gameTime);
       }
-      else
+      else // goHome
       {
-        WalkTo(new Vector2(Home.Rectangle.X + 32, Home.Rectangle.Y + 32));
+        IsVisible = true;
+
+        var bedPosition = Home.Components.Where(c => c is Bed).FirstOrDefault().Position + new Vector2(0, 32);
+
+        WalkTo(bedPosition);
+
+        if (this.Position == bedPosition)
+        {
+          _animationManager.Play(_animations["WalkDown"]);
+        }
       }
 
       _animationManager.Update(gameTime);
@@ -283,10 +293,10 @@ namespace TopDown.Sprites
 
       var speed = 1f * Engine.States.State.GameSpeed;
 
-      while ((Position.X + speed) % speed != 0)
-        speed--;
-      while ((Position.Y + speed) % speed != 0)
-        speed--;
+      //while ((Position.X + speed) % speed != 0)
+      //  speed--;
+      //while ((Position.Y + speed) % speed != 0)
+      //  speed--;
 
       if (Position.X < targetPosition.X)
         Velocity.X = speed;

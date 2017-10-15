@@ -20,6 +20,7 @@ using TopDown.Buildings.Labour;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
 using TopDown.Controls.CraftingMenu;
+using TopDown.Controls.InspectMenu;
 using TopDown.Controls.InventoryMenu;
 using TopDown.Controls.ItemMenu;
 using TopDown.Controls.JobMenu;
@@ -57,6 +58,7 @@ namespace TopDown.States
     JobMenu,
     CraftingMenu,
     InventoryMenu,
+    InspectMenu,
   }
 
   public class GameScreen : State
@@ -110,6 +112,8 @@ namespace TopDown.States
     /// Items in the inventory
     /// </summary>
     public List<Item> InventoryItems { get; set; }
+
+    public InspectMenuWindow InspectMenu { get; set; }
 
     public InventoryMenuWindow InventoryMenu { get; set; }
 
@@ -167,7 +171,7 @@ namespace TopDown.States
     {
       get
       {
-        var components = BuildingComponents.Where(c => c is Blacksmith || c is Tavern || c is Mine).Cast<Building>().ToList();
+        var components = BuildingComponents.Where(c => c is Blacksmith || c is Tavern || c is Mine || c is Farm).Cast<Building>().ToList();
 
         return components ?? new List<Building>();
       }
@@ -329,6 +333,12 @@ namespace TopDown.States
     {
     }
 
+    public void Inspect(Building building)
+    {
+      InspectMenu.Building = building;
+      State = GameStates.InspectMenu;
+    }
+
     private void ItemMenuUpdate(GameTime gameTime)
     {
       Time = Time.AddSeconds(10 * GameSpeed);
@@ -413,6 +423,8 @@ namespace TopDown.States
       CraftingMenu = new CraftingMenuWindow(this);
 
       JobMenu = new JobMenuWindow(this);
+
+      InspectMenu = new InspectMenuWindow(this);
 
       InventoryMenu = new InventoryMenuWindow(this);
 
@@ -582,6 +594,7 @@ namespace TopDown.States
         new ResourceView(Resources),
         _buildMenu,
         CraftingMenu,
+        InspectMenu,
         InventoryMenu,
         JobMenu,
         ItemMenu,
@@ -780,12 +793,12 @@ namespace TopDown.States
       //penumbra.Transform = globalTransformation;
     }
 
-    private void MenuUpdate(GameTime gameTime, Keys menuKey)
+    private void MenuUpdate(GameTime gameTime, Keys? menuKey)
     {
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
-      if (Keyboard.IsKeyPressed(menuKey) ||
+      if ((menuKey != null && Keyboard.IsKeyPressed(menuKey.Value)) ||
         Keyboard.IsKeyPressed(Keys.Escape))
       {
         State = GameStates.Playing;
@@ -1076,6 +1089,13 @@ namespace TopDown.States
           MenuUpdate(gameTime, Keys.I);
 
           break;
+
+        case GameStates.InspectMenu:
+
+          MenuUpdate(gameTime, null);
+
+          break;
+
         default:
           throw new Exception("Unknown state: " + State.ToString());
       }

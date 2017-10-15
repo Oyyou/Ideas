@@ -17,6 +17,10 @@ namespace TopDown.Buildings.Labour
 {
   public class Mine : Building
   {
+    private const float _maxWorkTimer = 4f;
+
+    private float _workTimer;
+
     public override BuildingStates State
     {
       get { return _state; }
@@ -101,10 +105,9 @@ namespace TopDown.Buildings.Labour
 
       _buttons = new List<OptionsButton>()
       {
-        new OptionsButton(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"))
-        {
-          Text = "Demolish",
-        },
+        _demolishButton,
+        _fireButton,
+        _hireButton,
       };
 
       foreach (var button in _buttons)
@@ -151,7 +154,28 @@ namespace TopDown.Buildings.Labour
     {
       var position = new Vector2(Rectangle.X + 64, Rectangle.Y + 64);
 
-      npc.WalkTo(position);
+      if (npc.Position != position)
+      {
+        npc.WalkTo(position);
+        if (position == npc.Position)
+        {
+          // Resets the timer when they finally get to work
+          _workTimer = 0f;
+        }
+      }
+      else
+      {
+        npc.IsVisible = false; // Since they'll by "in the mine", they need to invisible.
+
+        _workTimer += (float)gameTime.ElapsedGameTime.TotalSeconds * GameScreen.GameSpeed;
+
+        // _maxWorkTimer will be multiplied by the skill rating of the npc
+        if (_workTimer > _maxWorkTimer)
+        {
+          _gameScreen.Resources.Stone++;
+          _workTimer = 0f;
+        }
+      }
     }
   }
 }

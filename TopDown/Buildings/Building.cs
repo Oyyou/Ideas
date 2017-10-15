@@ -38,12 +38,13 @@ namespace TopDown.Buildings
 
     protected class Wall
     {
+      [Flags]
       public enum Directions
       {
-        Up,
-        Down,
-        Left,
-        Right,
+        Up = 1,
+        Down = 2,
+        Left = 4,
+        Right = 8,
       }
 
       public Directions Direction { get; set; }
@@ -55,7 +56,7 @@ namespace TopDown.Buildings
 
     protected float _constructTimer;
 
-    protected OptionsButton _demloshButton;
+    protected OptionsButton _demolishButton;
 
     protected float _demolishTimer;
 
@@ -66,6 +67,8 @@ namespace TopDown.Buildings
     protected OptionsButton _hireButton;
 
     protected float _hitTimer;
+
+    protected OptionsButton _inspectButton;
 
     protected const float _maxConstructTimer = 2.5f;
 
@@ -115,12 +118,25 @@ namespace TopDown.Buildings
     /// </summary>
     public List<DoorLocation> DoorLocations;
 
+    public bool HasStaff
+    {
+      get
+      {
+        return _gameScreen.NPCComponents.Any(c => c.Workplace == this);
+      }
+    }
+
     public string Name { get; set; }
 
     /// <summary>
     /// This is the fella in charge of construction
     /// </summary>
     public NPC NPCBuilder { get; private set; }
+
+    /// <summary>
+    /// NPC go boom-boom
+    /// </summary>
+    public NPC NPCDemolisher { get; private set; }
 
     public override Vector2 Position
     {
@@ -129,7 +145,7 @@ namespace TopDown.Buildings
       {
         _spriteInside.Position = value;
         _spriteOutsideTop.Position = new Vector2(_spriteInside.Position.X, _spriteInside.Position.Y - _outsideExtraHeight);
-        _spriteOutsideBottom.Position = new Vector2(_spriteInside.Position.X , _spriteInside.Position.Y - _outsideExtraHeight);
+        _spriteOutsideBottom.Position = new Vector2(_spriteInside.Position.X, _spriteInside.Position.Y - _outsideExtraHeight);
 
         SetDoorLocations();
       }
@@ -168,27 +184,34 @@ namespace TopDown.Buildings
             };
 
             if (Walls != null)
+            {
               foreach (var wallTest in Walls)
               {
                 if (wallTest.Position == new Vector2(x / 32, y / 32))
                 {
-                  switch (wallTest.Direction)
+                  var directions = wallTest.Direction.ToString().Split(',').Select(c => (Wall.Directions)Enum.Parse(typeof(Wall.Directions), c.Trim()));
+
+                  foreach (var direction in directions)
                   {
-                    case Wall.Directions.Up:
-                      searchNode.Neighbors[0] = new SearchNode();
-                      break;
-                    case Wall.Directions.Down:
-                      searchNode.Neighbors[1] = new SearchNode();
-                      break;
-                    case Wall.Directions.Left:
-                      searchNode.Neighbors[2] = new SearchNode();
-                      break;
-                    case Wall.Directions.Right:
-                      searchNode.Neighbors[3] = new SearchNode();
-                      break;
+                    switch (direction)
+                    {
+                      case Wall.Directions.Up:
+                        searchNode.Neighbors[0] = new SearchNode();
+                        break;
+                      case Wall.Directions.Down:
+                        searchNode.Neighbors[1] = new SearchNode();
+                        break;
+                      case Wall.Directions.Left:
+                        searchNode.Neighbors[2] = new SearchNode();
+                        break;
+                      case Wall.Directions.Right:
+                        searchNode.Neighbors[3] = new SearchNode();
+                        break;
+                    }
                   }
                 }
               }
+            }
 
             if (DoorLocations != null)
             {
@@ -417,7 +440,7 @@ namespace TopDown.Buildings
           _gameScreen.Notifications.Add(_gameScreen.Time, $"{npc.Name} finished building {this.Name}");
 
           State = BuildingStates.Built;
-          _gameScreen.State = States.GameStates.Playing;
+          //_gameScreen.State = States.GameStates.Playing;
           _gameScreen.UpdateMap();
           npc.Construct -= this.Construct;
         }
@@ -464,8 +487,8 @@ namespace TopDown.Buildings
 
           IsRemoved = true;
 
-          State = BuildingStates.Built;
-          _gameScreen.State = States.GameStates.Playing;
+          IsRemoved = true;
+          //_gameScreen.State = States.GameStates.Playing;
           _gameScreen.UpdateMap();
           npc.Demolish -= this.Demolish;
         }
@@ -478,7 +501,14 @@ namespace TopDown.Buildings
 
     private void DemloshButton_Click(object sender, EventArgs e)
     {
-      //State = BuildingStates.Demolishing;
+      if (HasStaff)
+      {
+        GameScreen.MessageBox.Show("Can't demolish a staffed building.");
+      }
+      else
+      {
+        State = BuildingStates.Demolishing;
+      }
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -630,10 +660,13 @@ namespace TopDown.Buildings
       var buttonTexture = content.Load<Texture2D>("Controls/Button");
       var buttonFont = content.Load<SpriteFont>("Fonts/Font");
 
-      _demloshButton = new OptionsButton(buttonTexture, buttonFont);
-      _demloshButton.Text = "Demolish";
-      _demloshButton.Click += DemloshButton_Click;
+      _demolishButton = new OptionsButton(buttonTexture, buttonFont);
+      _demolishButton.Text = "Demolish";
+      _demolishButton.Click += DemloshButton_Click;
 
+      _inspectButton = new OptionsButton(content.Load<Texture2D>("Controls/Button"), content.Load<SpriteFont>("Fonts/Font"));
+      _inspectButton.Text = "Inspect";
+      _inspectButton.Click += InspectButton_Click;
 
       _fireButton = new OptionsButton(buttonTexture, buttonFont);
       _fireButton.Text = "Fire";
@@ -642,6 +675,11 @@ namespace TopDown.Buildings
       _hireButton = new OptionsButton(buttonTexture, buttonFont);
       _hireButton.Text = "Hire";
       _hireButton.Click += HireButton_Click;
+    }
+
+    private void InspectButton_Click(object sender, EventArgs e)
+    {
+      _gameScreen.Inspect(this);
     }
 
     private void HireButton_Click(object sender, EventArgs e)
@@ -745,7 +783,7 @@ namespace TopDown.Buildings
 
           foreach (var component in Components)
           {
-            component.Layer = _spriteOutsideBottom.Layer - 0.001f;
+            component.Layer = DefaultLayer + 0.0020f;
             component.Update(gameTime);
           }
 
@@ -763,13 +801,13 @@ namespace TopDown.Buildings
           break;
         case BuildingStates.Demolishing:
 
-          if (NPCBuilder != null)
+          if (NPCDemolisher != null)
           {
-            if (NPCBuilder.IsWorking)
-              NPCBuilder = null;
+            if (NPCDemolisher.IsWorking)
+              NPCDemolisher = null;
           }
 
-          if (NPCBuilder == null)
+          if (NPCDemolisher == null)
           {
             var npc = _gameScreen.NPCComponents
               .Where(c => !c.IsBuilding && !c.IsWorking)
@@ -779,9 +817,9 @@ namespace TopDown.Buildings
                   this.DoorLocations.Where(v => v.IsValid).FirstOrDefault().Position))
               .FirstOrDefault();
 
-            NPCBuilder = npc;
+            NPCDemolisher = npc;
 
-            NPCBuilder.Demolish += Demolish;
+            NPCDemolisher.Demolish += Demolish;
           }
 
           Build(gameTime);

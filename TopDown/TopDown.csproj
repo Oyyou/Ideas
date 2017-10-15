@@ -46,11 +46,13 @@
   <ItemGroup>
     <Compile Include="Builders\PathBuilder.cs" />
     <Compile Include="Buildings\Building.cs" />
+    <Compile Include="Buildings\Labour\Farm.cs" />
     <Compile Include="Buildings\Labour\Mine.cs" />
     <Compile Include="Buildings\OptionsButton.cs" />
     <Compile Include="Controls\CraftingMenu\CraftingMenuSubButton.cs" />
     <Compile Include="Controls\CraftingMenu\CraftingMenuWindow.cs" />
     <Compile Include="Controls\GameSpeedController.cs" />
+    <Compile Include="Controls\InspectMenu\InspectMenuWindow.cs" />
     <Compile Include="Controls\InventoryMenu\InventoryMenuWindow.cs" />
     <Compile Include="Controls\JobMenu\JobMenuButton.cs" />
     <Compile Include="Controls\JobMenu\JobMenuSubButton.cs" />

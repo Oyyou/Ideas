@@ -1,77 +1,77 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="TopDown.Builders.PathBuilder" Collapsed="true">
-    <Position X="53.75" Y="1.75" Width="1.5" />
+    <Position X="58.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AgQAMAAAAQAAAgMAAAAACQAAAAAAAACAAAAABIAAAAQ=</HashCode>
       <FileName>Builders\PathBuilder.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Buildings.Building" Collapsed="true">
-    <Position X="41.25" Y="1.75" Width="1.5" />
+    <Position X="46.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIwAEFEAEQAQUiBiAQAASQQPhAAxwAChgAAAhECAQgQ=</HashCode>
+      <HashCode>AIwMGFEIUQAQ0iBiAQAASQQnhAg5wAChgIQAhECAQgQ=</HashCode>
       <FileName>Buildings\Building.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.BuildMenu.BuildMenuSubButton" Collapsed="true">
-    <Position X="31.25" Y="3.25" Width="1.5" />
+    <Position X="36" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAACAACgAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
       <FileName>Controls\BuildMenu\BuildMenuSubButton.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.BuildMenu.BuildMenuWindow" Collapsed="true">
-    <Position X="20" Y="3.25" Width="1.5" />
+    <Position X="24.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CEQAMiAAAAAAAgAAABACBAAAAAAAAICAAAAAgAABDAQ=</HashCode>
+      <HashCode>CEQAMiAAAAAAAgAAABACBAAAAAABAICAAAAAgAABDAQ=</HashCode>
       <FileName>Controls\BuildMenu\BuildMenuWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.ItemMenu.ItemMenu" Collapsed="true">
-    <Position X="56" Y="1.75" Width="1.5" />
+    <Position X="60.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAEQAAAAAAIgABAIAAAQABgACCAACAAAAAgQAAAAQ=</HashCode>
       <FileName>Controls\ItemMenu\ItemMenu.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.ItemMenu.ItemMenuButton" Collapsed="true">
-    <Position X="33.5" Y="3.25" Width="1.5" />
+    <Position X="38.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAACAAAAAAAAQCCgAAAIiAAACAAAAAAAAIA=</HashCode>
       <FileName>Controls\ItemMenu\ItemMenuButton.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.Keyboard" Collapsed="true">
-    <Position X="47" Y="1.75" Width="1.5" />
+    <Position X="51.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>gAQAEAAAAABBAgAAAAAAAAAAAAAAAACAACAAQAAAAAQ=</HashCode>
       <FileName>Controls\Keyboard.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.Mouse" Collapsed="true">
-    <Position X="49.25" Y="1.75" Width="1.5" />
+    <Position X="54" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>QgwAGAAAAQAAAgAgAIAABCAAAAAgAACAFAAAAHAAAAQ=</HashCode>
       <FileName>Controls\Mouse.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.ResourceView" Collapsed="true">
-    <Position X="51.5" Y="1.75" Width="1.5" />
+    <Position X="56.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAEAAAAgAAAgAAAAAAAAAAAACAAACAAAAAAAAAAAQ=</HashCode>
       <FileName>Controls\ResourceView.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Core.Camera" Collapsed="true">
-    <Position X="85" Y="0.5" Width="1.5" />
+    <Position X="92" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAgAAAAAAAAAgAAIAAAQAAAAAAAAAAAAAAAEAACE=</HashCode>
       <FileName>Core\Camera.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.FX.Particle" Collapsed="true">
-    <Position X="69.5" Y="3.25" Width="1.5" />
+    <Position X="76.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>FX\Particle.cs</FileName>
@@ -85,28 +85,28 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Program" Collapsed="true">
-    <Position X="90.25" Y="2.5" Width="1.5" />
+    <Position X="97.25" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
       <FileName>Program.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Logic.Pathfinder" Collapsed="true">
-    <Position X="86.75" Y="2.5" Width="1.5" />
+    <Position X="93.75" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAIAAmAAABQCAAAAAAAAAABIAAEADAAAiAAgA=</HashCode>
       <FileName>Logic\Pathfinder.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Models.Resources" Collapsed="true">
-    <Position X="85" Y="3.5" Width="1.5" />
+    <Position X="92" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAECAAAgAAAAE=</HashCode>
       <FileName>Models\Resources.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Resources.Rock" Collapsed="true">
-    <Position X="71.75" Y="3.25" Width="1.5" />
+    <Position X="78.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAEAEAIAAgAAAAAAACBQAAAAAAAAAAAAAAAAAAAgQ=</HashCode>
       <FileName>Resources\Rock.cs</FileName>
@@ -115,7 +115,7 @@
   <Class Name="TopDown.States.GameScreen" Collapsed="true">
     <Position X="2.75" Y="7.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>Ag0gkACIKAApAgAAwMBAAIUADACAAAAAEgQAJCoAIwU=</HashCode>
+      <HashCode>Ag0gkBCIKAApAgAAwMBAEIUADACAQAAAEgQAJCoAMwU=</HashCode>
       <FileName>Screens\GameScreen.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -127,14 +127,14 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Sprites.Player" Collapsed="true">
-    <Position X="67.25" Y="3.25" Width="1.5" />
+    <Position X="74.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAQAgAAAAAAAAAAAgAAA=</HashCode>
       <FileName>Sprites\Player.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Component" Collapsed="true">
-    <Position X="42.5" Y="0.5" Width="1.5" />
+    <Position X="46.25" Y="0.5" Width="1.5" />
     <TypeIdentifier />
     <Lollipop Position="0.2" />
   </Class>
@@ -143,27 +143,27 @@
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.Controls.Button" Collapsed="true">
-    <Position X="27.75" Y="1.75" Width="1.5" />
+    <Position X="32.75" Y="1.75" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.FX.GrassParticle" Collapsed="true">
-    <Position X="74" Y="3.25" Width="1.5" />
+    <Position X="81" Y="3.25" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.Managers.AnimationManager" Collapsed="true">
-    <Position X="80.75" Y="1.75" Width="1.5" />
+    <Position X="87.75" Y="1.75" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.Models.Animation" Collapsed="true">
-    <Position X="83.25" Y="0.5" Width="1.5" />
+    <Position X="90.25" Y="0.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.Models.GameModel" Collapsed="true">
-    <Position X="86.75" Y="1.5" Width="1.5" />
+    <Position X="93.75" Y="1.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.Sprites.Sprite" Collapsed="true">
-    <Position X="66" Y="1.75" Width="1.5" />
+    <Position X="72" Y="1.75" Width="1.5" />
     <TypeIdentifier />
     <Lollipop Position="0.2" />
   </Class>
@@ -172,126 +172,126 @@
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Collisions.CollisionObject" Collapsed="true">
-    <Position X="86.75" Y="0.5" Width="1.5" />
+    <Position X="93.75" Y="0.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Collisions.CollisionObjectGroup" Collapsed="true">
-    <Position X="88.5" Y="0.5" Width="1.5" />
+    <Position X="95.5" Y="0.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Collisions.Ellipse" Collapsed="true">
-    <Position X="90.25" Y="0.5" Width="1.5" />
+    <Position X="97.25" Y="0.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Collisions.Polyline" Collapsed="true">
-    <Position X="88.5" Y="2.5" Width="1.5" />
+    <Position X="95.5" Y="2.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Images.Image" Collapsed="true">
-    <Position X="88.5" Y="1.5" Width="1.5" />
+    <Position X="95.5" Y="1.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Images.ImageLayer" Collapsed="true">
-    <Position X="90.25" Y="1.5" Width="1.5" />
+    <Position X="97.25" Y="1.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Layers.Layer" Collapsed="true">
-    <Position X="83.25" Y="2.5" Width="1.5" />
+    <Position X="90.25" Y="2.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Layers.LayerTile" Collapsed="true">
-    <Position X="85" Y="2.5" Width="1.5" />
+    <Position X="92" Y="2.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Property" Collapsed="true">
-    <Position X="83.25" Y="3.5" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
-  <Class Name="Engine.TmxSharp.TmxMap" Collapsed="true">
-    <Position X="86.75" Y="4.5" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
-  <Class Name="Engine.TmxSharp.Tilesets.Animation.Frame" Collapsed="true">
-    <Position X="85" Y="1.5" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
-  <Class Name="Engine.TmxSharp.Tilesets.Terrain" Collapsed="true">
     <Position X="90.25" Y="3.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
+  <Class Name="Engine.TmxSharp.TmxMap" Collapsed="true">
+    <Position X="93.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Engine.TmxSharp.Tilesets.Animation.Frame" Collapsed="true">
+    <Position X="92" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Engine.TmxSharp.Tilesets.Terrain" Collapsed="true">
+    <Position X="97.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
   <Class Name="Engine.TmxSharp.Tilesets.Tileset" Collapsed="true">
-    <Position X="83.25" Y="4.5" Width="1.5" />
+    <Position X="90.25" Y="4.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.TmxSharp.Tilesets.TilesetTile" Collapsed="true">
-    <Position X="85" Y="4.5" Width="1.5" />
+    <Position X="92" Y="4.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="TopDown.Buildings.Housing.SmallHouse" Collapsed="true">
-    <Position X="40.25" Y="3.25" Width="1.5" />
+    <Position X="45" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAAAEAAAAAAQAAAAAAEAAAAAAAAAAAAEAAABACAAAA=</HashCode>
+      <HashCode>AAAAAEAAAAAAAAAAAAAEAAAAAAAAAAAAEAAABACAAAA=</HashCode>
       <FileName>Buildings\Housing\SmallHouse.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Buildings.Labour.Blacksmith" Collapsed="true">
-    <Position X="42.5" Y="3.25" Width="1.5" />
+    <Position X="47.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIgAAEAAAAAAQAAAAAAAAAAAAAAAQAAAAAAABACAAAQ=</HashCode>
+      <HashCode>AAgAAEAAAAAAAAAAAAAAAAAAAAAAQAAAAAAABACAAAQ=</HashCode>
       <FileName>Buildings\Labour\Blacksmith.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.MessageBox" Collapsed="true">
-    <Position X="35.75" Y="1.75" Width="1.5" />
+    <Position X="40.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAEAAAAQAgAgAgAAAAAAAAAACMAACIAAAAAAAAAAQ=</HashCode>
       <FileName>Controls\MessageBox.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Sprites.NPC" Collapsed="true">
-    <Position X="65" Y="3.25" Width="1.5" />
+    <Position X="72" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>EAwAkBIAIAAACAAwAgAAAQQAACUiwgAAAAAAAAAgABQ=</HashCode>
+      <HashCode>EAwAkBIAIAAAiAAwAgAAAQQAACUiQgAAAIAAAAAgABQ=</HashCode>
       <FileName>Sprites\NPC.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Sprites.Path" Collapsed="true">
-    <Position X="62.75" Y="3.25" Width="1.5" />
+    <Position X="69.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Sprites\Path.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Buildings.Housing.Tavern" Collapsed="true">
-    <Position X="44.75" Y="3.25" Width="1.5" />
+    <Position X="49.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAAAEAAAAAAQAAAAAAAAAAAAAAAAAAAAAAABACAAAA=</HashCode>
+      <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABACAAAA=</HashCode>
       <FileName>Buildings\Housing\Tavern.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.JobMenu.JobMenuWindow" Collapsed="true">
-    <Position X="17.75" Y="3.25" Width="1.5" />
+    <Position X="22.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>BAQAEAAAAAAAAgAAAAAAgAEBAAABCACAAAAAgAAAAAQ=</HashCode>
+      <HashCode>BAQAEAAAAAAgAgAAAAAAgAEBAAAACACAAAAAgAAAAAQ=</HashCode>
       <FileName>Controls\JobMenu\JobMenuWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.MenuWindow" Collapsed="true">
-    <Position X="16.5" Y="1.75" Width="1.5" />
+    <Position X="20.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAEBAAAAAAQgABAAABAQAAAECAAACAAAIAAAAAAAQ=</HashCode>
       <FileName>Controls\MenuWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Furnitures.Bar" Collapsed="true">
-    <Position X="60.5" Y="4.75" Width="1.5" />
+    <Position X="67.5" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Furnitures\Bar.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Furnitures.Furniture" Collapsed="true">
-    <Position X="60.5" Y="3.25" Width="1.5" />
+    <Position X="66.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAEBAAAAAAAAAAAAAAAQAAAAAAAAAAAAAIBAAAAAQ=</HashCode>
       <FileName>Furnitures\Furniture.cs</FileName>
@@ -299,96 +299,96 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="TopDown.Controls.JobMenu.JobMenuButton" Collapsed="true">
-    <Position X="26.75" Y="3.25" Width="1.5" />
+    <Position X="31.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Controls\JobMenu\JobMenuButton.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.JobMenu.JobMenuSubButton" Collapsed="true">
-    <Position X="29" Y="3.25" Width="1.5" />
+    <Position X="33.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAIAAAAAAAAIAgAAAAAAAAABEAAAgAAAAACAAAAAIQQ=</HashCode>
       <FileName>Controls\JobMenu\JobMenuSubButton.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Buildings.Labour.Mine" Collapsed="true">
-    <Position X="38" Y="3.25" Width="1.5" />
+    <Position X="42.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIgAAEAAAAAAQAAAAAAAAAAAAAAAAAAAAAAABACAAAQ=</HashCode>
+      <HashCode>AAgAAEAAAAAAAAAAAACAAAAAAAAAAAAAAAQABACAAAU=</HashCode>
       <FileName>Buildings\Labour\Mine.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.CraftingMenu.CraftingMenuSubButton" Collapsed="true">
-    <Position X="24.5" Y="3.25" Width="1.5" />
+    <Position X="29.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAgAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Controls\CraftingMenu\CraftingMenuSubButton.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.CraftingMenu.CraftingMenuWindow" Collapsed="true">
-    <Position X="15.5" Y="3.25" Width="1.5" />
+    <Position X="20.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AASAUgAAAAAAAgAAAAgAkAAAAEAAAIAgAAAAgAAAABQ=</HashCode>
       <FileName>Controls\CraftingMenu\CraftingMenuWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Items.Item" Collapsed="true">
-    <Position X="58.25" Y="3.25" Width="1.5" />
+    <Position X="63" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>ABAAAAAAACAAEAAAAAAAAAQACgAAAAAAAAAAAAAACAA=</HashCode>
       <FileName>Items\Item.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.InventoryMenu.InventoryMenuWindow" Collapsed="true">
-    <Position X="13.25" Y="3.25" Width="1.5" />
+    <Position X="18" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAEgAAAAAAAgAAAAgAAABAABAAAAAAAAIAgAAAAAQ=</HashCode>
       <FileName>Controls\InventoryMenu\InventoryMenuWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.Toolbars.BottomToolbar" Collapsed="true">
-    <Position X="76.25" Y="3.25" Width="1.5" />
+    <Position X="83.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAAACAAAAAEAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
       <FileName>Controls\Toolbars\BottomToolbar.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.Toolbars.Toolbar" Collapsed="true">
-    <Position X="77.25" Y="1.75" Width="1.5" />
+    <Position X="84.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAEAAAAAQAAgAAAAAAAQAAAAAAAACAAAAAAAAAAAQ=</HashCode>
       <FileName>Controls\Toolbars\Toolbar.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.Toolbars.TopToolbar" Collapsed="true">
-    <Position X="78.5" Y="3.25" Width="1.5" />
+    <Position X="85.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAACAAEAAAAgAAAAAAAAAAAAAAAAAABAAAAAAQ=</HashCode>
       <FileName>Controls\Toolbars\TopToolbar.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Controls.ComboBox" Collapsed="true">
-    <Position X="4.25" Y="1.75" Width="1.5" />
+    <Position X="6.75" Y="1.75" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.Controls.ComboBoxItem" Collapsed="true">
-    <Position X="6.5" Y="1.75" Width="1.5" />
+    <Position X="9" Y="1.75" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.Utilities.FrameCounter" Collapsed="true">
-    <Position X="8.75" Y="1.75" Width="1.5" />
+    <Position X="11.25" Y="1.75" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="TopDown.Buildings.OptionsButton" Collapsed="true">
-    <Position X="22.25" Y="3.25" Width="1.5" />
+    <Position X="27" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Buildings\OptionsButton.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Controls.Notifications" Collapsed="true">
-    <Position X="11" Y="1.75" Width="1.5" />
+    <Position X="13.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAYAEAAAAQAAAgAAAAAAAAAAAACQAACAAAAAAAAAAAQ=</HashCode>
       <FileName>Controls\Notifications.cs</FileName>
@@ -416,7 +416,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Managers.ExperienceManager" Collapsed="true">
-    <Position X="83.25" Y="1.5" Width="1.5" />
+    <Position X="90.25" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Managers\ExperienceManager.cs</FileName>
@@ -444,84 +444,105 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Skills.Skill" Collapsed="true">
-    <Position X="86.75" Y="3.5" Width="1.5" />
+    <Position X="93.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAABAAAAAAAAQAA=</HashCode>
       <FileName>Skills\Skill.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Skills.Skills" Collapsed="true">
-    <Position X="88.5" Y="3.5" Width="1.5" />
+    <Position X="95.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Skills\Skills.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TopDown.Traits.Trait" Collapsed="true">
-    <Position X="88.5" Y="4.5" Width="1.5" />
+    <Position X="95.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Traits\Trait.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="TopDown.Controls.GameSpeedController" Collapsed="true">
+    <Position X="4.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAEAAAAAAAAgAAAAAAAAAAAAABAACAAAAAAQAAAAQ=</HashCode>
+      <FileName>Controls\GameSpeedController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TopDown.Controls.InspectMenu.InspectMenuWindow" Collapsed="true">
+    <Position X="15.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAEBAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Controls\InspectMenu\InspectMenuWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TopDown.Furnitures.Bed" Collapsed="true">
+    <Position X="65.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Furnitures\Bed.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Enum Name="TopDown.Builders.PathBuilderStates" Collapsed="true">
-    <Position X="86.75" Y="6.5" Width="1.5" />
+    <Position X="93.75" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAIIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Builders\PathBuilder.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TopDown.Buildings.BuildingStates" Collapsed="true">
-    <Position X="83.25" Y="5.75" Width="1.5" />
+    <Position X="90.25" Y="5.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAABAAAAIAAAIAAAAQAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAIAAAEAAAAAAAACAAAAAEAAAAQAAAA=</HashCode>
       <FileName>Buildings\Building.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TopDown.Controls.ItemMenu.ItemMenuButtonStates" Collapsed="true">
-    <Position X="90.25" Y="5.75" Width="1.5" />
+    <Position X="97.25" Y="5.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAACAAAEAAAAAAAAA=</HashCode>
       <FileName>Controls\ItemMenu\ItemMenuButton.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TopDown.Controls.MouseStates" Collapsed="true">
-    <Position X="85" Y="6.5" Width="1.5" />
+    <Position X="92" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
       <FileName>Controls\Mouse.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TopDown.States.GameStates" Collapsed="true">
-    <Position X="85" Y="5.75" Width="1.5" />
+    <Position X="92" Y="5.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAhEAAAAAAAAAABAAAAAAQIAAAAAAAAAIAAAAgAAAE=</HashCode>
+      <HashCode>AAAhEAAAAAAAAAABAAAAAAQIAAAAAAAAAIAAAAgAEAE=</HashCode>
       <FileName>Screens\GameScreen.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TopDown.Furnitures.PlacableObjectStates" Collapsed="true">
-    <Position X="88.5" Y="6.5" Width="1.5" />
+    <Position X="95.5" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
       <FileName>Furnitures\Furniture.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TopDown.Items.ItemCategories" Collapsed="true">
-    <Position X="86.75" Y="5.75" Width="1.5" />
+    <Position X="93.75" Y="5.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAACAAAAAAAAAQAgAAAAAAAAgAAgAAAAAAAAACAA=</HashCode>
       <FileName>Items\Item.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TopDown.Items.ItemMaterials" Collapsed="true">
-    <Position X="88.5" Y="5.75" Width="1.5" />
+    <Position X="95.5" Y="5.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAEIAAAAAAAAAAAAAAAAAAAAAAACAAAAEAAgAAAAAAE=</HashCode>
       <FileName>Items\Item.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TopDown.States.Layers" Collapsed="true">
-    <Position X="83.25" Y="6.5" Width="1.5" />
+    <Position X="90.25" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAIAAAoCAACAAAAAEAAAAAAAAAAAAgAAAAA=</HashCode>
       <FileName>Screens\GameScreen.cs</FileName>
