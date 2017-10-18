@@ -61,6 +61,7 @@
     <Compile Include="Controls\Notifications.cs" />
     <Compile Include="Controls\Toolbars\Toolbar.cs" />
     <Compile Include="Controls\Toolbars\BottomToolbar.cs" />
+    <Compile Include="Controls\Toolbars\ToolbarButton.cs" />
     <Compile Include="Controls\Toolbars\TopToolbar.cs" />
     <Compile Include="Furnitures\Bed.cs" />
     <Compile Include="Furnitures\Bar.cs" />

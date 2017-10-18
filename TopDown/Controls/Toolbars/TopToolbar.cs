@@ -38,17 +38,18 @@ namespace TopDown.Controls.Toolbars
     public override void LoadContent(ContentManager content)
     {
       _toolbarSprite = new Sprite(content.Load<Texture2D>("Controls/Toolbar_Top"));
+      _toolbarSprite.IsVisible = false; // TODO: Remove all together
 
-      var buildButton = new Button(content.Load<Texture2D>("Controls/Icons/Build"));
+      var buildButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Build"));
       buildButton.Click += BuildButton_Click;
 
-      var craftButton = new Button(content.Load<Texture2D>("Controls/Icons/Crafting"));
+      var craftButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Crafting"));
       craftButton.Click += CraftButton_Click;
 
-      var jobsButton = new Button(content.Load<Texture2D>("Controls/Icons/Jobs"));
+      var jobsButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Jobs"));
       jobsButton.Click += JobsButton_Click;
 
-      var inventoryButton = new Button(content.Load<Texture2D>("Controls/Icons/Inventory"));
+      var inventoryButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Inventory"));
       inventoryButton.Click += InventoryButton_Click;
 
       _icons = new List<Button>()

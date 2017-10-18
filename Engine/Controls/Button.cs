@@ -58,6 +58,8 @@ namespace Engine.Controls
 
     public override Rectangle Rectangle { get; set; }
 
+    public float Scale { get; set; }
+
     public string Text { get; set; }
 
     public Button(Texture2D texture)
@@ -88,7 +90,7 @@ namespace Engine.Controls
       if (!IsVisible)
         return;
 
-      spriteBatch.Draw(_texture, Rectangle, null, _colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
+      spriteBatch.Draw(_texture, Position, null, _colour, 0, new Vector2(0, 0), Scale, SpriteEffects.None, Layer);
 
       foreach (var component in Components)
         component.Draw(gameTime, spriteBatch);
@@ -104,7 +106,7 @@ namespace Engine.Controls
       float x = (Rectangle.X + (Rectangle.Width / 2)) - (_font.MeasureString(Text).X / 2);
       float y = (Rectangle.Y + (Rectangle.Height / 2)) - (_font.MeasureString(Text).Y / 2);
 
-      spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColor, 0, new Vector2(0, 0), 1, SpriteEffects.None, Layer + 0.001f);
+      spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColor, 0, new Vector2(0, 0), Scale, SpriteEffects.None, Layer + 0.001f);
     }
 
     private void Initialise()
@@ -118,6 +120,18 @@ namespace Engine.Controls
       IsEnabled = true;
 
       IsVisible = true;
+
+      Scale = 1f;
+    }
+
+    protected virtual void OffHover()
+    {
+
+    }
+
+    protected virtual void OnHover()
+    {
+
     }
 
     public override void LoadContent(ContentManager content)
@@ -145,7 +159,7 @@ namespace Engine.Controls
       if (!IsEnabled)
         return;
 
-      Rectangle = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+      Rectangle = new Rectangle((int)Position.X, (int)Position.Y, (int)(_texture.Width * Scale), (int)(_texture.Height * Scale));
 
       _previousMouse = _currentMouse;
       _currentMouse = Mouse.GetState();
@@ -168,6 +182,10 @@ namespace Engine.Controls
 
       foreach (var component in Components)
         component.Update(gameTime);
+
+      if (IsHovering)
+        OnHover();
+      else OffHover();
     }
   }
 }
