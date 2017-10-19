@@ -60,7 +60,7 @@ namespace GUITest.Interface
 
     public void SetButtonPositions()
     {
-      var screenWidth = 800; // Todo: this
+      var screenWidth = Game1.ScreenWidth;
 
       var spaceBetween = 10;
 

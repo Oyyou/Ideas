@@ -47,7 +47,7 @@ namespace GUITest.Interface
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(Texture, Position, null, Color, 0f, Origin, Scale, SpriteEffects.None, 0);
+      spriteBatch.Draw(Texture, Position, null, Color, 0f, Origin, Scale, SpriteEffects.None, 0.1f);
     }
 
     public void OnClick()

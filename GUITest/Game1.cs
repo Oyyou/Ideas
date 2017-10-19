@@ -16,6 +16,12 @@ namespace GUITest
 
     private Toolbar _toolbar;
 
+    private Window _window;
+
+    public static int ScreenHeight { get; private set; }
+
+    public static int ScreenWidth { get; private set; }
+
     public Game1()
     {
       graphics = new GraphicsDeviceManager(this);
@@ -32,7 +38,25 @@ namespace GUITest
     {
       IsMouseVisible = true;
 
+      ScreenHeight = graphics.PreferredBackBufferHeight;
+      ScreenWidth = graphics.PreferredBackBufferWidth;
+
+      Window.AllowUserResizing = true;
+      Window.ClientSizeChanged += Window_ClientSizeChanged;
+
       base.Initialize();
+    }
+
+    private void Window_ClientSizeChanged(object sender, System.EventArgs e)
+    {
+      graphics.PreferredBackBufferHeight = MathHelper.Clamp(graphics.PreferredBackBufferHeight, 480, 1400);
+      graphics.PreferredBackBufferWidth = MathHelper.Clamp(graphics.PreferredBackBufferWidth, 800, 2560);
+      graphics.ApplyChanges();
+
+      ScreenHeight = graphics.PreferredBackBufferHeight;
+      ScreenWidth = graphics.PreferredBackBufferWidth;
+
+      _toolbar.OnScreenResize();
     }
 
     /// <summary>
@@ -45,6 +69,8 @@ namespace GUITest
       spriteBatch = new SpriteBatch(GraphicsDevice);
 
       _toolbar = new Toolbar(Content);
+
+      _window = new Interface.Window(Content);
     }
 
     /// <summary>
@@ -76,11 +102,23 @@ namespace GUITest
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
-      spriteBatch.Begin();
+      var original = graphics.GraphicsDevice.Viewport;
+
+      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
 
       _toolbar.Draw(gameTime, spriteBatch);
 
       spriteBatch.End();
+
+      graphics.GraphicsDevice.Viewport = new Viewport(10, 10, 250, 360);
+
+      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
+
+      _window.Draw(gameTime, spriteBatch);
+
+      spriteBatch.End();
+
+      graphics.GraphicsDevice.Viewport = original;
 
       base.Draw(gameTime);
     }
