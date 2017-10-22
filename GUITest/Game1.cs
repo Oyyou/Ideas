@@ -26,6 +26,10 @@ namespace GUITest
     {
       graphics = new GraphicsDeviceManager(this);
       Content.RootDirectory = "Content";
+
+      graphics.PreferredBackBufferWidth = 1280;
+      graphics.PreferredBackBufferHeight = 720;
+      graphics.ApplyChanges();
     }
 
     /// <summary>
@@ -57,6 +61,7 @@ namespace GUITest
       ScreenWidth = graphics.PreferredBackBufferWidth;
 
       _toolbar.OnScreenResize();
+      _window.OnScreenResize();
     }
 
     /// <summary>
@@ -91,6 +96,8 @@ namespace GUITest
     {
       _toolbar.Update(gameTime);
 
+      _window.Update(gameTime);
+
       base.Update(gameTime);
     }
 
@@ -102,7 +109,6 @@ namespace GUITest
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
-      var original = graphics.GraphicsDevice.Viewport;
 
       spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
 
@@ -110,15 +116,7 @@ namespace GUITest
 
       spriteBatch.End();
 
-      graphics.GraphicsDevice.Viewport = new Viewport(10, 10, 250, 360);
-
-      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
-
-      _window.Draw(gameTime, spriteBatch);
-
-      spriteBatch.End();
-
-      graphics.GraphicsDevice.Viewport = original;
+      _window.Draw(gameTime, spriteBatch, graphics);
 
       base.Draw(gameTime);
     }

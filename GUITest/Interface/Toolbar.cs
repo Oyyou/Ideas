@@ -133,7 +133,7 @@ namespace GUITest.Interface
       {
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
-        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Crafting")),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
       };

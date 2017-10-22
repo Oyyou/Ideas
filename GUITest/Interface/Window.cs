@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,31 +16,65 @@ namespace GUITest.Interface
 
     private SpriteFont _font;
 
+    private Scrollbar _scrollbar;
+
+    public Vector2 CameraPosition { get; protected set; }
+
     public string Name { get; protected set; }
 
     public Vector2 Position { get; protected set; }
 
     public readonly Texture2D Texture;
 
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
     {
-      spriteBatch.Draw(Texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
+      var original = graphics.GraphicsDevice.Viewport;
 
-      spriteBatch.DrawString(_font, "Window", new Vector2(Position.X + 10, Position.Y + 10), Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.1f);
+      DrawWindow(gameTime, spriteBatch);
+
+      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X, (int)Position.Y + 35, Texture.Width, Texture.Height);
+
+      DrawButtons(gameTime, spriteBatch);
+
+      graphics.GraphicsDevice.Viewport = original;
+    }
+
+    private void DrawButtons(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: Matrix.CreateTranslation(CameraPosition.X, CameraPosition.Y, 0));
 
       foreach (var button in _buttons)
         button.Draw(gameTime, spriteBatch);
+
+      spriteBatch.End();
+    }
+
+    private void DrawWindow(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
+
+      spriteBatch.Draw(Texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
+
+      _scrollbar.Draw(gameTime, spriteBatch);
+
+      spriteBatch.DrawString(_font, "Window", new Vector2(Position.X + 10, Position.Y + 10), Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.1f);
+
+      spriteBatch.End();
     }
 
     public void OnScreenResize()
     {
-      SetPosition();
-
-      SetButtonPositions();
+      SetPositions();
     }
 
-    public void SetButtonPositions()
+    public void SetPositions()
     {
+      CameraPosition = new Vector2(0, CameraPosition.Y);
+
+      Position = new Vector2((Game1.ScreenWidth / 2) - (Texture.Width / 2), 20);
+
+      _scrollbar.Position = new Vector2((Position.X + Texture.Width) - 20 - 10, Position.Y + 35);
+
       var screenWidth = Game1.ScreenWidth;
 
       var spaceBetween = 10;
@@ -48,21 +83,30 @@ namespace GUITest.Interface
 
       var buttonWidth = _buttons.FirstOrDefault().Texture.Width;
 
-      var x = Position.X + 10 + (buttonWidth / 2);
+      var x = CameraPosition.X + 10 + (buttonWidth / 2);
 
-      var y = Position.Y  + 60;
+      var y = CameraPosition.Y + 25;
 
       foreach (var button in _buttons)
       {
         button.Position = new Vector2(x, y);
         x += button.Texture.Width + spaceBetween;
 
-        if (x >= Position.X + (Texture.Width))
+        if (x >= (CameraPosition.X + (Texture.Width) - 40))
         {
-          x = Position.X + 10 + (buttonWidth / 2);
+          x = CameraPosition.X + 10 + (buttonWidth / 2);
           y += buttonHeight + spaceBetween;
         }
       }
+    }
+
+    public void Update(GameTime gameTime)
+    {
+      CameraPosition = new Vector2(CameraPosition.X, MathHelper.Clamp(-_scrollbar._innerY + 60, -1000, 2400));
+
+      var height = (int)(_buttons.Last().Position.Y - _buttons.FirstOrDefault().Position.Y);
+
+      _scrollbar.Update(gameTime, height);
     }
 
     public Window(ContentManager content)
@@ -71,7 +115,7 @@ namespace GUITest.Interface
 
       Texture = content.Load<Texture2D>("Interface/Window");
 
-      SetPosition();
+      _scrollbar = new Scrollbar(content);
 
       _buttons = new List<ToolbarButton>()
       {
@@ -82,12 +126,7 @@ namespace GUITest.Interface
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
       };
 
-      SetButtonPositions();
-    }
-
-    private void SetPosition()
-    {
-      Position = new Vector2(0, 0);// Game1.ScreenWidth / 2, (Texture.Height / 2) + 20);
+      SetPositions();
     }
   }
 }
