@@ -18,19 +18,20 @@ namespace GUITest.Interface
 
     private Texture2D _inner;
 
-    private int _innerHeight;
-
     private Rectangle _innerRectangle
     {
       get
       {
-        return new Rectangle((int)Position.X + 3, _innerY, _inner.Width, _innerHeight);
+        // TODO: Figure out how to set the height dynamically based off content height
+        return new Rectangle((int)Position.X + _padding, _innerY, _inner.Width, 30);
       }
     }
 
     public int _innerY;
 
     private Texture2D _outer;
+
+    private const int _padding = 3;
 
     private int _previousScrollValue;
 
@@ -55,13 +56,8 @@ namespace GUITest.Interface
       _outer = content.Load<Texture2D>("Interface/Scrollbar_Outer");
     }
 
-    public void Update(GameTime gameTime, int contentHeight)
+    public void Update(GameTime gameTime)
     {
-      var scrollTrackSpace = contentHeight - (_outer.Height - 6);
-      var scrollThumbSpace = _outer.Height;
-
-      _innerHeight = scrollThumbSpace + scrollTrackSpace;
-
       _previousScrollValue = _currentScrollValue;
       _currentScrollValue = Mouse.GetState().ScrollWheelValue;
 
@@ -87,7 +83,7 @@ namespace GUITest.Interface
         _innerY += (_previousScrollValue - _currentScrollValue) / 10;
       }
 
-      _innerY = MathHelper.Clamp(_innerY, (int)Position.Y + 3, ((int)Position.Y + _outer.Height - 3) - _innerRectangle.Height);
+      _innerY = MathHelper.Clamp(_innerY, (int)Position.Y + _padding, ((int)Position.Y + _outer.Height - _padding) - _innerRectangle.Height);
     }
   }
 }

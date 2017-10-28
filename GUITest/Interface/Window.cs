@@ -32,7 +32,7 @@ namespace GUITest.Interface
 
       DrawWindow(gameTime, spriteBatch);
 
-      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X, (int)Position.Y + 35, Texture.Width, Texture.Height);
+      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X, (int)Position.Y + 35, Texture.Width, Texture.Height - 35);
 
       DrawButtons(gameTime, spriteBatch);
 
@@ -104,9 +104,7 @@ namespace GUITest.Interface
     {
       CameraPosition = new Vector2(CameraPosition.X, MathHelper.Clamp(-_scrollbar._innerY + 60, -1000, 2400));
 
-      var height = (int)(_buttons.Last().Position.Y - _buttons.FirstOrDefault().Position.Y);
-
-      _scrollbar.Update(gameTime, height);
+      _scrollbar.Update(gameTime);
     }
 
     public Window(ContentManager content)
@@ -123,6 +121,30 @@ namespace GUITest.Interface
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
       };
 
