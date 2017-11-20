@@ -18,18 +18,31 @@ namespace GUITest
 
     private Window _window;
 
+    public bool IsWindowOpen
+    {
+      get
+      {
+        return _window != null;
+      }
+    }
+
     public static int ScreenHeight { get; private set; }
 
     public static int ScreenWidth { get; private set; }
+
+    public void CloseWindow()
+    {
+      _window = null;
+    }
 
     public Game1()
     {
       graphics = new GraphicsDeviceManager(this);
       Content.RootDirectory = "Content";
 
-      graphics.PreferredBackBufferWidth = 1280;
-      graphics.PreferredBackBufferHeight = 720;
-      graphics.ApplyChanges();
+      //graphics.PreferredBackBufferWidth = 1280;
+      //graphics.PreferredBackBufferHeight = 720;
+      //graphics.ApplyChanges();
     }
 
     /// <summary>
@@ -61,7 +74,7 @@ namespace GUITest
       ScreenWidth = graphics.PreferredBackBufferWidth;
 
       _toolbar.OnScreenResize();
-      _window.OnScreenResize();
+      _window?.OnScreenResize();
     }
 
     /// <summary>
@@ -73,9 +86,9 @@ namespace GUITest
       // Create a new SpriteBatch, which can be used to draw textures.
       spriteBatch = new SpriteBatch(GraphicsDevice);
 
-      _toolbar = new Toolbar(Content);
+      _toolbar = new Toolbar(this, Content);
 
-      _window = new Interface.Window(Content);
+      //_window = new Interface.Window(Content);
     }
 
     /// <summary>
@@ -96,7 +109,7 @@ namespace GUITest
     {
       _toolbar.Update(gameTime);
 
-      _window.Update(gameTime);
+      _window?.Update(gameTime);
 
       base.Update(gameTime);
     }
@@ -108,17 +121,21 @@ namespace GUITest
     protected override void Draw(GameTime gameTime)
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
-
-
+      
       spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
 
       _toolbar.Draw(gameTime, spriteBatch);
 
       spriteBatch.End();
 
-      _window.Draw(gameTime, spriteBatch, graphics);
+      _window?.Draw(gameTime, spriteBatch, graphics);
 
       base.Draw(gameTime);
+    }
+
+    public void OpenWindow(Window window)
+    {
+      _window = window;
     }
   }
 }

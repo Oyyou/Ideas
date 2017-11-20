@@ -14,7 +14,11 @@ namespace GUITest.Interface
   {
     private List<ToolbarButton> _buttons;
 
+    private ContentManager _content;
+
     private MouseState _currentMouseState;
+
+    private Game1 _game;
 
     private MouseState _previousMouseState;
 
@@ -61,16 +65,19 @@ namespace GUITest.Interface
     public void SetButtonPositions()
     {
       var screenWidth = Game1.ScreenWidth;
+      var screenHeight = Game1.ScreenHeight;
 
       var spaceBetween = 10;
 
       var buttonWidth = _buttons.FirstOrDefault().Texture.Width;
+      var buttonHeight = _buttons.FirstOrDefault().Texture.Height;
 
-      var x = (screenWidth / 2) - (_buttons.Sum(c => buttonWidth + spaceBetween) / 2) + (buttonWidth/ 2);
+      var x = (screenWidth / 2) - (_buttons.Sum(c => buttonWidth + spaceBetween) / 2) + (buttonWidth / 2);
+      var y = screenHeight - (buttonHeight);
 
       foreach (var button in _buttons)
       {
-        button.Position = new Vector2(x, 420);
+        button.Position = new Vector2(x, y);
         x += button.Texture.Width + spaceBetween;
       }
     }
@@ -101,6 +108,8 @@ namespace GUITest.Interface
 
             if (clicked)
             {
+              _game.CloseWindow();
+
               foreach (var b in _buttons)
                 b.CurrentState = ToolbarButtonStates.Nothing;
 
@@ -112,7 +121,7 @@ namespace GUITest.Interface
             break;
           case ToolbarButtonStates.Clicked:
 
-            if (clicked && !_buttons.Any(c => c != button && c.Rectangle.Intersects(mouseRectangle))) // Check if we're clicking somewhere that isn't on any button
+            if (clicked && !_buttons.Any(c => c.Rectangle.Intersects(mouseRectangle)) && !_game.IsWindowOpen) // Check if we're clicking somewhere that isn't on any button
             {
               foreach (var b in _buttons)
                 b.CurrentState = ToolbarButtonStates.Nothing;
@@ -127,18 +136,30 @@ namespace GUITest.Interface
       }
     }
 
-    public Toolbar(ContentManager content)
+    public Toolbar(Game1 game, ContentManager content)
     {
+      _game = game;
+
+      _content = content;
+
+      var squad = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad"));
+      squad.Click += Squad_Click;
+
       _buttons = new List<ToolbarButton>()
       {
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
-        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        squad,
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Crafting")),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
       };
 
       SetButtonPositions();
+    }
+
+    private void Squad_Click(object sender, EventArgs e)
+    {
+      _game.OpenWindow(new Window(_content));
     }
   }
 }
