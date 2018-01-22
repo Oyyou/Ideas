@@ -22,7 +22,7 @@ namespace TopDown.Controls.BuildMenu
 
     public List<ItemMenuButton> Items { get; set; }
 
-    public Models.Resources ResourceCost;
+    public VillageBackend.Models.Resources ResourceCost;
 
     public BuildMenuSubButton(Texture2D texture, SpriteFont font)
       : base(texture, font)

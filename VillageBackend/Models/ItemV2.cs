@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TopDown.Items;
+using static VillageBackend.Enums;
 
-namespace TopDown.Models
+namespace VillageBackend.Models
 {
   public abstract class ItemV2
   {

@@ -85,10 +85,6 @@
     <Compile Include="Logic\Pathfinder.cs" />
     <Compile Include="ItemStats\ItemStats.cs" />
     <Compile Include="Managers\ExperienceManager.cs" />
-    <Compile Include="Models\ItemV2.cs" />
-    <Compile Include="Models\Resources.cs" />
-    <Compile Include="Models\Armour.cs" />
-    <Compile Include="Models\Weapon.cs" />
     <Compile Include="Skills\Skill.cs" />
     <Compile Include="Skills\Skills.cs" />
     <Compile Include="ItemStats\WeaponStats.cs" />
@@ -127,6 +123,10 @@
     <ProjectReference Include="..\Engine\Engine.csproj">
       <Project>{7fb609dd-9800-434e-9a22-b617e9c8cb81}</Project>
       <Name>Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VillageBackend\VillageBackend.csproj">
+      <Project>{706f5872-ee1c-43ae-a394-028abe0a3cb9}</Project>
+      <Name>VillageBackend</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

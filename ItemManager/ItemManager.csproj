@@ -111,9 +111,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TopDown\TopDown.csproj">
-      <Project>{5b87edea-586e-4f3c-b309-31217a793cbd}</Project>
-      <Name>TopDown</Name>
+    <ProjectReference Include="..\VillageBackend\VillageBackend.csproj">
+      <Project>{706f5872-ee1c-43ae-a394-028abe0a3cb9}</Project>
+      <Name>VillageBackend</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

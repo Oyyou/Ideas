@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TopDown.Items;
 using TopDown.States;
+using static VillageBackend.Enums;
 
 namespace TopDown.Controls.InventoryMenu
 {

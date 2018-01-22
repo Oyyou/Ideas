@@ -159,7 +159,7 @@ namespace TopDown.States
 
     //public TopDown.Sprites.Player Player { get; private set; }
 
-    public Models.Resources Resources { get; set; }
+    public VillageBackend.Models.Resources Resources { get; set; }
 
     public Building SelectedBuilding { get; set; }
 
@@ -445,7 +445,7 @@ namespace TopDown.States
 
       Notifications = new Notifications();
 
-      Resources = new Models.Resources();
+      Resources = new VillageBackend.Models.Resources();
 
       var playerAnimations = new Dictionary<string, Animation>()
       {

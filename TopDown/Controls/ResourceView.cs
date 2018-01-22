@@ -14,7 +14,7 @@ namespace TopDown.Controls
   {
     private SpriteFont _font;
 
-    private Models.Resources _resources;
+    private VillageBackend.Models.Resources _resources;
 
     public override void CheckCollision(Component component)
     {
@@ -32,7 +32,7 @@ namespace TopDown.Controls
       _font = content.Load<SpriteFont>("Fonts/Font");
     }
 
-    public ResourceView(Models.Resources resources)
+    public ResourceView(VillageBackend.Models.Resources resources)
     {
       _resources = resources;
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TopDown.Models
+namespace VillageBackend.Models
 {
   public class Weapon : ItemV2
   {

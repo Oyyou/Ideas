@@ -1,4 +1,5 @@
 ﻿using GUITest.Interface;
+using GUITest.Interface.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -30,6 +31,16 @@ namespace GUITest
 
     public static int ScreenWidth { get; private set; }
 
+    public static Rectangle ScreenRectangle { get; private set; }
+
+    public Rectangle WindowRectangle
+    {
+      get
+      {
+        return _window != null ? _window.Rectangle : new Rectangle(0, 0, 0, 0);
+      }
+    }
+
     public void CloseWindow()
     {
       _window = null;
@@ -58,6 +69,8 @@ namespace GUITest
       ScreenHeight = graphics.PreferredBackBufferHeight;
       ScreenWidth = graphics.PreferredBackBufferWidth;
 
+      ScreenRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
+
       Window.AllowUserResizing = true;
       Window.ClientSizeChanged += Window_ClientSizeChanged;
 
@@ -72,6 +85,8 @@ namespace GUITest
 
       ScreenHeight = graphics.PreferredBackBufferHeight;
       ScreenWidth = graphics.PreferredBackBufferWidth;
+
+      ScreenRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
 
       _toolbar.OnScreenResize();
       _window?.OnScreenResize();

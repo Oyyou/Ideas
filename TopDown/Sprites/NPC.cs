@@ -11,7 +11,6 @@ using Engine;
 using TopDown.Buildings;
 using TopDown.Items;
 using Microsoft.Xna.Framework.Content;
-using TopDown.Models;
 using TopDown.Skills;
 using TopDown.Furnitures;
 

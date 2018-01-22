@@ -37,6 +37,8 @@ namespace GUITest.Interface
 
     public int MinContentHeight { get; set; }
 
+    public Rectangle ScrollArea { get; set; }
+
     /// <summary>
     /// The position of the scrollbar
     /// </summary>
@@ -78,7 +80,7 @@ namespace GUITest.Interface
         _innerY = mouseRectangle.Y - (_innerRectangle.Height / 2);
       }
 
-      if (_previousScrollValue != _currentScrollValue)
+      if (_previousScrollValue != _currentScrollValue && mouseRectangle.Intersects(ScrollArea))
       {
         _innerY += (_previousScrollValue - _currentScrollValue) / 10;
       }

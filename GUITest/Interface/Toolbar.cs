@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GUITest.Interface.Windows;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -121,6 +122,25 @@ namespace GUITest.Interface
             break;
           case ToolbarButtonStates.Clicked:
 
+            if(clicked)
+            {
+              if (!mouseRectangle.Intersects(Game1.ScreenRectangle))
+                continue;
+
+              if(mouseRectangle.Intersects(button.Rectangle) || // If we're clicking a button that is already clicked..
+                 (!_buttons.Any(c => c.Rectangle.Intersects(mouseRectangle)) && // Or clicking something that isn't a button, or an open window
+                  !mouseRectangle.Intersects(_game.WindowRectangle)))
+              {
+                _game.CloseWindow();
+
+                foreach (var b in _buttons)
+                  b.CurrentState = ToolbarButtonStates.Nothing;
+
+                // Set the clicked button to "Hover" because that's where the mouse'll be
+                button.CurrentState = ToolbarButtonStates.Hovering;
+              }
+            }
+
             if (clicked && !_buttons.Any(c => c.Rectangle.Intersects(mouseRectangle)) && !_game.IsWindowOpen) // Check if we're clicking somewhere that isn't on any button
             {
               foreach (var b in _buttons)
@@ -145,11 +165,14 @@ namespace GUITest.Interface
       var squad = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad"));
       squad.Click += Squad_Click;
 
+      var crafting = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Crafting"));
+      crafting.Click += Crafting_Click;
+
       _buttons = new List<ToolbarButton>()
       {
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
         squad,
-        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Crafting")),
+        crafting,
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
       };
@@ -157,9 +180,14 @@ namespace GUITest.Interface
       SetButtonPositions();
     }
 
+    private void Crafting_Click(object sender, EventArgs e)
+    {
+      _game.OpenWindow(new CraftingWindow(_content));
+    }
+
     private void Squad_Click(object sender, EventArgs e)
     {
-      _game.OpenWindow(new Window(_content));
+      //_game.OpenWindow(new Window(_content));
     }
   }
 }

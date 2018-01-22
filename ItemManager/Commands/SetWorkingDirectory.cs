@@ -11,8 +11,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
-using TopDown.Items;
-using TopDown.Models;
 
 namespace ItemManager.Commands
 {

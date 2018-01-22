@@ -26,7 +26,7 @@ namespace TopDown.Resources
 
     private float _timer = 0;
 
-    public Models.Resources Resources { get; set; }
+    public VillageBackend.Models.Resources Resources { get; set; }
 
     private void GenerateRockParticle(float lifeTimer)
     {
@@ -50,7 +50,7 @@ namespace TopDown.Resources
     {
       base.LoadContent(content);
 
-      Resources = new Models.Resources()
+      Resources = new VillageBackend.Models.Resources()
       {
         Stone = 10,
       };

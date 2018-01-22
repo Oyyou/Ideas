@@ -10,9 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TopDown.Items;
 using TopDown.ItemStats;
-using TopDown.Models;
 using TopDown.Sprites;
 using TopDown.States;
+using static VillageBackend.Enums;
 
 namespace TopDown.Controls.CraftingMenu
 {
@@ -43,7 +43,7 @@ namespace TopDown.Controls.CraftingMenu
         new Item(_content.Load<Texture2D>("Items/WoodenChestPiece"), 3, "Wooden Chest Piece", category)
         {
           ExperienceValue = 3,
-          ResourceCost = new Models.Resources()
+          ResourceCost = new VillageBackend.Models.Resources()
           {
             Wood = 5,
           },
@@ -247,7 +247,7 @@ namespace TopDown.Controls.CraftingMenu
         new Item(_content.Load<Texture2D>("Items/WoodenSword"), 3, "Wooden Sword", category)
         {
           ExperienceValue = 2,
-          ResourceCost = new Models.Resources()
+          ResourceCost = new VillageBackend.Models.Resources()
           {
             Wood = 2,
           },

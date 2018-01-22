@@ -40,7 +40,7 @@ namespace TopDown.Controls.BuildMenu
           Text = "Library",
           Layer =  0.99f,
           GameScreenSetValue = States.GameStates.PlacingBuilding,
-          ResourceCost = new Models.Resources()
+          ResourceCost = new VillageBackend.Models.Resources()
           {
             Food = 30,
             Gold = 10,
@@ -186,7 +186,7 @@ namespace TopDown.Controls.BuildMenu
         Text = "Small House",
         Layer = 0.99f,
         GameScreenSetValue = States.GameStates.PlacingBuilding,
-        ResourceCost = new Models.Resources()
+        ResourceCost = new VillageBackend.Models.Resources()
         {
           Food = 5,
           Gold = 1,
@@ -244,7 +244,7 @@ namespace TopDown.Controls.BuildMenu
         Text = "Tavern",
         Layer = 0.99f,
         GameScreenSetValue = States.GameStates.PlacingBuilding,
-        ResourceCost = new Models.Resources()
+        ResourceCost = new VillageBackend.Models.Resources()
         {
           Food = 5,
           Gold = 1,
@@ -335,7 +335,7 @@ namespace TopDown.Controls.BuildMenu
         Text = "Blacksmith",
         Layer = 0.99f,
         GameScreenSetValue = States.GameStates.PlacingBuilding,
-        ResourceCost = new Models.Resources()
+        ResourceCost = new VillageBackend.Models.Resources()
         {
           Food = 15,
           Gold = 10,
@@ -374,7 +374,7 @@ namespace TopDown.Controls.BuildMenu
         Text = "Farm",
         Layer = 0.99f,
         GameScreenSetValue = GameStates.PlacingBuilding,
-        ResourceCost = new Models.Resources()
+        ResourceCost = new VillageBackend.Models.Resources()
         {
           Food = 15,
           Gold = 10,
@@ -394,7 +394,7 @@ namespace TopDown.Controls.BuildMenu
         Text = "Mine",
         Layer = 0.99f,
         GameScreenSetValue = States.GameStates.PlacingBuilding,
-        ResourceCost = new Models.Resources()
+        ResourceCost = new VillageBackend.Models.Resources()
         {
           Food = 15,
           Gold = 10,
@@ -414,7 +414,7 @@ namespace TopDown.Controls.BuildMenu
           Text = "Lumber Mill",
           Layer =  0.99f,
           GameScreenSetValue = States.GameStates.PlacingBuilding,
-          ResourceCost = new Models.Resources()
+          ResourceCost = new VillageBackend.Models.Resources()
           {
             Food = 15,
             Gold = 10,
@@ -496,7 +496,7 @@ namespace TopDown.Controls.BuildMenu
         Text = "Path",
         Layer = 0.99f,
         GameScreenSetValue = States.GameStates.ItemMenu,
-        ResourceCost = new Models.Resources()
+        ResourceCost = new VillageBackend.Models.Resources()
         {
           Food = 0,
           Gold = 0,

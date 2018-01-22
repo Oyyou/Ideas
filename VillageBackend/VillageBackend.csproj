@@ -6,11 +6,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{7E851BB3-1543-499B-ACB6-CDF3AA841009}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{706F5872-EE1C-43AE-A394-028ABE0A3CB9}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GUITest</RootNamespace>
-    <AssemblyName>GUITest</AssemblyName>
+    <RootNamespace>VillageBackend</RootNamespace>
+    <AssemblyName>VillageBackend</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -37,18 +37,16 @@
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Game1.cs" />
-    <Compile Include="Interface\Buttons\Button.cs" />
-    <Compile Include="Interface\Scrollbar.cs" />
-    <Compile Include="Interface\Toolbar.cs" />
-    <Compile Include="Interface\ToolbarButton.cs" />
-    <Compile Include="Interface\Windows\Window.cs" />
-    <Compile Include="Interface\Windows\CraftingWindow.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Models\Armour.cs" />
+    <Compile Include="Models\ItemV2.cs" />
+    <Compile Include="Models\Resources.cs" />
+    <Compile Include="Models\Weapon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -62,14 +60,7 @@
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="Content\Content.mgcb" />
     <None Include="app.manifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\VillageBackend\VillageBackend.csproj">
-      <Project>{706f5872-ee1c-43ae-a394-028abe0a3cb9}</Project>
-      <Name>VillageBackend</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />

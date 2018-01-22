@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using TopDown.Items;
-using TopDown.Models;
+using VillageBackend.Models;
+using static VillageBackend.Enums;
 
 namespace ItemManager.Commands
 {

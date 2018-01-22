@@ -6,30 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using System.ComponentModel;
-using TopDown.Models;
+using static VillageBackend.Enums;
 
 namespace TopDown.Items
 {
-  public enum ItemCategories
-  {
-    Weapon,
-    Armour,
-    Tool,
-    Clothing,
-    Jewellery,
-    Medicine
-  }
-
-  public enum ItemMaterials
-  {
-    Wood,
-    Stone,
-    Iron,
-    Copper,
-    Silver,
-    Gold,
-  }
-
   public class Item : Sprite
   {
     public ItemCategories Category { get; set; }
@@ -54,7 +34,7 @@ namespace TopDown.Items
     /// <summary>
     /// The cost of the item
     /// </summary>
-    public Models.Resources ResourceCost;
+    public VillageBackend.Models.Resources ResourceCost;
 
     /// <summary>
     /// The stat sof the item
