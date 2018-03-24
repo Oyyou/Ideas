@@ -12,6 +12,8 @@ namespace GUITest.Interface.Windows
 {
   public abstract class Window
   {
+    protected ContentManager _content;
+
     protected MouseState _currentMouseState;
 
     protected SpriteFont _font;
@@ -19,6 +21,8 @@ namespace GUITest.Interface.Windows
     protected bool _hasUpdated;
 
     protected MouseState _previousMouseState;
+
+    public bool Close { get; set; }
 
     public string Name { get; protected set; }
 
@@ -36,6 +40,10 @@ namespace GUITest.Interface.Windows
 
     public Window(ContentManager content)
     {
+      Close = false;
+
+      _content = content;
+
       Name = "Window";
 
       _font = content.Load<SpriteFont>("Fonts/Font");

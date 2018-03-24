@@ -1,0 +1,26 @@
+[
+  {
+    "Name": "Sword",
+    "CraftTime": 5,
+    "ExperienceValue": 1,
+    "Damage": 2,
+    "AttackSpeed": 3,
+    "Range": 1
+  },
+  {
+    "Name": "Axe",
+    "CraftTime": 5,
+    "ExperienceValue": 1,
+    "Damage": 3,
+    "AttackSpeed": 2,
+    "Range": 1
+  },
+  {
+    "Name": "Spear",
+    "CraftTime": 5,
+    "ExperienceValue": 1,
+    "Damage": 2,
+    "AttackSpeed": 1,
+    "Range": 2
+  }
+]
