@@ -26,5 +26,10 @@ namespace VillageBackend.Models
         { "Wood", Wood },
       }.Where(c => c.Value > 0).ToDictionary(c => c.Key, v => v.Value);
     }
+    
+    public static bool CanAfford(Resources stock, Resources itemCost)
+    {
+      return stock.GetContent().All(c => c.Value >= itemCost.GetContent()[c.Key]);
+    }
   }
 }
