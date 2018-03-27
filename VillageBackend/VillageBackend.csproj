@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
+    <Compile Include="Managers\ItemManager.cs" />
     <Compile Include="Models\Armour.cs" />
     <Compile Include="Models\ItemV2.cs" />
     <Compile Include="Models\Resources.cs" />
