@@ -29,5 +29,10 @@ namespace VillageBackend.Models
     public ItemMaterials Material { get; set; }
 
     public string Name { get; set; }
+    
+    /// <summary>
+    /// The resources used to craft the item
+    /// </summary>
+    public Resources ResourceCost { get; set; }
   }
 }
