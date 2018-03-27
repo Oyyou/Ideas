@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using VillageBackend.Models;
+using VillageBackend.Managers;
 using System.IO;
 
 namespace GUITest.Interface.Windows
@@ -52,16 +53,20 @@ namespace GUITest.Interface.Windows
   }
 
   public class CraftingWindow : Window
-  {
+  {    
+    private ItemManager _itemManager;
+    
     #region Items
     private List<Weapon> _weapons;
 
     private List<Armour> _armours;
     #endregion
-
+    
+    #region Sections
     private WindowSection _categorySection;
 
     private WindowSection _itemSection;
+    #endregion
 
     private const int _spaceBetween = 10;
 
@@ -70,8 +75,10 @@ namespace GUITest.Interface.Windows
     /// </summary>
     public ItemV2 Item { get; private set; }
 
-    public CraftingWindow(ContentManager content) : base(content)
+    public CraftingWindow(ContentManager content, ItemManager itemManager) : base(content)
     {
+      _itemManager = itemManager;
+    
       Name = "Crafting";
 
       Texture = content.Load<Texture2D>("Interface/Window2x_1y");
@@ -206,6 +213,11 @@ namespace GUITest.Interface.Windows
       var button = sender as ItemButton;
 
       Item = button.Item;
+			
+			// if can afford
+				_itemManager.AddToQueue(button.Item);
+			// else 
+			//	 error message
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
