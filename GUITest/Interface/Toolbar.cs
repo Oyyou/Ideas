@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VillageBackend.Managers;
 
 namespace GUITest.Interface
 {
@@ -182,7 +183,7 @@ namespace GUITest.Interface
 
     private void Crafting_Click(object sender, EventArgs e)
     {
-      _game.OpenWindow(new CraftingWindow(_content));
+      _game.OpenWindow(new CraftingWindow(_content, new ItemManager()));
     }
 
     private void Squad_Click(object sender, EventArgs e)
