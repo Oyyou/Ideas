@@ -10,7 +10,12 @@ namespace VillageBackend.Models
   public abstract class ItemV2
   {
     public ItemCategories Category { get; set; }
-
+    
+    /// <summary>
+    /// The id of the villager who crafted the item
+    /// </summary>
+    public int CrafterId { get; set; }
+    
     /// <summary>
     /// The amount of time spent crafting the item
     /// </summary>
