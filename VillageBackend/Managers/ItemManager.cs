@@ -25,7 +25,7 @@ namespace VillageBackend.Managers
     /// </summary>
     public List<ItemV2> QueuedItems { get; private set; }
 		
-		public ItemManager(Resources resources)
+	  public ItemManager(Resources resources)
 		{
 			_resources = resources;
 		}
