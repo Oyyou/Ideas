@@ -1,9 +1,10 @@
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VillageBackend.Models
+using VillageBackend.Models;
 using static VillageBackend.Enums;
 
 namespace VillageBackend.Managers
@@ -32,7 +33,7 @@ namespace VillageBackend.Managers
     
     public void AddToQueue(ItemV2 item)
     {
-      if(!Resources.CanAfford(_resources, item.ResourceCost)
+      if(!Resources.CanAfford(_resources, item.ResourceCost))
         throw new Exception("Check to see if the item is affordable before adding to q");
       
 			QueuedItems.Add(item);
