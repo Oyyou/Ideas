@@ -1,4 +1,6 @@
-﻿using GUITest.Interface.Windows;
+﻿using Engine;
+using Engine.States;
+using GUITest.Interface.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,9 +22,9 @@ namespace GUITest.Interface
 
     private MouseState _currentMouseState;
 
-    private Game1 _game;
-
     private MouseState _previousMouseState;
+
+    private State _state;
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
@@ -110,7 +112,7 @@ namespace GUITest.Interface
 
             if (clicked)
             {
-              _game.CloseWindow();
+              _state.CloseWindow();
 
               foreach (var b in _buttons)
                 b.CurrentState = ToolbarButtonStates.Nothing;
@@ -125,14 +127,14 @@ namespace GUITest.Interface
 
             if(clicked)
             {
-              if (!mouseRectangle.Intersects(Game1.ScreenRectangle))
+              if (!mouseRectangle.Intersects(GameEngine.ScreenRectangle))
                 continue;
 
               if(mouseRectangle.Intersects(button.Rectangle) || // If we're clicking a button that is already clicked..
                  (!_buttons.Any(c => c.Rectangle.Intersects(mouseRectangle)) && // Or clicking something that isn't a button, or an open window
-                  !mouseRectangle.Intersects(_game.WindowRectangle)))
+                  !mouseRectangle.Intersects(_state.WindowRectangle)))
               {
-                _game.CloseWindow();
+                _state.CloseWindow();
 
                 foreach (var b in _buttons)
                   b.CurrentState = ToolbarButtonStates.Nothing;
@@ -142,7 +144,7 @@ namespace GUITest.Interface
               }
             }
 
-            if (clicked && !_buttons.Any(c => c.Rectangle.Intersects(mouseRectangle)) && !_game.IsWindowOpen) // Check if we're clicking somewhere that isn't on any button
+            if (clicked && !_buttons.Any(c => c.Rectangle.Intersects(mouseRectangle)) && !_state.IsWindowOpen) // Check if we're clicking somewhere that isn't on any button
             {
               foreach (var b in _buttons)
                 b.CurrentState = ToolbarButtonStates.Nothing;
@@ -157,9 +159,9 @@ namespace GUITest.Interface
       }
     }
 
-    public Toolbar(Game1 game, ContentManager content)
+    public Toolbar(State game, ContentManager content)
     {
-      _game = game;
+      _state = game;
 
       _content = content;
 
@@ -183,12 +185,18 @@ namespace GUITest.Interface
 
     private void Crafting_Click(object sender, EventArgs e)
     {
-      _game.OpenWindow(new CraftingWindow(_content, new ItemManager()));
+      _state.OpenWindow(new CraftingWindow(_content, new ItemManager(new VillageBackend.Models.Resources())));
     }
 
     private void Squad_Click(object sender, EventArgs e)
     {
       //_game.OpenWindow(new Window(_content));
+    }
+
+    public void UnloadContent()
+    {
+      foreach (var button in _buttons)
+        button.UnloadContent();
     }
   }
 }

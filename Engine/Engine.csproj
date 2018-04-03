@@ -72,6 +72,7 @@
     <Compile Include="TMXSharp\Tilesets\TilesetTile.cs" />
     <Compile Include="TMXSharp\TmxMap.cs" />
     <Compile Include="Utilities\FrameCounter.cs" />
+    <Compile Include="Windows\Window.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

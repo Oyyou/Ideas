@@ -67,5 +67,10 @@ namespace GUITest.Interface
 
       CurrentState = ToolbarButtonStates.Nothing;
     }
+
+    public void UnloadContent()
+    {
+      Texture.Dispose();
+    }
   }
 }

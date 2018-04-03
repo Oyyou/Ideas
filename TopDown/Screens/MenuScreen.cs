@@ -94,5 +94,10 @@ namespace TopDown.States
       foreach (var component in _guiComponents)
         component.Update(gameTime);
     }
+
+    public override void OnScreenResize()
+    {
+
+    }
   }
 }

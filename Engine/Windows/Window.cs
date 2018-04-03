@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GUITest.Interface.Windows
+namespace Engine.Interface.Windows
 {
   public abstract class Window
   {
@@ -61,6 +61,8 @@ namespace GUITest.Interface.Windows
     }
 
     public abstract void SetPositions();
+
+    public abstract void UnloadContent();
 
     public abstract void Update(GameTime gameTime);
   }

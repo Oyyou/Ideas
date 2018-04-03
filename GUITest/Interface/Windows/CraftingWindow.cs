@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using VillageBackend.Models;
 using VillageBackend.Managers;
 using System.IO;
+using Engine.Interface.Windows;
 
 namespace GUITest.Interface.Windows
 {
@@ -50,6 +51,12 @@ namespace GUITest.Interface.Windows
     }
 
     public IEnumerable<Button> Items;
+
+    public void UnloadContent()
+    {
+      foreach (var item in Items)
+        item.UnloadContent();
+    }
   }
 
   public class CraftingWindow : Window
@@ -373,7 +380,7 @@ namespace GUITest.Interface.Windows
 
         var x = _spaceBetween + (buttonWidth / 2);
 
-        var y = 30;
+        var y = Position.Y + 3;
 
         foreach (var button in _itemSection.Items)
         {
@@ -467,6 +474,13 @@ namespace GUITest.Interface.Windows
             throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
         }
       }
+    }
+
+    public override void UnloadContent()
+    {
+      _categorySection.UnloadContent();
+
+      _itemSection.UnloadContent();
     }
 
     private void UpdateCategories()

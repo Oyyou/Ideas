@@ -42,12 +42,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Game1.cs" />
+    <Compile Include="GameScreen.cs" />
     <Compile Include="Interface\Buttons\Button.cs" />
     <Compile Include="Interface\Buttons\ItemButton.cs" />
     <Compile Include="Interface\Scrollbar.cs" />
     <Compile Include="Interface\Toolbar.cs" />
     <Compile Include="Interface\ToolbarButton.cs" />
-    <Compile Include="Interface\Windows\Window.cs" />
     <Compile Include="Interface\Windows\CraftingWindow.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,6 +71,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.csproj">
+      <Project>{7fb609dd-9800-434e-9a22-b617e9c8cb81}</Project>
+      <Name>Engine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VillageBackend\VillageBackend.csproj">
       <Project>{706f5872-ee1c-43ae-a394-028abe0a3cb9}</Project>
       <Name>VillageBackend</Name>

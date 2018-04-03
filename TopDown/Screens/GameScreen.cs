@@ -1,10 +1,12 @@
 ﻿using Engine;
 using Engine.Controls;
+using Engine.Interface.Windows;
 using Engine.Models;
 using Engine.Sprites;
 using Engine.States;
 using Engine.TmxSharp;
 using Engine.Utilities;
+using GUITest.Interface.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -67,13 +69,13 @@ namespace TopDown.States
 
     private Camera _camera;
 
-    private Effect _effect;
-
     private SpriteFont _font;
 
     private List<Component> _guiComponents;
 
     private RenderTarget2D _renderTarget;
+
+    private GUITest.Interface.Toolbar _toolbar;
 
     //private PenumbraComponent penumbra;
     Vector2 baseScreenSize = Vector2.Zero;
@@ -314,6 +316,8 @@ namespace TopDown.States
 
     public void DrawGui(GameTime gameTime)
     {
+      _window?.Draw(gameTime, _spriteBatch, _graphicsDeviceManager);
+
       _spriteBatch.Begin(SpriteSortMode.FrontToBack);
 
       var time = Time.ToString("hh:mm") + (Time.Hour >= 12 ? " pm" : " am");
@@ -325,6 +329,8 @@ namespace TopDown.States
 
       foreach (var component in _guiComponents)
         component.Draw(gameTime, _spriteBatch);
+
+      _toolbar.Draw(gameTime, _spriteBatch);
 
       _spriteBatch.End();
     }
@@ -410,7 +416,7 @@ namespace TopDown.States
         _graphicsDevice.PresentationParameters.BackBufferFormat,
         DepthFormat.Depth24);
 
-      //_effect = _content.Load<Effect>("Effect/BlackAndWhite");
+      _toolbar = new GUITest.Interface.Toolbar(this, gameModel.ContentManger);
 
       _font = _content.Load<SpriteFont>("Fonts/Font");
 
@@ -908,6 +914,9 @@ namespace TopDown.States
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
+      _toolbar.Update(gameTime);
+      _window?.Update(gameTime);
+
       foreach (var component in GameComponents)
         component.Update(gameTime);
 
@@ -987,6 +996,12 @@ namespace TopDown.States
       }
     }
 
+    public override void OnScreenResize()
+    {
+      _toolbar.OnScreenResize();
+      _window?.OnScreenResize();
+    }
+
     public void SetGameSpeed()
     {
       // For the time being - the GameSpeed needs to be a multiple of 32
@@ -1019,6 +1034,9 @@ namespace TopDown.States
       GameComponents.Clear();
 
       _guiComponents.Clear();
+
+      _toolbar.UnloadContent();
+      _window?.UnloadContent();
     }
 
     public Vector2 GetMouseWithCameraPosition()

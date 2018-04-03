@@ -29,6 +29,8 @@ namespace VillageBackend.Managers
 	  public ItemManager(Resources resources)
 		{
 			_resources = resources;
+
+      QueuedItems = new List<ItemV2>();
 		}
     
     public void AddToQueue(ItemV2 item)

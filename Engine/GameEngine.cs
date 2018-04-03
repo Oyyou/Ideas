@@ -31,6 +31,8 @@ namespace Engine
 
     public static int ScreenWidth { get; protected set; }
 
+    public static Rectangle ScreenRectangle { get; protected set; }
+
     public void ChangeState(State state)
     {
       _nextState = state;

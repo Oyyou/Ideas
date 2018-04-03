@@ -1,4 +1,5 @@
-﻿using Engine.Models;
+﻿using Engine.Interface.Windows;
+using Engine.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,7 +29,12 @@ namespace Engine.States
 
     protected GraphicsDevice _graphicsDevice
     {
-      get { return _gameModel.GraphicsDevice; }
+      get { return _graphicsDeviceManager.GraphicsDevice; }
+    }
+
+    protected GraphicsDeviceManager _graphicsDeviceManager
+    {
+      get { return _gameModel.GraphicsDeviceManager; }
     }
 
     protected SpriteBatch _spriteBatch
@@ -36,8 +42,26 @@ namespace Engine.States
       get { return _gameModel.SpriteBatch; }
     }
 
+    protected Window _window;
+
+    public bool IsWindowOpen
+    {
+      get
+      {
+        return _window != null;
+      }
+    }
+
+    public Rectangle WindowRectangle
+    {
+      get
+      {
+        return _window != null ? _window.Rectangle : new Rectangle(0, 0, 0, 0);
+      }
+    }
+
     #endregion
-    
+
     /// <summary>
     /// How quickly everything goes
     /// </summary>
@@ -45,11 +69,23 @@ namespace Engine.States
 
     #region Methods
 
+    public void CloseWindow()
+    {
+      _window = null;
+    }
+
     public abstract void Draw(GameTime gameTime);
 
     public virtual void LoadContent(GameModel gameModel)
     {
       _gameModel = gameModel;
+    }
+
+    public abstract void OnScreenResize();
+
+    public void OpenWindow(Window window)
+    {
+      _window = window;
     }
 
     public abstract void PostUpdate(GameTime gameTime);

@@ -87,5 +87,10 @@ namespace GUITest.Interface.Buttons
     {
       Click?.Invoke(this, new EventArgs());
     }
+
+    public void UnloadContent()
+    {
+      Texture.Dispose();
+    }
   }
 }

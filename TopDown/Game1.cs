@@ -13,7 +13,6 @@ namespace TopDown
   /// </summary>
   public class Game1 : GameEngine
   {
-
     public Game1()
     {
       Random = new System.Random();
@@ -62,6 +61,8 @@ namespace TopDown
       ScreenHeight = _graphics.PreferredBackBufferHeight;
 
       ScreenWidth = _graphics.PreferredBackBufferWidth;
+
+      _currentState.OnScreenResize();
     }
 
     /// <summary>
@@ -73,7 +74,13 @@ namespace TopDown
       // Create a new SpriteBatch, which can be used to draw textures.
       _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-      _gameModel = new Engine.Models.GameModel(Content, this, _graphics.GraphicsDevice, _spriteBatch);
+      _gameModel = new Engine.Models.GameModel()
+      {
+        ContentManger = Content,
+        Game = this,
+        GraphicsDeviceManager = _graphics,
+        SpriteBatch = _spriteBatch,
+      };
 
       _currentState = new GameScreen();
 

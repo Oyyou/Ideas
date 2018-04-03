@@ -58,10 +58,10 @@ namespace TopDown.Core
       else if (GameScreen.Keyboard.IsKeyDown(Keys.S))
         Position.Y += speed;
 
-      if (_previousScrollValue < _currentScrollValue)
-        Scale += 0.05f;
-      else if (_previousScrollValue > _currentScrollValue)
-        Scale -= 0.05f;
+      //if (_previousScrollValue < _currentScrollValue)
+      //  Scale += 0.05f;
+      //else if (_previousScrollValue > _currentScrollValue)
+      //  Scale -= 0.05f;
 
       Transform = Matrix.CreateTranslation(-Position.X, -Position.Y, 0) *
         Matrix.CreateScale(Scale) *

@@ -1,4 +1,6 @@
-﻿using GUITest.Interface;
+﻿using Engine;
+using Engine.Models;
+using GUITest.Interface;
 using GUITest.Interface.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,50 +17,16 @@ namespace GUITest
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
-  public class Game1 : Game
+  public class Game1 : GameEngine
   {
-    GraphicsDeviceManager graphics;
-    SpriteBatch spriteBatch;
-
-    private Toolbar _toolbar;
-
-    private Window _window;
-
-    public bool IsWindowOpen
-    {
-      get
-      {
-        return _window != null;
-      }
-    }
-
-    public static int ScreenHeight { get; private set; }
-
-    public static int ScreenWidth { get; private set; }
-
-    public static Rectangle ScreenRectangle { get; private set; }
-
-    public Rectangle WindowRectangle
-    {
-      get
-      {
-        return _window != null ? _window.Rectangle : new Rectangle(0, 0, 0, 0);
-      }
-    }
-
-    public void CloseWindow()
-    {
-      _window = null;
-    }
+    private GameScreen _gameScreen;
 
     public Game1()
     {
-      graphics = new GraphicsDeviceManager(this);
-      Content.RootDirectory = "Content";
+      Random = new Random();
 
-      //graphics.PreferredBackBufferWidth = 1280;
-      //graphics.PreferredBackBufferHeight = 720;
-      //graphics.ApplyChanges();
+      _graphics = new GraphicsDeviceManager(this);
+      Content.RootDirectory = "Content";
     }
 
     /// <summary>
@@ -69,32 +37,41 @@ namespace GUITest
     /// </summary>
     protected override void Initialize()
     {
-      IsMouseVisible = true;
-
-      ScreenHeight = graphics.PreferredBackBufferHeight;
-      ScreenWidth = graphics.PreferredBackBufferWidth;
-
-      ScreenRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
-
       Window.AllowUserResizing = true;
+
+      var height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
+
+      var width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+
+      _graphics.PreferredBackBufferHeight = Math.Max(height, 480);
+
+      _graphics.PreferredBackBufferWidth = Math.Max(width, 800);
+
+      _graphics.ApplyChanges();
+
+      ScreenHeight = _graphics.PreferredBackBufferHeight;
+
+      ScreenWidth = _graphics.PreferredBackBufferWidth;
+
       Window.ClientSizeChanged += Window_ClientSizeChanged;
+
+      IsMouseVisible = true;
 
       base.Initialize();
     }
 
     private void Window_ClientSizeChanged(object sender, System.EventArgs e)
     {
-      graphics.PreferredBackBufferHeight = MathHelper.Clamp(graphics.PreferredBackBufferHeight, 480, 1400);
-      graphics.PreferredBackBufferWidth = MathHelper.Clamp(graphics.PreferredBackBufferWidth, 800, 2560);
-      graphics.ApplyChanges();
+      _graphics.PreferredBackBufferHeight = MathHelper.Clamp(_graphics.PreferredBackBufferHeight, 480, 1400);
+      _graphics.PreferredBackBufferWidth = MathHelper.Clamp(_graphics.PreferredBackBufferWidth, 800, 2560);
+      _graphics.ApplyChanges();
 
-      ScreenHeight = graphics.PreferredBackBufferHeight;
-      ScreenWidth = graphics.PreferredBackBufferWidth;
+      ScreenHeight = _graphics.PreferredBackBufferHeight;
+      ScreenWidth = _graphics.PreferredBackBufferWidth;
 
       ScreenRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
 
-      _toolbar.OnScreenResize();
-      _window?.OnScreenResize();
+      _gameScreen.OnScreenResize();
     }
 
     /// <summary>
@@ -104,11 +81,18 @@ namespace GUITest
     protected override void LoadContent()
     {
       // Create a new SpriteBatch, which can be used to draw textures.
-      spriteBatch = new SpriteBatch(GraphicsDevice);
+      _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-      _toolbar = new Toolbar(this, Content);
-
-      //_window = new Interface.Window(Content);
+      _gameModel = new GameModel()
+      {
+        ContentManger = Content,
+        Game = this,
+        GraphicsDeviceManager = _graphics,
+        SpriteBatch = _spriteBatch,
+      };
+      
+      _gameScreen = new GameScreen();
+      _gameScreen.LoadContent(_gameModel);
     }
 
     /// <summary>
@@ -117,7 +101,7 @@ namespace GUITest
     /// </summary>
     protected override void UnloadContent()
     {
-      // TODO: Unload any non ContentManager content here
+      _gameScreen.UnloadContent();
     }
 
     /// <summary>
@@ -127,9 +111,9 @@ namespace GUITest
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Update(GameTime gameTime)
     {
-      _toolbar.Update(gameTime);
+      _gameScreen.Update(gameTime);
 
-      _window?.Update(gameTime);
+      _gameScreen.PostUpdate(gameTime);
 
       base.Update(gameTime);
     }
@@ -141,21 +125,10 @@ namespace GUITest
     protected override void Draw(GameTime gameTime)
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
-      
-      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
 
-      _toolbar.Draw(gameTime, spriteBatch);
-
-      spriteBatch.End();
-
-      _window?.Draw(gameTime, spriteBatch, graphics);
+      _gameScreen.Draw(gameTime);
 
       base.Draw(gameTime);
-    }
-
-    public void OpenWindow(Window window)
-    {
-      _window = window;
     }
   }
 }
