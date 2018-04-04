@@ -21,7 +21,11 @@ namespace GUITest.Interface
 
     private ContentManager _content;
 
+    private KeyboardState _currentKeyboardState;
+
     private MouseState _currentMouseState;
+
+    private KeyboardState _previousKeyboardState;
 
     private MouseState _previousMouseState;
 
@@ -91,6 +95,9 @@ namespace GUITest.Interface
 
     public void Update(GameTime gameTime)
     {
+      _previousKeyboardState = _currentKeyboardState;
+      _currentKeyboardState = Keyboard.GetState();
+	    
       _previousMouseState = _currentMouseState;
       _currentMouseState = Mouse.GetState();
 
@@ -100,6 +107,14 @@ namespace GUITest.Interface
 
       foreach (var button in _buttons)
       {
+        if (_previousKeyboardState != _currentKeyboardState && _currentKeyboardState.IsKeyDown(button.OpenKey))
+        {
+          if (button.CurrentState == ToolbarButtonStates.Clicked)
+            button.CurrentState = ToolbarButtonStates.Nothing;
+          else
+            button.CurrentState = ToolbarButtonStates.Clicked;
+        }
+	      
         switch (button.CurrentState)
         {
           case ToolbarButtonStates.Nothing:
@@ -170,19 +185,19 @@ namespace GUITest.Interface
 			
       _content = content;
 
-      var squad = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad"));
+      var squad = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad"), Keys.S);
       squad.Click += Squad_Click;
 
-      var crafting = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Crafting"));
+      var crafting = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Crafting"), Keys.C);
       crafting.Click += Crafting_Click;
 
       _buttons = new List<ToolbarButton>()
       {
-        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map"), Keys.M),
         squad,
         crafting,
-        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
-        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
+        //new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
+        //new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
       };
 
       SetButtonPositions();
