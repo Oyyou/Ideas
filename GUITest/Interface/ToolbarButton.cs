@@ -24,6 +24,11 @@ namespace GUITest.Interface
 
     public ToolbarButtonStates CurrentState;
 
+    /// <summary>
+    /// The key that activates the button
+    /// </summary>
+    public readonly Keys OpenKey;
+
     public readonly Vector2 Origin;
 
     public Vector2 Position;
@@ -55,9 +60,11 @@ namespace GUITest.Interface
       Click?.Invoke(this, new EventArgs());
     }
 
-    public ToolbarButton(Texture2D texture)
+    public ToolbarButton(Texture2D texture, Keys openKey)
     {
       Texture = texture;
+
+      OpenKey = openKey;
 
       Color = Color.White;
 
