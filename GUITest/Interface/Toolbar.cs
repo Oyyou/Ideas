@@ -122,13 +122,28 @@ namespace GUITest.Interface
             if (mouseRectangle.Intersects(button.Rectangle))
               button.CurrentState = ToolbarButtonStates.Hovering;
 
+            if (_previousKeyboardState != _currentKeyboardState &&
+                _currentKeyboardState.IsKeyDown(button.OpenKey))
+            {
+              _state.CloseWindow();
+
+              foreach (var b in _buttons)
+                b.CurrentState = ToolbarButtonStates.Nothing;
+
+              button.CurrentState = ToolbarButtonStates.Clicked;
+
+              button.OnClick();
+            }
+
             break;
           case ToolbarButtonStates.Hovering:
 
             if (!mouseRectangle.Intersects(button.Rectangle))
               button.CurrentState = ToolbarButtonStates.Nothing;
 
-            if (clicked)
+            if (clicked ||
+                (_previousKeyboardState != _currentKeyboardState &&
+                 _currentKeyboardState.IsKeyDown(button.OpenKey)))
             {
               _state.CloseWindow();
 
@@ -143,15 +158,35 @@ namespace GUITest.Interface
             break;
           case ToolbarButtonStates.Clicked:
 
-            if(clicked)
+            if (_previousKeyboardState != _currentKeyboardState &&
+                 _currentKeyboardState.IsKeyDown(button.OpenKey))
             {
-              if (!mouseRectangle.Intersects(GameEngine.ScreenRectangle))
-                continue;
+              _state.CloseWindow();
 
-              if(mouseRectangle.Intersects(button.Rectangle) || // If we're clicking a button that is already clicked..
+              foreach (var b in _buttons)
+                b.CurrentState = ToolbarButtonStates.Nothing;
+
+              break;
+            }
+
+            if (clicked)
+            {
+              Console.WriteLine("Clicked");
+
+              if (!mouseRectangle.Intersects(GameEngine.ScreenRectangle))
+              {
+                Console.WriteLine("Not in screen");
+                continue;
+              }
+
+              if (mouseRectangle.Intersects(button.Rectangle))
+                Console.WriteLine("Is over button");
+
+              if (mouseRectangle.Intersects(button.Rectangle) || // If we're clicking a button that is already clicked..
                  (!_buttons.Any(c => c.Rectangle.Intersects(mouseRectangle)) && // Or clicking something that isn't a button, or an open window
                   !mouseRectangle.Intersects(_state.WindowRectangle)))
               {
+                Console.WriteLine("Closing Window");
                 _state.CloseWindow();
 
                 foreach (var b in _buttons)
