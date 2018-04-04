@@ -51,6 +51,8 @@ namespace TopDown
 
       ScreenWidth = _graphics.PreferredBackBufferWidth;
 
+      ScreenRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
+
       Window.ClientSizeChanged += Window_ClientSizeChanged;
 
       base.Initialize();
@@ -61,6 +63,8 @@ namespace TopDown
       ScreenHeight = _graphics.PreferredBackBufferHeight;
 
       ScreenWidth = _graphics.PreferredBackBufferWidth;
+
+      ScreenRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
 
       _currentState.OnScreenResize();
     }
