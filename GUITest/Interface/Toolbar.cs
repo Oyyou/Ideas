@@ -106,15 +106,7 @@ namespace GUITest.Interface
       var clicked = _currentMouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
 
       foreach (var button in _buttons)
-      {
-        if (_previousKeyboardState != _currentKeyboardState && _currentKeyboardState.IsKeyDown(button.OpenKey))
-        {
-          if (button.CurrentState == ToolbarButtonStates.Clicked)
-            button.CurrentState = ToolbarButtonStates.Nothing;
-          else
-            button.CurrentState = ToolbarButtonStates.Clicked;
-        }
-	      
+      {	      
         switch (button.CurrentState)
         {
           case ToolbarButtonStates.Nothing:
