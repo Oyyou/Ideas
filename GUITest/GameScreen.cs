@@ -37,7 +37,7 @@ namespace GUITest
     {
       base.LoadContent(gameModel);
 
-      _toolbar = new Toolbar(this, new Resources(), gameModel.ContentManger);
+      _toolbar = new Toolbar(this, new VillageBackend.Managers.ItemManager(new Resources()), gameModel.ContentManger);
     }
 
     public override void OnScreenResize()

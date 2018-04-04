@@ -419,8 +419,6 @@ namespace TopDown.States
         _graphicsDevice.PresentationParameters.BackBufferFormat,
         DepthFormat.Depth24);
 
-      _toolbar = new GUITest.Interface.Toolbar(this, Resources, gameModel.ContentManger);
-
       _font = _content.Load<SpriteFont>("Fonts/Font");
 
       State = GameStates.Playing;
@@ -454,9 +452,17 @@ namespace TopDown.States
 
       Notifications = new Notifications();
 
-      Resources = new VillageBackend.Models.Resources();
+      Resources = new VillageBackend.Models.Resources()
+      {
+        Food = 100,
+        Gold = 100,
+        Stone = 100,
+        Wood = 100,
+      };
 
       _itemManager = new ItemManager(Resources);
+
+      _toolbar = new GUITest.Interface.Toolbar(this, _itemManager, gameModel.ContentManger);
 
       var playerAnimations = new Dictionary<string, Animation>()
       {

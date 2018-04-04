@@ -12,15 +12,15 @@ namespace VillageBackend.Managers
   public class ItemManager
   {
     /// <summary>
-    /// The resources from the actual game
-    /// </summary>
-    private Resources _resources;
-    
-    /// <summary>
     /// All items that have been crafted
     /// </summary>
     public List<ItemV2> Items { get; private set; }
-    
+
+    /// <summary>
+    /// The resources from the actual game
+    /// </summary>
+    public readonly Resources Resources;
+
     /// <summary>
     /// The items added to the queue to be crafed by the assigned villager
     /// </summary>
@@ -28,14 +28,14 @@ namespace VillageBackend.Managers
 		
 	  public ItemManager(Resources resources)
 		{
-			_resources = resources;
+			Resources = resources;
 
       QueuedItems = new List<ItemV2>();
 		}
     
     public void AddToQueue(ItemV2 item)
     {
-      if(!Resources.CanAfford(_resources, item.ResourceCost))
+      if(!Resources.CanAfford(Resources, item.ResourceCost))
         throw new Exception("Check to see if the item is affordable before adding to q");
       
 			QueuedItems.Add(item);

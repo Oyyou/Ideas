@@ -25,11 +25,11 @@ namespace GUITest.Interface
 
     private MouseState _currentMouseState;
 
+    private ItemManager _itemManager;
+
     private KeyboardState _previousKeyboardState;
 
     private MouseState _previousMouseState;
-
-    private Resources _resources;
     
     private State _state;
 
@@ -204,11 +204,11 @@ namespace GUITest.Interface
       }
     }
 
-    public Toolbar(State game, Resources resources, ContentManager content)
+    public Toolbar(State game, ItemManager itemManager, ContentManager content)
     {	    
       _state = game;
 			
-	    _resources = resources;
+	    _itemManager = itemManager;
 			
       _content = content;
 
@@ -232,7 +232,7 @@ namespace GUITest.Interface
 
     private void Crafting_Click(object sender, EventArgs e)
     {
-      _state.OpenWindow(new CraftingWindow(_content, new ItemManager(_resources)));
+      _state.OpenWindow(new CraftingWindow(_content, _itemManager));
     }
 
     private void Squad_Click(object sender, EventArgs e)

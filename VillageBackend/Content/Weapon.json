@@ -5,7 +5,13 @@
     "ExperienceValue": 1,
     "Damage": 2,
     "AttackSpeed": 3,
-    "Range": 1
+    "Range": 1,
+    "ResourceCost": {
+      "Food": 0,
+      "Gold": 1,
+      "Stone": 1,
+      "Wood": 1
+    }
   },
   {
     "Name": "Axe",
@@ -13,7 +19,13 @@
     "ExperienceValue": 1,
     "Damage": 3,
     "AttackSpeed": 2,
-    "Range": 1
+    "Range": 1,
+    "ResourceCost": {
+      "Food": 0,
+      "Gold": 1,
+      "Stone": 2,
+      "Wood": 1
+    }
   },
   {
     "Name": "Spear",
@@ -21,6 +33,12 @@
     "ExperienceValue": 1,
     "Damage": 2,
     "AttackSpeed": 1,
-    "Range": 2
+    "Range": 2,
+    "ResourceCost": {
+      "Food": 0,
+      "Gold": 2,
+      "Stone": 1,
+      "Wood": 1
+    }
   }
 ]

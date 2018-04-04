@@ -24,7 +24,7 @@ namespace VillageBackend.Models
         { "Gold", Gold },
         { "Stone", Stone },
         { "Wood", Wood },
-      }.Where(c => c.Value > 0).ToDictionary(c => c.Key, v => v.Value);
+      }.ToDictionary(c => c.Key, v => v.Value);
     }
     
     public static bool CanAfford(Resources stock, Resources itemCost)

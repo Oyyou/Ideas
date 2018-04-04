@@ -593,9 +593,6 @@
 /processorParam:TextureFormat=Color
 /build:Controls/Icons/Inventory.png
 
-#begin Items/Weapons.json
-/copy:Items/Weapons.json
-
 #begin Sprites/hull35x35.png
 /importer:TextureImporter
 /processor:TextureProcessor

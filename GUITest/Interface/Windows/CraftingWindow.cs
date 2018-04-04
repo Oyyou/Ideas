@@ -60,15 +60,15 @@ namespace GUITest.Interface.Windows
   }
 
   public class CraftingWindow : Window
-  {    
+  {
     private ItemManager _itemManager;
-    
+
     #region Items
     private List<Weapon> _weapons;
 
     private List<Armour> _armours;
     #endregion
-    
+
     #region Sections
     private WindowSection _categorySection;
 
@@ -85,7 +85,7 @@ namespace GUITest.Interface.Windows
     public CraftingWindow(ContentManager content, ItemManager itemManager) : base(content)
     {
       _itemManager = itemManager;
-    
+
       Name = "Crafting";
 
       Texture = content.Load<Texture2D>("Interface/Window2x_1y");
@@ -219,11 +219,9 @@ namespace GUITest.Interface.Windows
       var button = sender as ItemButton;
 
       Item = button.Item;
-			
-			// if can afford
-				_itemManager.AddToQueue(button.Item);
-			// else 
-			//	 error message
+
+      if (Resources.CanAfford(_itemManager.Resources, button.Item.ResourceCost))
+        _itemManager.AddToQueue(button.Item);
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
@@ -361,7 +359,7 @@ namespace GUITest.Interface.Windows
 
       var categories = Enum.GetNames(typeof(ItemCategories)).ToList();
 
-      foreach(var item in _categorySection.Items)
+      foreach (var item in _categorySection.Items)
       {
         item.Position = new Vector2(x, y);
         y += item.Rectangle.Height + 5;
@@ -447,28 +445,11 @@ namespace GUITest.Interface.Windows
               foreach (var b in _itemSection.Items)
                 b.CurrentState = ToolbarButtonStates.Nothing;
 
-              button.CurrentState = ToolbarButtonStates.Clicked;
-
               button.OnClick();
             }
 
             break;
-          case ToolbarButtonStates.Clicked:
 
-            // Close the window, and start to place the building!
-
-            //var mouseRectangle = new Rectangle(_currentMouseState.Position.X, _currentMouseState.Position.Y, 1, 1);
-            //var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
-
-            if (clicked && !_itemSection.Items.Any(c => c != button && c.Rectangle.Intersects(mouseRectangleWithCamera_Items))) // Check if we're clicking somewhere that isn't on any button
-            {
-              foreach (var b in _itemSection.Items)
-                b.CurrentState = ToolbarButtonStates.Nothing;
-
-              button.CurrentState = ToolbarButtonStates.Hovering;
-            }
-
-            break;
           default:
             throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
         }
