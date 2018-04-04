@@ -416,7 +416,7 @@ namespace TopDown.States
         _graphicsDevice.PresentationParameters.BackBufferFormat,
         DepthFormat.Depth24);
 
-      _toolbar = new GUITest.Interface.Toolbar(this, gameModel.ContentManger);
+      _toolbar = new GUITest.Interface.Toolbar(this, Resources, gameModel.ContentManger);
 
       _font = _content.Load<SpriteFont>("Fonts/Font");
 
