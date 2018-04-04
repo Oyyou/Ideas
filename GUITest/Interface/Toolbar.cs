@@ -28,11 +28,6 @@ namespace GUITest.Interface
     private Resources _resources;
     
     private State _state;
-    
-    public Toolbar(Resources resources)
-    {
-			_resources = resources;
-    }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
@@ -167,10 +162,12 @@ namespace GUITest.Interface
       }
     }
 
-    public Toolbar(State game, ContentManager content)
-    {
+    public Toolbar(State game, Resources resources, ContentManager content)
+    {	    
       _state = game;
-
+			
+	    _resources = resources;
+			
       _content = content;
 
       var squad = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad"));
