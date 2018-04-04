@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VillageBackend.Managers;
+using VillageBackend.Models;
 
 namespace GUITest.Interface
 {
@@ -24,7 +25,14 @@ namespace GUITest.Interface
 
     private MouseState _previousMouseState;
 
+    private Resources _resources;
+    
     private State _state;
+    
+    public Toolbar(Resources resources)
+    {
+			_resources = resources;
+    }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
@@ -185,7 +193,7 @@ namespace GUITest.Interface
 
     private void Crafting_Click(object sender, EventArgs e)
     {
-      _state.OpenWindow(new CraftingWindow(_content, new ItemManager(new VillageBackend.Models.Resources())));
+      _state.OpenWindow(new CraftingWindow(_content, new ItemManager(_resources)));
     }
 
     private void Squad_Click(object sender, EventArgs e)
