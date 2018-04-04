@@ -22,7 +22,7 @@ namespace TopDown.Controls.Toolbars
 
     private void CraftButton_Click(object sender, EventArgs e)
     {
-      _gameScreen.State = GameStates.CraftingMenu;
+      //_gameScreen.State = GameStates.CraftingMenu;
     }
 
     private void InventoryButton_Click(object sender, EventArgs e)
