@@ -33,6 +33,7 @@ using TopDown.Items;
 using TopDown.Logic;
 using TopDown.Resources;
 using TopDown.Sprites;
+using VillageBackend.Managers;
 using static TopDown.Logic.Pathfinder;
 //using Penumbra;
 
@@ -72,6 +73,8 @@ namespace TopDown.States
     private SpriteFont _font;
 
     private List<Component> _guiComponents;
+
+    private ItemManager _itemManager;
 
     private RenderTarget2D _renderTarget;
 
@@ -453,6 +456,8 @@ namespace TopDown.States
 
       Resources = new VillageBackend.Models.Resources();
 
+      _itemManager = new ItemManager(Resources);
+
       var playerAnimations = new Dictionary<string, Animation>()
       {
         { "WalkDown", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkDown"), 4) },
@@ -804,10 +809,14 @@ namespace TopDown.States
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
+      _toolbar.Update(gameTime);
+      _window?.Update(gameTime);
+
       if ((menuKey != null && Keyboard.IsKeyPressed(menuKey.Value)) ||
         Keyboard.IsKeyPressed(Keys.Escape))
       {
         State = GameStates.Playing;
+        CloseWindow();
       }
     }
 
@@ -939,34 +948,34 @@ namespace TopDown.States
 
       if (Keyboard.IsKeyPressed(Keys.C))
       {
-        var selectedItem = CraftingMenu.ComboBox.SelectedItem;
-        CraftingMenu.ComboBox.Reset();
+        //var selectedItem = CraftingMenu.ComboBox.SelectedItem;
+        //CraftingMenu.ComboBox.Reset();
 
-        var npcs = NPCComponents.Where(c => c.Workplace != null && c.Workplace.Name == "Blacksmith");
+        //var npcs = NPCComponents.Where(c => c.Workplace != null && c.Workplace.Name == "Blacksmith");
 
-        var items = new List<ComboBoxItem>();
-        foreach (var npc in npcs)
-        {
-          var item = new ComboBoxItem(CraftingMenu.ComboBox);
+        //var items = new List<ComboBoxItem>();
+        //foreach (var npc in npcs)
+        //{
+        //  var item = new ComboBoxItem(CraftingMenu.ComboBox);
 
-          item.Content = npc;
+        //  item.Content = npc;
 
-          item.LoadContent(_content);
+        //  item.LoadContent(_content);
 
-          item.Text = npc.Name;
+        //  item.Text = npc.Name;
 
-          items.Add(item);
-        }
+        //  items.Add(item);
+        //}
 
-        CraftingMenu.ComboBox.Items = items;
+        //CraftingMenu.ComboBox.Items = items;
 
-        if (selectedItem != null)
-        {
-          if (CraftingMenu.ComboBox.Items.Any(c => c.Text == selectedItem.Text))
-          {
-            CraftingMenu.ComboBox.SelectedItem = CraftingMenu.ComboBox.Items.Where(c => c.Text == selectedItem.Text).FirstOrDefault();
-          }
-        }
+        //if (selectedItem != null)
+        //{
+        //  if (CraftingMenu.ComboBox.Items.Any(c => c.Text == selectedItem.Text))
+        //  {
+        //    CraftingMenu.ComboBox.SelectedItem = CraftingMenu.ComboBox.Items.Where(c => c.Text == selectedItem.Text).FirstOrDefault();
+        //  }
+        //}
 
         State = GameStates.CraftingMenu;
 
