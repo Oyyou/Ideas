@@ -10,6 +10,7 @@ using GUITest.Interface;
 using GUITest.Interface.Windows;
 using Engine.Models;
 using Engine.Interface.Windows;
+using VillageBackend.Models;
 
 namespace GUITest
 {
@@ -36,7 +37,7 @@ namespace GUITest
     {
       base.LoadContent(gameModel);
 
-      _toolbar = new Toolbar(this, gameModel.ContentManger);
+      _toolbar = new Toolbar(this, new Resources(), gameModel.ContentManger);
     }
 
     public override void OnScreenResize()
