@@ -71,7 +71,7 @@ namespace TopDown.Controls.CraftingMenu
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      if (_gameScreen.State != States.GameStates.CraftingMenu)
+      //if (_gameScreen.State != States.GameStates.CraftingMenu)
         return;
 
       base.Draw(gameTime, spriteBatch);
@@ -299,7 +299,7 @@ namespace TopDown.Controls.CraftingMenu
 
     public override void Update(GameTime gameTime)
     {
-      if (_gameScreen.State != States.GameStates.CraftingMenu)
+      //if (_gameScreen.State != States.GameStates.CraftingMenu)
         return;
 
       ComboBox.IsEnabled = false;
