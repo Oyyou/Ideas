@@ -130,8 +130,7 @@ namespace GUITest.Interface.Windows
       _weapons = new List<Weapon>();
       _armours = new List<Armour>();
 
-      // Is this okay?
-      var files = Directory.GetFiles("../../../../../VillageBackend/Content/", "*.json");
+      var files = Directory.GetFiles("Content/Items", "*.json");
 
       foreach (var file in files)
       {
