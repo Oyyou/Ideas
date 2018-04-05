@@ -508,18 +508,13 @@ namespace GUITest.Interface.Windows
             break;
           case ToolbarButtonStates.Clicked:
 
-            // Close the window, and start to place the building!
+            //if (clicked && (mouseRectangleWithCamera_Categories.Intersects(windowRectangle)) && !_categorySection.Items.Any(c => c != button && c.Rectangle.Intersects(mouseRectangleWithCamera_Categories))) // Check if we're clicking somewhere that isn't on any button
+            //{
+            //  foreach (var b in _categorySection.Items)
+            //    b.CurrentState = ToolbarButtonStates.Nothing;
 
-            //var mouseRectangle = new Rectangle(_currentMouseState.Position.X, _currentMouseState.Position.Y, 1, 1);
-            //var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
-
-            if (clicked && (mouseRectangleWithCamera_Categories.Intersects(windowRectangle)) && !_categorySection.Items.Any(c => c != button && c.Rectangle.Intersects(mouseRectangleWithCamera_Categories))) // Check if we're clicking somewhere that isn't on any button
-            {
-              foreach (var b in _categorySection.Items)
-                b.CurrentState = ToolbarButtonStates.Nothing;
-
-              button.CurrentState = ToolbarButtonStates.Hovering;
-            }
+            //  button.CurrentState = ToolbarButtonStates.Hovering;
+            //}
 
             break;
           default:
