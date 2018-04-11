@@ -81,7 +81,10 @@ namespace Engine.States
         for (int i = 0; i < _windows.Count; i++)
         {
           if (_windows[i].GetType() == _window.GetType())
+          {
             _windows[i] = _window;
+            break;
+          }
         }
       }
       else

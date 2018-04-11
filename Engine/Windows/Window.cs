@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Engine.Interface.Windows
 {
-  public abstract class Window
+  public abstract class Window : ICloneable
   {
     protected ContentManager _content;
 
@@ -65,5 +65,10 @@ namespace Engine.Interface.Windows
     public abstract void UnloadContent();
 
     public abstract void Update(GameTime gameTime);
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
+    }
   }
 }
