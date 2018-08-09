@@ -77,10 +77,14 @@ namespace GUITest.Interface.Windows
 
     private const int _spaceBetween = 10;
 
+    private QueueWindow _queueWindow;
+
     /// <summary>
     /// The item to be created
     /// </summary>
     public ItemV2 Item { get; private set; }
+
+    public override Rectangle WindowRectangle { get => new Rectangle(Rectangle.X, Rectangle.Y, Rectangle.Width + 10 + _queueWindow.Rectangle.Width, Rectangle.Height); }
 
     public CraftingWindow(ContentManager content, ItemManager itemManager) : base(content)
     {
@@ -89,6 +93,8 @@ namespace GUITest.Interface.Windows
       Name = "Crafting";
 
       Texture = content.Load<Texture2D>("Interface/Window2x_1y");
+
+      _queueWindow = new QueueWindow(content, itemManager);
 
       _categorySection = new WindowSection()
       {
@@ -217,6 +223,7 @@ namespace GUITest.Interface.Windows
     private void ItemClicked(object sender, EventArgs e)
     {
       var button = sender as ItemButton;
+      Console.WriteLine($"Item button '{button.Item.Name}' clicked");
 
       Item = button.Item;
 
@@ -242,6 +249,8 @@ namespace GUITest.Interface.Windows
       DrawCategories(gameTime, spriteBatch);
 
       graphics.GraphicsDevice.Viewport = original;
+
+      _queueWindow.Draw(gameTime, spriteBatch, graphics);
     }
 
     protected void DrawButtons(GameTime gameTime, SpriteBatch spriteBatch)
@@ -346,7 +355,10 @@ namespace GUITest.Interface.Windows
       var screenWidth = Game1.ScreenWidth;
       var screenHeight = Game1.ScreenHeight;
 
-      Position = new Vector2((Game1.ScreenWidth / 2) - (Texture.Width / 2), screenHeight - Texture.Height - 100);
+      Position = new Vector2((screenWidth / 2) - (WindowRectangle.Width / 2), screenHeight - Texture.Height - 100);
+
+      _queueWindow.Position = new Vector2(Position.X + this.Rectangle.Width + 10, Position.Y);
+      _queueWindow.SetPositions();
 
       _categorySection.Area = new Rectangle((int)Position.X, (int)Position.Y + 35, 190, Texture.Height - 35);
       _categorySection.Scrollbar.Position = new Vector2((Position.X + 170), Position.Y + 35);
@@ -406,6 +418,8 @@ namespace GUITest.Interface.Windows
       UpdateItems();
 
       UpdateCategories();
+
+      _queueWindow.Update(gameTime);
     }
 
     private void UpdateItems()
@@ -461,6 +475,8 @@ namespace GUITest.Interface.Windows
       _categorySection.UnloadContent();
 
       _itemSection.UnloadContent();
+
+      _queueWindow.UnloadContent();
     }
 
     private void UpdateCategories()
