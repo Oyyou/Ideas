@@ -503,12 +503,6 @@
 /processorParam:TextureFormat=Color
 /build:Items/WoodenSword.png
 
-#begin Effect/BlackAndWhite.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effect/BlackAndWhite.fx
-
 #begin Controls/ComboBox.png
 /importer:TextureImporter
 /processor:TextureProcessor
