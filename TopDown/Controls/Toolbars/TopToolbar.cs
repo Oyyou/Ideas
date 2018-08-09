@@ -20,11 +20,6 @@ namespace TopDown.Controls.Toolbars
       _gameScreen.State = GameStates.BuildMenu;
     }
 
-    private void CraftButton_Click(object sender, EventArgs e)
-    {
-      //_gameScreen.State = GameStates.CraftingMenu;
-    }
-
     private void InventoryButton_Click(object sender, EventArgs e)
     {
       _gameScreen.State = GameStates.InventoryMenu;
@@ -43,9 +38,6 @@ namespace TopDown.Controls.Toolbars
       var buildButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Build"));
       buildButton.Click += BuildButton_Click;
 
-      var craftButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Crafting"));
-      craftButton.Click += CraftButton_Click;
-
       var jobsButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Jobs"));
       jobsButton.Click += JobsButton_Click;
 
@@ -55,7 +47,6 @@ namespace TopDown.Controls.Toolbars
       _icons = new List<Button>()
       {
         buildButton,
-        craftButton,
         jobsButton,
         inventoryButton,
       };

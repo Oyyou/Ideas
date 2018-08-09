@@ -80,10 +80,6 @@ namespace TopDown.States
 
     private GUITest.Interface.Toolbar _toolbar;
 
-    //private PenumbraComponent penumbra;
-    Vector2 baseScreenSize = Vector2.Zero;
-    private Matrix globalTransformation;
-
     public IEnumerable<Building> BuildingComponents
     {
       get
@@ -92,8 +88,6 @@ namespace TopDown.States
           .Where(c => c.State == BuildingStates.Built);
       }
     }
-
-    public CraftingMenuWindow CraftingMenu;
 
     public List<Component> CollidableComponents
     {
@@ -272,7 +266,7 @@ namespace TopDown.States
 
       GameComponents.Add(npc);
     }
-    
+
     public override void Draw(GameTime gameTime)
     {
       //if (baseScreenSize == Vector2.Zero)
@@ -409,6 +403,10 @@ namespace TopDown.States
     {
       base.LoadContent(gameModel);
 
+      var timeStarted = DateTime.Now.TimeOfDay;
+
+      Console.WriteLine("Loading");
+
       GameSpeed = 1f;
 
       _renderTarget = new RenderTarget2D(
@@ -426,8 +424,6 @@ namespace TopDown.States
       PathFinder = new Pathfinder();
 
       _buildMenu = new BuildMenuWindow(this);
-
-      CraftingMenu = new CraftingMenuWindow(this);
 
       JobMenu = new JobMenuWindow(this);
 
@@ -464,32 +460,15 @@ namespace TopDown.States
 
       _toolbar = new GUITest.Interface.Toolbar(this, _itemManager, gameModel.ContentManger);
 
-      var playerAnimations = new Dictionary<string, Animation>()
-      {
-        { "WalkDown", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkDown"), 4) },
-        { "WalkLeft", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkLeft"), 4) },
-        { "WalkRight", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkRight"), 4) },
-        { "WalkUp", new Animation(_content.Load<Texture2D>("Sprites/Player/WalkUp"), 4) },
-      };
-
-      //Player = new TopDown.Sprites.Player(playerAnimations)
-      //{
-      //  Layer = 0.9f,
-      //  Position = new Vector2(512, 320),
-      //};
-
       GameComponents = new List<Component>()
       {
         //Player,
       };
 
+      // The background
       var dot = new Texture2D(_graphicsDevice, 1, 1);
       dot.SetData(new Color[] { new Color(0, 200, 0), });
 
-      //for (int y = 0; y < 10; y++)
-      //{
-      //  for (int x = 0; x < 100; x++)
-      //  {
       GameComponents.Add(new Sprite(dot)
       {
         IsCollidable = false,
@@ -497,12 +476,13 @@ namespace TopDown.States
         Position = new Vector2(0, 0),
         Scale = 10000,
       });
-      //  }
-      //}
+
+      Console.WriteLine("-->Map");
 
       var map = TmxMap.Load("Content/Maps/Level01.tmx");
 
       var textures = map.Tileset.Select(c => _content.Load<Texture2D>("Tilemaps/" + c.Name)).ToList();
+
 
       foreach (var layer in map.Layer)
       {
@@ -607,10 +587,8 @@ namespace TopDown.States
         Mouse,
         MessageBox,
         new TopToolbar(this),
-        //new BottomToolbar(this),
         new ResourceView(Resources),
         _buildMenu,
-        CraftingMenu,
         InspectMenu,
         InventoryMenu,
         JobMenu,
@@ -624,6 +602,8 @@ namespace TopDown.States
 
       foreach (var component in _guiComponents)
         component.LoadContent(_content);
+
+      Console.WriteLine("-->Buildings");
 
       foreach (var objectGroup in map.ObjectGroups)
       {
@@ -751,63 +731,20 @@ namespace TopDown.States
         }
       }
 
+      Console.WriteLine("-->Updating Path");
+
       UpdateMap();
 
-
-      // Create our lighting component and register it as a service so that subsystems can access it.--------------
-      //penumbra = new PenumbraComponent(_game)
-      //{
-      //  AmbientColor = new Color(new Vector3(0.1f))
-      //};
-
-      //// Create sample light source and shadow hull.
-      //Light light = new PointLight
-      //{
-      //  Color = new Color(255, 140, 0),
-      //  Scale = new Vector2(9000), // Range of the light source (how far the light will travel)
-      //  ShadowType = ShadowType.Solid, // Will not lit hulls themselves
-      //  Position = new Vector2(-500, 1000),
-      //  Intensity = 1.5f,
-      //  Radius = 100,
-      //};
-
-      //create all the hulls unsing the CollisionRectangles
-      foreach (var collisionRectangle in BuildingComponents.SelectMany(a => a.CollisionRectangles))
+      // Doing this loads the window into memory
+      Console.WriteLine("-->Windows");
+      _windows = new List<Window>()
       {
-        AddHull(collisionRectangle);
-      }
+        new CraftingWindow(_content, _itemManager),
+      };
 
-      //penumbra.Lights.Add(light);
-      //_game.Services.AddService(penumbra);
+      var timeEnded = DateTime.Now.TimeOfDay;
 
-
-      // Load penumbra
-      //penumbra.Initialize();
-
-    }
-
-    private void AddHull(Rectangle collisionRectangle)
-    {
-      //var hull = new Hull(new Vector2(0, 0), new Vector2(collisionRectangle.Width, 0), new Vector2(collisionRectangle.Width, collisionRectangle.Height), new Vector2(0, collisionRectangle.Height))
-      //{
-      //  Position = collisionRectangle.Location.ToVector2() * 2,
-      //  Scale = new Vector2(2),
-      //  Origin = new Vector2(0),
-      //};
-
-      //penumbra.Hulls.Add(hull);
-    }
-
-    private void SetGlobalTransform()
-    {
-      baseScreenSize = new Vector2(_graphicsDevice.DisplayMode.Width, _graphicsDevice.DisplayMode.Height);
-      //-----------------------------------------------------------------------------------------------------------
-      //Work out how much we need to scale our graphics to fill the screen
-      float horScaling = _graphicsDevice.PresentationParameters.BackBufferWidth / baseScreenSize.X;
-      float verScaling = _graphicsDevice.PresentationParameters.BackBufferHeight / baseScreenSize.Y;
-      Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
-      globalTransformation = Matrix.CreateScale(screenScalingFactor);
-      //penumbra.Transform = globalTransformation;
+      Console.WriteLine("Total load time: " + (timeEnded - timeStarted));
     }
 
     private void MenuUpdate(GameTime gameTime, Keys? menuKey)
@@ -835,11 +772,6 @@ namespace TopDown.States
 
       foreach (var component in GameComponents)
         component.Update(gameTime);
-
-      //foreach (var building in BuildingComponents)
-      //{
-      //  building.State = BuildingStates.Built_In;
-      //}
 
       for (int i = 0; i < GameComponents.Count; i++)
       {
@@ -1054,20 +986,13 @@ namespace TopDown.States
       _window?.UnloadContent();
     }
 
-    public Vector2 GetMouseWithCameraPosition()
-    {
-      Matrix inverseTransform = Matrix.Invert(globalTransformation);
-
-      return Vector2.Transform(new Vector2(Mouse.PositionWithCamera.X, Mouse.PositionWithCamera.Y), inverseTransform);
-    }
-
     public override void Update(GameTime gameTime)
     {
       if (Keyboard.IsKeyPressed(Keys.T))
         Notifications.Add(Time, "This is a test notification");
 
       _camera.Update(gameTime);
-      
+
       SetGameSpeed();
 
       switch (State)
