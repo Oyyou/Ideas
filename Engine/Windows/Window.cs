@@ -26,7 +26,7 @@ namespace Engine.Interface.Windows
 
     public string Name { get; protected set; }
 
-    public Vector2 Position { get; protected set; }
+    public Vector2 Position { get; set; }
 
     public Rectangle Rectangle
     {
@@ -35,6 +35,8 @@ namespace Engine.Interface.Windows
         return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
       }
     }
+
+    public abstract Rectangle WindowRectangle { get; }
 
     public Texture2D Texture { get; protected set; }
 

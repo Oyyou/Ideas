@@ -44,7 +44,7 @@ namespace Engine.States
 
     protected Window _window;
 
-    private List<Window> _windows;
+    protected List<Window> _windows;
 
     public bool IsWindowOpen
     {
@@ -58,7 +58,7 @@ namespace Engine.States
     {
       get
       {
-        return _window != null ? _window.Rectangle : new Rectangle(0, 0, 0, 0);
+        return _window != null ? _window.WindowRectangle : new Rectangle(0, 0, 0, 0);
       }
     }
 
