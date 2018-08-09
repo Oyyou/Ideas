@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,13 +25,13 @@ namespace VillageBackend.Managers
     /// <summary>
     /// The items added to the queue to be crafed by the assigned villager
     /// </summary>
-    public List<ItemV2> QueuedItems { get; private set; }
+    public ObservableCollection<ItemV2> QueuedItems { get; private set; }
 		
 	  public ItemManager(Resources resources)
 		{
 			Resources = resources;
 
-      QueuedItems = new List<ItemV2>();
+      QueuedItems = new ObservableCollection<ItemV2>();
 		}
     
     public void AddToQueue(ItemV2 item)
