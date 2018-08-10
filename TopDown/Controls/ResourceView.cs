@@ -16,11 +16,6 @@ namespace TopDown.Controls
 
     private VillageBackend.Models.Resources _resources;
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.DrawString(_font, "Wood: " + _resources.Wood, new Vector2(10, 5), Color.Red);

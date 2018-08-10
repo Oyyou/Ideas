@@ -1,5 +1,6 @@
 ﻿using Engine;
 using Engine.States;
+using GUITest.Interface.Buttons;
 using GUITest.Interface.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -25,47 +26,36 @@ namespace GUITest.Interface
 
     private MouseState _currentMouseState;
 
-    private ItemManager _itemManager;
-
     private KeyboardState _previousKeyboardState;
 
     private MouseState _previousMouseState;
     
     private State _state;
 
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public Toolbar(State game, ContentManager content)
     {
-      foreach (var button in _buttons)
+      _state = game;
+
+      _content = content;
+
+      _buttons = new List<ToolbarButton>()
       {
-        switch (button.CurrentState)
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map"), Keys.M),
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad"), Keys.S)
         {
-          case ToolbarButtonStates.Nothing:
+          Click = Squad_Click,
+        },
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Crafting"), Keys.C)
+        {
+          Click = Crafting_Click,
+        },
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Jobs"), Keys.J)
+        {
+          Click = Jobs_Click,
+        },
+      };
 
-            button.Color = Color.White;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ToolbarButtonStates.Hovering:
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ToolbarButtonStates.Clicked:
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.2f;
-
-            break;
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
-
-        button.Draw(gameTime, spriteBatch);
-      }
+      SetButtonPositions();
     }
 
     public void OnScreenResize()
@@ -109,10 +99,10 @@ namespace GUITest.Interface
       {	      
         switch (button.CurrentState)
         {
-          case ToolbarButtonStates.Nothing:
+          case ButtonStates.Nothing:
 
             if (mouseRectangle.Intersects(button.Rectangle))
-              button.CurrentState = ToolbarButtonStates.Hovering;
+              button.CurrentState = ButtonStates.Hovering;
 
             if (_previousKeyboardState != _currentKeyboardState &&
                 _currentKeyboardState.IsKeyDown(button.OpenKey))
@@ -120,18 +110,18 @@ namespace GUITest.Interface
               _state.CloseWindow();
 
               foreach (var b in _buttons)
-                b.CurrentState = ToolbarButtonStates.Nothing;
+                b.CurrentState = ButtonStates.Nothing;
 
-              button.CurrentState = ToolbarButtonStates.Clicked;
+              button.CurrentState = ButtonStates.Clicked;
 
               button.OnClick();
             }
 
             break;
-          case ToolbarButtonStates.Hovering:
+          case ButtonStates.Hovering:
 
             if (!mouseRectangle.Intersects(button.Rectangle))
-              button.CurrentState = ToolbarButtonStates.Nothing;
+              button.CurrentState = ButtonStates.Nothing;
 
             if (clicked ||
                 (_previousKeyboardState != _currentKeyboardState &&
@@ -140,15 +130,15 @@ namespace GUITest.Interface
               _state.CloseWindow();
 
               foreach (var b in _buttons)
-                b.CurrentState = ToolbarButtonStates.Nothing;
+                b.CurrentState = ButtonStates.Nothing;
 
-              button.CurrentState = ToolbarButtonStates.Clicked;
+              button.CurrentState = ButtonStates.Clicked;
 
               button.OnClick();
             }
 
             break;
-          case ToolbarButtonStates.Clicked:
+          case ButtonStates.Clicked:
 
             if (_previousKeyboardState != _currentKeyboardState &&
                  _currentKeyboardState.IsKeyDown(button.OpenKey))
@@ -156,7 +146,7 @@ namespace GUITest.Interface
               _state.CloseWindow();
 
               foreach (var b in _buttons)
-                b.CurrentState = ToolbarButtonStates.Nothing;
+                b.CurrentState = ButtonStates.Nothing;
 
               break;
             }
@@ -167,7 +157,7 @@ namespace GUITest.Interface
 
               if (!mouseRectangle.Intersects(GameEngine.ScreenRectangle))
               {
-                Console.WriteLine("Not in screen");
+                Console.WriteLine("Not on screen");
                 continue;
               }
 
@@ -182,19 +172,19 @@ namespace GUITest.Interface
                 _state.CloseWindow();
 
                 foreach (var b in _buttons)
-                  b.CurrentState = ToolbarButtonStates.Nothing;
+                  b.CurrentState = ButtonStates.Nothing;
 
                 // Set the clicked button to "Hover" because that's where the mouse'll be
-                button.CurrentState = ToolbarButtonStates.Hovering;
+                button.CurrentState = ButtonStates.Hovering;
               }
             }
 
             if (clicked && !_buttons.Any(c => c.Rectangle.Intersects(mouseRectangle)) && !_state.IsWindowOpen) // Check if we're clicking somewhere that isn't on any button
             {
               foreach (var b in _buttons)
-                b.CurrentState = ToolbarButtonStates.Nothing;
+                b.CurrentState = ButtonStates.Nothing;
 
-              button.CurrentState = ToolbarButtonStates.Hovering;
+              button.CurrentState = ButtonStates.Hovering;
             }
 
             break;
@@ -204,38 +194,17 @@ namespace GUITest.Interface
       }
     }
 
-    public Toolbar(State game, ItemManager itemManager, ContentManager content)
-    {	    
-      _state = game;
-			
-	    _itemManager = itemManager;
-			
-      _content = content;
-
-      var squad = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad"), Keys.S);
-      squad.Click += Squad_Click;
-
-      var crafting = new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Crafting"), Keys.C);
-      crafting.Click += Crafting_Click;
-
-      _buttons = new List<ToolbarButton>()
-      {
-        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map"), Keys.M),
-        squad,
-        crafting,
-        //new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map")),
-        //new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad")),
-      };
-
-      SetButtonPositions();
-    }
-
-    private void Crafting_Click(object sender, EventArgs e)
+    private void Crafting_Click(object sender)
     {
-      _state.OpenWindow(new CraftingWindow(_content, _itemManager));
+      _state.OpenWindow("Crafting");
     }
 
-    private void Squad_Click(object sender, EventArgs e)
+    private void Jobs_Click(object sender)
+    {
+      _state.OpenWindow("Jobs");
+    }
+
+    private void Squad_Click(object sender)
     {
       //_game.OpenWindow(new Window(_content));
     }
@@ -244,6 +213,41 @@ namespace GUITest.Interface
     {
       foreach (var button in _buttons)
         button.UnloadContent();
+    }
+
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      foreach (var button in _buttons)
+      {
+        switch (button.CurrentState)
+        {
+          case ButtonStates.Nothing:
+
+            button.Color = Color.White;
+
+            button.Scale = 1.0f;
+
+            break;
+          case ButtonStates.Hovering:
+
+            button.Color = Color.YellowGreen;
+
+            button.Scale = 1.0f;
+
+            break;
+          case ButtonStates.Clicked:
+
+            button.Color = Color.YellowGreen;
+
+            button.Scale = 1.2f;
+
+            break;
+          default:
+            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
+        }
+
+        button.Draw(gameTime, spriteBatch);
+      }
     }
   }
 }

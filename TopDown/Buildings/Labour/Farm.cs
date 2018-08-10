@@ -8,6 +8,7 @@ using TopDown.States;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using TopDown.Sprites;
+using VillageBackend.Models;
 
 namespace TopDown.Buildings.Labour
 {
@@ -46,6 +47,11 @@ namespace TopDown.Buildings.Labour
     public Farm(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom) : base(gameState, textureInside, textureOutsideTop, textureOutsideBottom)
     {
       Name = "Farm";
+
+      Job = new Job()
+      {
+        Name = Name,
+      };
     }
 
     public override void LoadContent(ContentManager content)

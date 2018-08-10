@@ -60,11 +60,6 @@ namespace TopDown.Controls.BuildMenu
 
     }
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       if (_gameScreen.State != States.GameStates.BuildMenu)

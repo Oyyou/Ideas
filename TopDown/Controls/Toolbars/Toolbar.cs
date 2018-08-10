@@ -22,11 +22,6 @@ namespace TopDown.Controls.Toolbars
 
     protected Sprite _toolbarSprite;
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       if (_gameScreen.State != GameStates.Playing)

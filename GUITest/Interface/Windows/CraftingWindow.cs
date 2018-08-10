@@ -115,14 +115,12 @@ namespace GUITest.Interface.Windows
 
       _categorySection.Items = categories.Select(c =>
       {
-        var button = new Button(buttonTexture, buttonFont)
+        return new Button(buttonTexture, buttonFont)
         {
           Text = c,
+          Click = CategoryClicked,
         };
 
-        button.Click += CategoryClicked;
-
-        return button;
 
       }).ToList();
 
@@ -164,7 +162,7 @@ namespace GUITest.Interface.Windows
       }
     }
 
-    private void CategoryClicked(object sender, EventArgs e)
+    private void CategoryClicked(object sender)
     {
       var button = sender as Button;
 
@@ -214,13 +212,15 @@ namespace GUITest.Interface.Windows
       if (File.Exists(fullPath))
         content = "Interface/ItemIcons/" + item.Name;
 
-      var button = new ItemButton(_content.Load<Texture2D>(content), item);
-      button.Click += ItemClicked;
+      var button = new ItemButton(_content.Load<Texture2D>(content), item)
+      {
+        Click = ItemClicked,
+      };
 
       return button;
     }
 
-    private void ItemClicked(object sender, EventArgs e)
+    private void ItemClicked(object sender)
     {
       var button = sender as ItemButton;
       Console.WriteLine($"Item button '{button.Item.Name}' clicked");
@@ -261,21 +261,21 @@ namespace GUITest.Interface.Windows
       {
         switch (button.CurrentState)
         {
-          case ToolbarButtonStates.Nothing:
+          case ButtonStates.Nothing:
 
             button.Color = Color.White;
 
             button.Scale = 1.0f;
 
             break;
-          case ToolbarButtonStates.Hovering:
+          case ButtonStates.Hovering:
 
             button.Color = Color.YellowGreen;
 
             button.Scale = 1.0f;
 
             break;
-          case ToolbarButtonStates.Clicked:
+          case ButtonStates.Clicked:
 
             // This will be removed
 
@@ -302,21 +302,21 @@ namespace GUITest.Interface.Windows
       {
         switch (button.CurrentState)
         {
-          case ToolbarButtonStates.Nothing:
+          case ButtonStates.Nothing:
 
             button.Color = Color.White;
 
             button.Scale = 1.0f;
 
             break;
-          case ToolbarButtonStates.Hovering:
+          case ButtonStates.Hovering:
 
             button.Color = Color.YellowGreen;
 
             button.Scale = 1.0f;
 
             break;
-          case ToolbarButtonStates.Clicked:
+          case ButtonStates.Clicked:
 
             // This will be removed
 
@@ -443,21 +443,21 @@ namespace GUITest.Interface.Windows
       {
         switch (button.CurrentState)
         {
-          case ToolbarButtonStates.Nothing:
+          case ButtonStates.Nothing:
 
             if (mouseRectangleWithCamera_Items.Intersects(button.Rectangle) && mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ToolbarButtonStates.Hovering;
+              button.CurrentState = ButtonStates.Hovering;
 
             break;
-          case ToolbarButtonStates.Hovering:
+          case ButtonStates.Hovering:
 
             if (!mouseRectangleWithCamera_Items.Intersects(button.Rectangle) || !mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ToolbarButtonStates.Nothing;
+              button.CurrentState = ButtonStates.Nothing;
 
             if (clicked)
             {
               foreach (var b in _itemSection.Items)
-                b.CurrentState = ToolbarButtonStates.Nothing;
+                b.CurrentState = ButtonStates.Nothing;
 
               button.OnClick();
             }
@@ -472,6 +472,8 @@ namespace GUITest.Interface.Windows
 
     public override void UnloadContent()
     {
+      Texture.Dispose();
+
       _categorySection.UnloadContent();
 
       _itemSection.UnloadContent();
@@ -500,29 +502,29 @@ namespace GUITest.Interface.Windows
       {
         switch (button.CurrentState)
         {
-          case ToolbarButtonStates.Nothing:
+          case ButtonStates.Nothing:
 
             if (mouseRectangleWithCamera_Categories.Intersects(button.Rectangle) && mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ToolbarButtonStates.Hovering;
+              button.CurrentState = ButtonStates.Hovering;
 
             break;
-          case ToolbarButtonStates.Hovering:
+          case ButtonStates.Hovering:
 
             if (!mouseRectangleWithCamera_Categories.Intersects(button.Rectangle) || !mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ToolbarButtonStates.Nothing;
+              button.CurrentState = ButtonStates.Nothing;
 
             if (clicked)
             {
               foreach (var b in _categorySection.Items)
-                b.CurrentState = ToolbarButtonStates.Nothing;
+                b.CurrentState = ButtonStates.Nothing;
 
-              button.CurrentState = ToolbarButtonStates.Clicked;
+              button.CurrentState = ButtonStates.Clicked;
 
               button.OnClick();
             }
 
             break;
-          case ToolbarButtonStates.Clicked:
+          case ButtonStates.Clicked:
 
             //if (clicked && (mouseRectangleWithCamera_Categories.Intersects(windowRectangle)) && !_categorySection.Items.Any(c => c != button && c.Rectangle.Intersects(mouseRectangleWithCamera_Categories))) // Check if we're clicking somewhere that isn't on any button
             //{

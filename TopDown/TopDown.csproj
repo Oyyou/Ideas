@@ -136,8 +136,10 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
-    <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)VillageBackend\Content\*.json" "$(TargetDir)\Content\Items" /Y</PreBuildEvent>
+  <PropertyGroup>
+    <PreBuildEvent>if not exist $(TargetDir)\Content mkdir $(TargetDir)\Content
+if not exist $(TargetDir)\Content\Items mkdir $(TargetDir)\Content\Items
+xcopy "$(SolutionDir)VillageBackend\Content\*.json" "$(TargetDir)\Content\Items" /Y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

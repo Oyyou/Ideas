@@ -88,8 +88,10 @@ namespace GUITest.Interface.Windows
       if (File.Exists(fullPath))
         content = "Interface/ItemIcons/" + item.Name;
 
-      var button = new ItemButton(_content.Load<Texture2D>(content), item);
-      button.Click += ItemClick;
+      var button = new ItemButton(_content.Load<Texture2D>(content), item)
+      {
+        Click = ItemClick,
+      };
 
       return button;
     }
@@ -99,7 +101,7 @@ namespace GUITest.Interface.Windows
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void ItemClick(object sender, EventArgs e)
+    private void ItemClick(object sender)
     {
       var button = sender as ItemButton;
 
@@ -138,7 +140,7 @@ namespace GUITest.Interface.Windows
       {
         switch (button.CurrentState)
         {
-          case ToolbarButtonStates.Nothing:
+          case ButtonStates.Nothing:
 
             if (Keyboard.GetState().IsKeyDown(Keys.T))
             {
@@ -148,13 +150,13 @@ namespace GUITest.Interface.Windows
             }
 
             if (mouseRectangle.Intersects(button.Rectangle) && mouseRectangle.Intersects(WindowRectangle))
-              button.CurrentState = ToolbarButtonStates.Hovering;
+              button.CurrentState = ButtonStates.Hovering;
 
             break;
-          case ToolbarButtonStates.Hovering:
+          case ButtonStates.Hovering:
 
             if (!mouseRectangle.Intersects(button.Rectangle) || !mouseRectangle.Intersects(WindowRectangle))
-              button.CurrentState = ToolbarButtonStates.Nothing;
+              button.CurrentState = ButtonStates.Nothing;
 
             if (clicked)
               button.OnClick();
@@ -185,14 +187,14 @@ namespace GUITest.Interface.Windows
       {
         switch (button.CurrentState)
         {
-          case ToolbarButtonStates.Nothing:
+          case ButtonStates.Nothing:
 
             button.Color = Color.White;
 
             button.Scale = 1.0f;
 
             break;
-          case ToolbarButtonStates.Hovering:
+          case ButtonStates.Hovering:
 
             button.Color = Color.YellowGreen;
 

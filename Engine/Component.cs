@@ -29,8 +29,6 @@ namespace Engine
 
     public virtual Vector2 Position { get; set; }
 
-    public abstract void CheckCollision(Component component);
-
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
 
     public abstract void LoadContent(ContentManager content);

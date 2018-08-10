@@ -47,11 +47,6 @@ namespace Engine.Managers
       SpriteEffect = SpriteEffects.None;
     }
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       var layer = Layer;// + Position.Y / 100000;

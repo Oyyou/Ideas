@@ -61,11 +61,6 @@ namespace Engine.Utilities
       // other draw code here
     }
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public override void LoadContent(ContentManager content)
     {
       _font = content.Load<SpriteFont>("Fonts/Font");

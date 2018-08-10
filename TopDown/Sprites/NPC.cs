@@ -13,20 +13,12 @@ using TopDown.Items;
 using Microsoft.Xna.Framework.Content;
 using TopDown.Skills;
 using TopDown.Furnitures;
+using VillageBackend.Models;
 
 namespace TopDown.Sprites
 {
   public class NPC : Sprite
   {
-    public static string[] Names = new string[]
-    {
-      "Bob",
-      "Jimmy",
-      "Fred",
-      "Tim",
-      "John",
-    };
-
     #region Fields
 
     private float? _defaultLayer;
@@ -89,7 +81,13 @@ namespace TopDown.Sprites
     /// </summary>
     public string Job { get; set; }
 
-    public string Name { get; set; }
+    public string Name
+    {
+      get
+      {
+        return Villager.Name;
+      }
+    }
 
     public override Vector2 Position
     {
@@ -104,6 +102,8 @@ namespace TopDown.Sprites
     }
 
     public Skills.Skills Skills { get; set; }
+
+    public Villager Villager { get; set; }
 
     public delegate void WorkEvent(NPC npc, GameTime gameTime);
 
@@ -177,7 +177,7 @@ namespace TopDown.Sprites
         Scale = 0.5f,
       };
 
-      Name = Names[GameEngine.Random.Next(0, Names.Length)];
+      Villager = new Villager();
 
       Job = "Unemployed";
     }

@@ -27,11 +27,6 @@ namespace TopDown.Controls
 
     protected Sprite _windowSprite;
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     private void CloseButton_Click(object sender, EventArgs e)
     {
       OnClose();

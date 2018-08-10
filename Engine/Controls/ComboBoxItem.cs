@@ -63,11 +63,6 @@ namespace Engine.Controls
       }
     }
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public ComboBoxItem(ComboBox parent)
     {
       Parent = parent;

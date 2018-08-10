@@ -51,11 +51,6 @@ namespace TopDown.Controls.ItemMenu
       this.FullReset();
     }
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     private void Done_Click(object sender, EventArgs e)
     {
       // Items that need to be placed before finishing the building

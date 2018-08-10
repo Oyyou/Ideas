@@ -76,11 +76,6 @@ namespace Engine.Controls
       }
     }
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     private void Click(object sender, EventArgs e)
     {
       Show = !Show;

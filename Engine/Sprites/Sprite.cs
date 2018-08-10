@@ -127,30 +127,6 @@ namespace Engine.Sprites
 
     public Vector2 Velocity;
 
-    public override void CheckCollision(Component component)
-    {
-      if (component.CollisionRectangles == null)
-        return;
-
-      if (!component.IsCollidable)
-        return;
-
-      foreach (var rectangle in component.CollisionRectangles)
-      {
-        if (Velocity.X > 0 && this.IsTouchingLeft(rectangle))
-          Velocity.X = 0;
-
-        if (Velocity.X < 0 && this.IsTouchingRight(rectangle))
-          Velocity.X = 0;
-
-        if (Velocity.Y > 0 && this.IsTouchingTop(rectangle))
-          Velocity.Y = 0;
-
-        if (Velocity.Y < 0 && this.IsTouchingBottom(rectangle))
-          Velocity.Y = 0;
-      }
-    }
-
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       if (!IsVisible)

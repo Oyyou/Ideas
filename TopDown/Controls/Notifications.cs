@@ -38,11 +38,6 @@ namespace TopDown.Controls
       _notifications.Add(notification);
     }
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       var y = 20;

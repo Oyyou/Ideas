@@ -44,9 +44,13 @@
   <ItemGroup>
     <Compile Include="Enums.cs" />
     <Compile Include="Managers\ItemManager.cs" />
+    <Compile Include="Managers\JobManager.cs" />
+    <Compile Include="Managers\VillagerManager.cs" />
     <Compile Include="Models\Armour.cs" />
     <Compile Include="Models\ItemV2.cs" />
+    <Compile Include="Models\Job.cs" />
     <Compile Include="Models\Resources.cs" />
+    <Compile Include="Models\Villager.cs" />
     <Compile Include="Models\Weapon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

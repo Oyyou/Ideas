@@ -12,6 +12,7 @@ using TopDown.Buildings;
 using Microsoft.Xna.Framework.Graphics;
 using TopDown.Sprites;
 using Microsoft.Xna.Framework.Content;
+using VillageBackend.Models;
 
 namespace TopDown.Buildings.Labour
 {
@@ -117,6 +118,11 @@ namespace TopDown.Buildings.Labour
     public Mine(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom) : base(gameState, textureInside, textureOutsideTop, textureOutsideBottom)
     {
       Name = "Mine";
+
+      Job = new Job()
+      {
+        Name = Name,
+      };
     }
 
     protected override void SetDoorLocations()

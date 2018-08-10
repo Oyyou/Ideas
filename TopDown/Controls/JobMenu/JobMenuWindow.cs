@@ -41,11 +41,6 @@ namespace TopDown.Controls.JobMenu
       JobButton = button;
     }
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       if (_gameScreen.State != States.GameStates.JobMenu)

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TopDown.Sprites;
 using TopDown.States;
+using VillageBackend.Models;
 
 namespace TopDown.Buildings.Labour
 {
@@ -117,6 +118,11 @@ namespace TopDown.Buildings.Labour
     public Blacksmith(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom) : base(gameState, textureInside, textureOutsideTop, textureOutsideBottom)
     {
       Name = "Blacksmith";
+
+      Job = new Job()
+      {
+        Name = Name,
+      };
     }
 
     private void CraftItem(NPC npc, GameTime gameTime)

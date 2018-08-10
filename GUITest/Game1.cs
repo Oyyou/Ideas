@@ -53,6 +53,8 @@ namespace GUITest
 
       ScreenWidth = _graphics.PreferredBackBufferWidth;
 
+      ScreenRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
+
       Window.ClientSizeChanged += Window_ClientSizeChanged;
 
       IsMouseVisible = true;

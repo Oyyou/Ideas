@@ -1,5 +1,4 @@
 ﻿using Engine;
-using Engine.Controls;
 using Engine.Interface.Windows;
 using Engine.Models;
 using Engine.Sprites;
@@ -13,15 +12,12 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TopDown.Builders;
 using TopDown.Buildings;
 using TopDown.Buildings.Housing;
 using TopDown.Buildings.Labour;
 using TopDown.Controls;
 using TopDown.Controls.BuildMenu;
-using TopDown.Controls.CraftingMenu;
 using TopDown.Controls.InspectMenu;
 using TopDown.Controls.InventoryMenu;
 using TopDown.Controls.ItemMenu;
@@ -34,8 +30,8 @@ using TopDown.Logic;
 using TopDown.Resources;
 using TopDown.Sprites;
 using VillageBackend.Managers;
+using VillageBackend.Models;
 using static TopDown.Logic.Pathfinder;
-//using Penumbra;
 
 namespace TopDown.States
 {
@@ -74,7 +70,15 @@ namespace TopDown.States
 
     private List<Component> _guiComponents;
 
+    #region Managers
+
     private ItemManager _itemManager;
+
+    private JobManager _jobManager;
+
+    private VillagerManager _villagerManager;
+
+    #endregion
 
     private RenderTarget2D _renderTarget;
 
@@ -183,6 +187,7 @@ namespace TopDown.States
       SelectedBuilding = building;
 
       AddComponent(component: building);
+      _jobManager.Add(building.Job);
     }
 
     public void AddComponent(Component component)
@@ -245,7 +250,7 @@ namespace TopDown.States
 
       var animations = new List<Dictionary<string, Animation>>()
       {
-        playerAnimations,
+        //playerAnimations,
         pigAnimations,
         butterflyAnimations,
         chickenAnimations,
@@ -265,6 +270,7 @@ namespace TopDown.States
       npc.LoadContent(_content);
 
       GameComponents.Add(npc);
+      _villagerManager.Add(npc.Villager);
     }
 
     public override void Draw(GameTime gameTime)
@@ -313,7 +319,7 @@ namespace TopDown.States
 
     public void DrawGui(GameTime gameTime)
     {
-      _window?.Draw(gameTime, _spriteBatch, _graphicsDeviceManager);
+      Window?.Draw(gameTime, _spriteBatch, _graphicsDeviceManager);
 
       _spriteBatch.Begin(SpriteSortMode.FrontToBack);
 
@@ -344,21 +350,13 @@ namespace TopDown.States
 
     private void ItemMenuUpdate(GameTime gameTime)
     {
-      Time = Time.AddSeconds(10 * GameSpeed);
+      Time = new DateTime(2018, 08, 10, 12, 0, 0, 0);
 
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
       foreach (var component in GameComponents)
         component.Update(gameTime);
-
-      for (int i = 0; i < GameComponents.Count; i++)
-      {
-        for (int j = i + 1; j < GameComponents.Count; j++)
-        {
-          GameComponents[i].CheckCollision(GameComponents[j]);
-        }
-      }
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.B))
       {
@@ -458,7 +456,11 @@ namespace TopDown.States
 
       _itemManager = new ItemManager(Resources);
 
-      _toolbar = new GUITest.Interface.Toolbar(this, _itemManager, gameModel.ContentManger);
+      _jobManager = new JobManager();
+
+      _villagerManager = new VillagerManager();
+
+      _toolbar = new GUITest.Interface.Toolbar(this, gameModel.ContentManger);
 
       GameComponents = new List<Component>()
       {
@@ -476,6 +478,14 @@ namespace TopDown.States
         Position = new Vector2(0, 0),
         Scale = 10000,
       });
+
+      // Doing this loads the window into memory
+      Console.WriteLine("-->Windows");
+      _windows = new List<Window>()
+      {
+        new CraftingWindow(_content, _itemManager),
+        new JobsWindow(_content, _jobManager, _villagerManager),
+      };
 
       Console.WriteLine("-->Map");
 
@@ -650,6 +660,7 @@ namespace TopDown.States
 
             blacksmith.State = BuildingStates.Built;
             GameComponents.Add(blacksmith);
+            _jobManager.Add(blacksmith.Job);
 
             break;
 
@@ -719,6 +730,7 @@ namespace TopDown.States
               };
 
               npc.LoadContent(_content);
+              _villagerManager.Add(npc.Villager);
 
               GameComponents.Add(npc);
             }
@@ -735,13 +747,6 @@ namespace TopDown.States
 
       UpdateMap();
 
-      // Doing this loads the window into memory
-      Console.WriteLine("-->Windows");
-      _windows = new List<Window>()
-      {
-        new CraftingWindow(_content, _itemManager),
-      };
-
       var timeEnded = DateTime.Now.TimeOfDay;
 
       Console.WriteLine("Total load time: " + (timeEnded - timeStarted));
@@ -753,7 +758,7 @@ namespace TopDown.States
         component.Update(gameTime);
 
       _toolbar.Update(gameTime);
-      _window?.Update(gameTime);
+      Window?.Update(gameTime);
 
       if ((menuKey != null && Keyboard.IsKeyPressed(menuKey.Value)) ||
         Keyboard.IsKeyPressed(Keys.Escape))
@@ -765,21 +770,13 @@ namespace TopDown.States
 
     private void PlacingBuildingUpdate(GameTime gameTime)
     {
-      Time = Time.AddSeconds(10 * GameSpeed);
+      Time = new DateTime(2018, 08, 10, 12, 0, 0, 0);
 
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
       foreach (var component in GameComponents)
         component.Update(gameTime);
-
-      for (int i = 0; i < GameComponents.Count; i++)
-      {
-        for (int j = i + 1; j < GameComponents.Count; j++)
-        {
-          GameComponents[i].CheckCollision(GameComponents[j]);
-        }
-      }
 
       if (Keyboard.IsKeyPressed(Keys.B))
       {
@@ -818,21 +815,13 @@ namespace TopDown.States
 
     private void PlacingItemsUpdate(GameTime gameTime)
     {
-      Time = Time.AddSeconds(10 * GameSpeed);
+      Time = new DateTime(2018, 08, 10, 12, 0, 0, 0);
 
       foreach (var component in _guiComponents)
         component.Update(gameTime);
 
       foreach (var component in GameComponents)
         component.Update(gameTime);
-
-      for (int i = 0; i < GameComponents.Count; i++)
-      {
-        for (int j = i + 1; j < GameComponents.Count; j++)
-        {
-          GameComponents[i].CheckCollision(GameComponents[j]);
-        }
-      }
 
       if (GameScreen.Keyboard.IsKeyPressed(Keys.Escape))
       {
@@ -854,7 +843,8 @@ namespace TopDown.States
 
     private void PlayingUpdate(GameTime gameTime)
     {
-      Time = Time.AddSeconds(10 * GameSpeed);
+      // Time = Time.AddSeconds(10 * GameSpeed);
+      Time = new DateTime(2018, 08, 10, 12, 0, 0, 0);
 
       AddNPC();
 
@@ -862,18 +852,10 @@ namespace TopDown.States
         component.Update(gameTime);
 
       _toolbar.Update(gameTime);
-      _window?.Update(gameTime);
+      Window?.Update(gameTime);
 
       foreach (var component in GameComponents)
         component.Update(gameTime);
-
-      for (int i = 0; i < GameComponents.Count; i++)
-      {
-        for (int j = i + 1; j < GameComponents.Count; j++)
-        {
-          GameComponents[i].CheckCollision(GameComponents[j]);
-        }
-      }
 
       if (Keyboard.IsKeyPressed(Keys.P))
         State = GameStates.Paused;
@@ -946,7 +928,7 @@ namespace TopDown.States
     public override void OnScreenResize()
     {
       _toolbar.OnScreenResize();
-      _window?.OnScreenResize();
+      Window?.OnScreenResize();
     }
 
     public void SetGameSpeed()
@@ -983,7 +965,7 @@ namespace TopDown.States
       _guiComponents.Clear();
 
       _toolbar.UnloadContent();
-      _window?.UnloadContent();
+      Window?.UnloadContent();
     }
 
     public override void Update(GameTime gameTime)

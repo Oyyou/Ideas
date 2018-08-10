@@ -12,11 +12,11 @@ namespace GUITest.Interface.Buttons
 {
   public class Button
   {
-    public event EventHandler Click;
+    public Action<object> Click;
 
     public Color Color;
 
-    public ToolbarButtonStates CurrentState;
+    public ButtonStates CurrentState;
 
     public readonly SpriteFont Font;
 
@@ -26,7 +26,7 @@ namespace GUITest.Interface.Buttons
 
     public Vector2 Position;
 
-    public ToolbarButtonStates PreviousState;
+    public ButtonStates PreviousState;
 
     public Rectangle Rectangle
     {
@@ -57,7 +57,7 @@ namespace GUITest.Interface.Buttons
 
       Scale = 1f;
 
-      CurrentState = ToolbarButtonStates.Nothing;
+      CurrentState = ButtonStates.Nothing;
     }
 
     public Button(Texture2D texture, SpriteFont font) : this(texture)
@@ -85,7 +85,7 @@ namespace GUITest.Interface.Buttons
 
     public void OnClick()
     {
-      Click?.Invoke(this, new EventArgs());
+      Click?.Invoke(this);
     }
 
     public void UnloadContent()

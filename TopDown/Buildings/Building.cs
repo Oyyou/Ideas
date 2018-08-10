@@ -15,6 +15,7 @@ using Engine.Sprites;
 using static TopDown.Logic.Pathfinder;
 using TopDown.Sprites;
 using Engine.Controls;
+using VillageBackend.Models;
 
 namespace TopDown.Buildings
 {
@@ -112,6 +113,8 @@ namespace TopDown.Buildings
     public Color Color { get; set; }
 
     public const float DefaultLayer = 0.8f;
+
+    public Job Job;
 
     /// <summary>
     /// Locations in which there has to be at least one path so we can place the building.
@@ -398,11 +401,6 @@ namespace TopDown.Buildings
       }
 
       return canPlace;
-    }
-
-    public override void CheckCollision(Component component)
-    {
-
     }
 
     /// <summary>

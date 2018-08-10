@@ -42,7 +42,7 @@ namespace Engine.States
       get { return _gameModel.SpriteBatch; }
     }
 
-    protected Window _window;
+    public Window Window { get; protected set; }
 
     protected List<Window> _windows;
 
@@ -50,7 +50,7 @@ namespace Engine.States
     {
       get
       {
-        return _window != null;
+        return Window != null;
       }
     }
 
@@ -58,7 +58,7 @@ namespace Engine.States
     {
       get
       {
-        return _window != null ? _window.WindowRectangle : new Rectangle(0, 0, 0, 0);
+        return Window != null ? Window.WindowRectangle : new Rectangle(0, 0, 0, 0);
       }
     }
 
@@ -73,26 +73,26 @@ namespace Engine.States
 
     public void CloseWindow()
     {
-      if (_window == null)
+      if (Window == null)
         return;
 
-      if (_windows.Any(c => c.GetType() == _window.GetType()))
+      if (_windows.Any(c => c.GetType() == Window.GetType()))
       {
         for (int i = 0; i < _windows.Count; i++)
         {
-          if (_windows[i].GetType() == _window.GetType())
+          if (_windows[i].GetType() == Window.GetType())
           {
-            _windows[i] = _window;
+            _windows[i] = Window;
             break;
           }
         }
       }
       else
       {
-        _windows.Add(_window.Clone() as Window);
+        _windows.Add(Window.Clone() as Window);
       }
 
-      _window = null;
+      Window = null;
     }
 
     public abstract void Draw(GameTime gameTime);
@@ -106,24 +106,11 @@ namespace Engine.States
 
     public abstract void OnScreenResize();
 
-    public void OpenWindow(Window window)
+    public void OpenWindow(string name)
     {
-      if (_windows.Any(c => c.GetType() == window.GetType()))
-      {
-        for (int i = 0; i < _windows.Count; i++)
-        {
-          if (_windows[i].GetType() == window.GetType())
-          {
-            _window = _windows[i];
-            // TODO: Make sure the content of the selected category is updated
-            return;
-          }
-        }
-      }
-      else
-      {
-        _window = window;
-      }
+      var window = _windows.Where(c => c.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+
+      Window = window ?? throw new Exception($"Window '{name}' doesn't exist");
     }
 
     public abstract void PostUpdate(GameTime gameTime);

@@ -19,11 +19,6 @@ namespace TopDown.Controls
 
     private List<Button> _buttons;
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       var x = 5;

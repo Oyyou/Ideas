@@ -26,11 +26,6 @@ namespace TopDown.Controls
       }
     }
 
-    public override void CheckCollision(Component component)
-    {
-
-    }
-
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
 
