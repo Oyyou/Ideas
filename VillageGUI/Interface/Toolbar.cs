@@ -1,7 +1,7 @@
 ﻿using Engine;
 using Engine.States;
-using GUITest.Interface.Buttons;
-using GUITest.Interface.Windows;
+using VillageGUI.Interface.Buttons;
+using VillageGUI.Interface.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using VillageBackend.Managers;
 using VillageBackend.Models;
 
-namespace GUITest.Interface
+namespace VillageGUI.Interface
 {
   public class Toolbar
   {

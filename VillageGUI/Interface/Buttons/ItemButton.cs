@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using VillageBackend.Models;
 
-namespace GUITest.Interface.Buttons
+namespace VillageGUI.Interface.Buttons
 {
   public class ItemButton : Button
   {

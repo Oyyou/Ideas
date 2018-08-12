@@ -1,4 +1,4 @@
-﻿using GUITest.Interface.Buttons;
+﻿using VillageGUI.Interface.Buttons;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GUITest.Interface.Buttons
+namespace VillageGUI.Interface.Buttons
 {
   public enum ButtonStates
   {

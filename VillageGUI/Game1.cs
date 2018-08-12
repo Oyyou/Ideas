@@ -1,7 +1,7 @@
 ﻿using Engine;
 using Engine.Models;
-using GUITest.Interface;
-using GUITest.Interface.Windows;
+using VillageGUI.Interface;
+using VillageGUI.Interface.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,7 +12,7 @@ using System.IO;
 using VillageBackend.Models;
 using static VillageBackend.Enums;
 
-namespace GUITest
+namespace VillageGUI
 {
   /// <summary>
   /// This is the main type for your game.

@@ -5,7 +5,7 @@ using Engine.Sprites;
 using Engine.States;
 using Engine.TmxSharp;
 using Engine.Utilities;
-using GUITest.Interface.Windows;
+using VillageGUI.Interface.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -82,7 +82,7 @@ namespace TopDown.States
 
     private RenderTarget2D _renderTarget;
 
-    private GUITest.Interface.Toolbar _toolbar;
+    private VillageGUI.Interface.Toolbar _toolbar;
 
     public IEnumerable<Building> BuildingComponents
     {
@@ -180,6 +180,10 @@ namespace TopDown.States
       }
     }
 
+    public GameScreen()
+    {
+    }
+
     public void AddComponent(Building building)
     {
       building.IsRemoved = false;
@@ -271,75 +275,6 @@ namespace TopDown.States
 
       GameComponents.Add(npc);
       _villagerManager.Add(npc.Villager);
-    }
-
-    public override void Draw(GameTime gameTime)
-    {
-      //if (baseScreenSize == Vector2.Zero)
-      //  SetGlobalTransform();
-
-      //Console.Clear();
-      //Console.WriteLine(Mouse.PositionWithCamera);
-
-      // The "_renderTarget" is essentially a shot of the game. We draw to it, and then it-itself.
-      //_graphicsDevice.SetRenderTarget(_renderTarget);
-
-      _graphicsDevice.Clear(Color.Black);
-      //penumbra.BeginDraw();
-
-      _spriteBatch.Begin(
-        SpriteSortMode.FrontToBack,
-        BlendState.AlphaBlend,
-        SamplerState.PointWrap, null, null, null,
-       _camera.Transform);// * scale);
-
-      foreach (var component in GameComponents)
-        component.Draw(gameTime, _spriteBatch);
-
-
-      _spriteBatch.End();
-
-      //penumbra.Draw(gameTime);
-
-      //_graphicsDevice.SetRenderTarget(null);
-
-      //_graphicsDevice.Clear(Color.Black);
-
-      //_spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
-      //            SamplerState.LinearClamp, DepthStencilState.None,
-      //            RasterizerState.CullNone, null, _camera.Transform);
-
-      //_spriteBatch.Draw(_renderTarget, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.White);
-
-      //_spriteBatch.End();
-
-
-      DrawGui(gameTime);
-    }
-
-    public void DrawGui(GameTime gameTime)
-    {
-      Window?.Draw(gameTime, _spriteBatch, _graphicsDeviceManager);
-
-      _spriteBatch.Begin(SpriteSortMode.FrontToBack);
-
-      var time = Time.ToString("hh:mm") + (Time.Hour >= 12 ? " pm" : " am");
-
-      var x = GameEngine.ScreenWidth - _font.MeasureString(time).X - 10;
-
-      _spriteBatch.DrawString(_font, time, new Vector2(x, 5), Color.Red);
-      _spriteBatch.DrawString(_font, $"{NPCComponents.Count()}/{MaxNPCCount}", new Vector2(x, 25), Color.Red);
-
-      foreach (var component in _guiComponents)
-        component.Draw(gameTime, _spriteBatch);
-
-      _toolbar.Draw(gameTime, _spriteBatch);
-
-      _spriteBatch.End();
-    }
-
-    public GameScreen()
-    {
     }
 
     public void Inspect(Building building)
@@ -460,7 +395,7 @@ namespace TopDown.States
 
       _villagerManager = new VillagerManager();
 
-      _toolbar = new GUITest.Interface.Toolbar(this, gameModel.ContentManger);
+      _toolbar = new VillageGUI.Interface.Toolbar(this, gameModel.ContentManger);
 
       GameComponents = new List<Component>()
       {
@@ -738,7 +673,6 @@ namespace TopDown.States
             break;
 
           default:
-            //throw new Exception("Unknown group: " + objectGroup.Name);
             break;
         }
       }
@@ -867,39 +801,7 @@ namespace TopDown.States
         State = GameStates.JobMenu;
 
       if (Keyboard.IsKeyPressed(Keys.C))
-      {
-        //var selectedItem = CraftingMenu.ComboBox.SelectedItem;
-        //CraftingMenu.ComboBox.Reset();
-
-        //var npcs = NPCComponents.Where(c => c.Workplace != null && c.Workplace.Name == "Blacksmith");
-
-        //var items = new List<ComboBoxItem>();
-        //foreach (var npc in npcs)
-        //{
-        //  var item = new ComboBoxItem(CraftingMenu.ComboBox);
-
-        //  item.Content = npc;
-
-        //  item.LoadContent(_content);
-
-        //  item.Text = npc.Name;
-
-        //  items.Add(item);
-        //}
-
-        //CraftingMenu.ComboBox.Items = items;
-
-        //if (selectedItem != null)
-        //{
-        //  if (CraftingMenu.ComboBox.Items.Any(c => c.Text == selectedItem.Text))
-        //  {
-        //    CraftingMenu.ComboBox.SelectedItem = CraftingMenu.ComboBox.Items.Where(c => c.Text == selectedItem.Text).FirstOrDefault();
-        //  }
-        //}
-
         State = GameStates.CraftingMenu;
-
-      }
 
       if (Keyboard.IsKeyPressed(Keys.I))
         State = GameStates.InventoryMenu;
@@ -909,20 +811,6 @@ namespace TopDown.States
 
       if (Keyboard.IsKeyPressed(Keys.P))
         State = GameStates.Paused;
-    }
-
-    public override void PostUpdate(GameTime gameTime)
-    {
-      for (int i = 0; i < GameComponents.Count; i++)
-      {
-        GameComponents[i].PostUpdate(gameTime);
-
-        if (GameComponents[i].IsRemoved)
-        {
-          GameComponents.RemoveAt(i);
-          i--;
-        }
-      }
     }
 
     public override void OnScreenResize()
@@ -1041,6 +929,20 @@ namespace TopDown.States
       }
     }
 
+    public override void PostUpdate(GameTime gameTime)
+    {
+      for (int i = 0; i < GameComponents.Count; i++)
+      {
+        GameComponents[i].PostUpdate(gameTime);
+
+        if (GameComponents[i].IsRemoved)
+        {
+          GameComponents.RemoveAt(i);
+          i--;
+        }
+      }
+    }
+
     public void UpdateMap()
     {
       var pathPositions = BuildingComponents.SelectMany(c => c.PathPositions).ToList();
@@ -1094,6 +996,46 @@ namespace TopDown.States
       PathFinder.UpdateMap(pathPositions);
 
       PathFinder.WriteMap();
+    }
+
+    public override void Draw(GameTime gameTime)
+    {
+      _graphicsDevice.Clear(Color.Black);
+
+      _spriteBatch.Begin(
+        SpriteSortMode.FrontToBack,
+        BlendState.AlphaBlend,
+        SamplerState.PointWrap, null, null, null,
+       _camera.Transform);
+
+      foreach (var component in GameComponents)
+        component.Draw(gameTime, _spriteBatch);
+
+      _spriteBatch.End();
+
+
+      DrawGui(gameTime);
+    }
+
+    public void DrawGui(GameTime gameTime)
+    {
+      Window?.Draw(gameTime, _spriteBatch, _graphicsDeviceManager);
+
+      _spriteBatch.Begin(SpriteSortMode.FrontToBack);
+
+      var time = Time.ToString("hh:mm") + (Time.Hour >= 12 ? " pm" : " am");
+
+      var x = GameEngine.ScreenWidth - _font.MeasureString(time).X - 10;
+
+      _spriteBatch.DrawString(_font, time, new Vector2(x, 5), Color.Red);
+      _spriteBatch.DrawString(_font, $"{NPCComponents.Count()}/{MaxNPCCount}", new Vector2(x, 25), Color.Red);
+
+      foreach (var component in _guiComponents)
+        component.Draw(gameTime, _spriteBatch);
+
+      _toolbar.Draw(gameTime, _spriteBatch);
+
+      _spriteBatch.End();
     }
   }
 }
