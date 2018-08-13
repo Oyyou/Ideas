@@ -39,17 +39,12 @@ namespace VillageGUI.Interface
 
     public Rectangle ScrollArea { get; set; }
 
+    public float Layer { get; set; }
+
     /// <summary>
     /// The position of the scrollbar
     /// </summary>
     public Vector2 Position;
-
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      spriteBatch.Draw(_outer, Position, Color.White);
-
-      spriteBatch.Draw(_inner, _innerRectangle, Color.White);
-    }
 
     public Scrollbar(ContentManager content)
     {
@@ -86,6 +81,13 @@ namespace VillageGUI.Interface
       }
 
       _innerY = MathHelper.Clamp(_innerY, (int)Position.Y + _padding, ((int)Position.Y + _outer.Height - _padding) - _innerRectangle.Height);
+    }
+
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      spriteBatch.Draw(texture:_outer, position:Position, color:Color.White, layerDepth: Layer);
+
+      spriteBatch.Draw(texture: _inner, destinationRectangle: _innerRectangle, color: Color.White, layerDepth: Layer);
     }
   }
 }

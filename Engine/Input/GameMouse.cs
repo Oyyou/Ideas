@@ -26,14 +26,14 @@ namespace Engine.Input
       }
     }
 
-    public static IClickable ClickedObject
+    /// <summary>
+    /// The single object we're able to click
+    /// </summary>
+    public static IClickable ValidObject
     {
       get
       {
-        if (!Clicked)
-          return null;
-
-        return ClickableObjects.OrderBy(c => c.Layer).Last();
+        return ClickableObjects.OrderBy(c => c.Layer).LastOrDefault();
       }
     }
 
@@ -43,6 +43,12 @@ namespace Engine.Input
       {
         return new Rectangle((int)CurrentMouse.X, (int)CurrentMouse.Y, 1, 1);
       }
+    }
+
+    public static void AddObject(IClickable clickableObject)
+    {
+      if (!ClickableObjects.Contains(clickableObject))
+        ClickableObjects.Add(clickableObject);
     }
 
     public static void Update()

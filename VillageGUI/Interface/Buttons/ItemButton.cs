@@ -16,5 +16,10 @@ namespace VillageGUI.Interface.Buttons
     {
       Item = item;
     }
+
+    protected override void DrawClicked()
+    {
+      CurrentState = ButtonStates.Hovering;
+    }
   }
 }

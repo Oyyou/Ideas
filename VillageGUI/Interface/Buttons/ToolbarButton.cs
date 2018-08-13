@@ -22,5 +22,12 @@ namespace VillageGUI.Interface.Buttons
     {
       OpenKey = openKey;
     }
+
+    protected override void DrawClicked()
+    {
+      this.Color = Color.YellowGreen;
+
+      this.Scale = 1.20f;
+    }
   }
 }

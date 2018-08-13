@@ -12,12 +12,15 @@ using System.Text;
 using System.Threading.Tasks;
 using VillageBackend.Managers;
 using Engine.Input;
+using VillageGUI.Interface.Panels;
 
 namespace VillageGUI.Interface.Windows
 {
   public class JobsWindow : Window
   {
     private Texture2D _buttonTexture;
+
+    private Texture2D _villagerInfoTexture;
 
     private SpriteFont _buttonFont;
 
@@ -48,18 +51,24 @@ namespace VillageGUI.Interface.Windows
       _buttonTexture = content.Load<Texture2D>("Interface/Button");
       _buttonFont = content.Load<SpriteFont>("Fonts/Font");
 
+      _villagerInfoTexture = content.Load<Texture2D>("Interface/VillagerInfo");
+
       _jobManager.Jobs.CollectionChanged += Jobs_CollectionChanged;
       _villagerManager.Villagers.CollectionChanged += Villagers_CollectionChanged; ;
 
       _jobsSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content),
+        Scrollbar = new Scrollbar(content)
+        {
+          Layer = this.Layer + 0.01f,
+        },
         Items = _jobManager.Jobs.Select(c =>
           {
             var button = new Button(_buttonTexture, _buttonFont)
             {
               Text = c.Name,
-              Click = JobClicked
+              Click = JobClicked,
+              Layer = this.Layer + 0.01f,
             };
 
             return button;
@@ -69,13 +78,17 @@ namespace VillageGUI.Interface.Windows
 
       _villagerSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content),
+        Scrollbar = new Scrollbar(content)
+        {
+          Layer = this.Layer + 0.01f,
+        },
         Items = _villagerManager.Villagers.Select(c =>
         {
-          return new Button(_buttonTexture, _buttonFont)
+          return new VillagerInformationPanel(_content)
           {
-            Text = c.Name,
-            Click = JobClicked
+            //Text = c.Name,
+            //Click = JobClicked,
+            Layer = this.Layer + 0.01f,
           };
         }).ToList(),
       };
@@ -87,11 +100,11 @@ namespace VillageGUI.Interface.Windows
     {
       _villagerSection.Items = _villagerManager.Villagers.Select(c =>
       {
-        return new Button(_buttonTexture, _buttonFont)
+        return new VillagerInformationPanel(_content)
         {
-          Text = c.Name,
-          Click = JobClicked,
-          Layer = 0.75f,
+          //Text = c.Name,
+          //Click = JobClicked,
+          Layer = this.Layer + 0.01f,
         };
       }).ToList();
 
@@ -102,15 +115,12 @@ namespace VillageGUI.Interface.Windows
     {
       _jobsSection.Items = _jobManager.Jobs.Select(c =>
         {
-          var button = new Button(_buttonTexture, _buttonFont)
+          return new Button(_buttonTexture, _buttonFont)
           {
             Text = c.Name,
             Click = JobClicked,
-            Layer = 0.75f,
+            Layer = this.Layer + 0.01f,
           };
-
-          return button;
-
         }).ToList();
 
       SetPositions();
@@ -133,8 +143,11 @@ namespace VillageGUI.Interface.Windows
 
       if (jobItem != null)
       {
-        var x = 10 + (_jobsSection.Items.FirstOrDefault().Rectangle.Width / 2);
-        var y = Position.Y + 3;
+        var buttonHeight = jobItem.Rectangle.Height;
+        var buttonWidth = jobItem.Rectangle.Width;
+
+        var x = 10 + (buttonWidth / 2);
+        var y = (_jobsSection.Area.Y + (buttonHeight / 2)) + 3;
 
         foreach (var item in _jobsSection.Items)
         {
@@ -146,19 +159,20 @@ namespace VillageGUI.Interface.Windows
       _villagerSection.Area = new Rectangle((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
       _villagerSection.Scrollbar.Position = new Vector2((Position.X + Texture.Width) - 20 - 10, Position.Y + 35);
 
-      if (_villagerSection.Items.Count() > 0)
+      var villagerItem = _villagerSection.Items.FirstOrDefault();
+
+      if (villagerItem != null)
       {
-        var buttonHeight = _villagerSection.Items.FirstOrDefault().Texture.Height;
-        var buttonWidth = _villagerSection.Items.FirstOrDefault().Texture.Width;
+        var buttonHeight = villagerItem.Rectangle.Height;
+        var buttonWidth = villagerItem.Rectangle.Width;
 
         var x = 10 + (buttonWidth / 2);
-
-        var y = Position.Y + 3;
+        var y = (_villagerSection.Area.Y + (buttonHeight / 2)) + 3;
 
         foreach (var button in _villagerSection.Items)
         {
           button.Position = new Vector2(x, y);
-          x += button.Texture.Width + 10;
+          x += button.Rectangle.Width + 10;
 
           if ((x + (button.Rectangle.Width / 2)) > (_villagerSection.Area.Width))
           {
@@ -184,9 +198,9 @@ namespace VillageGUI.Interface.Windows
       _jobsSection.Scrollbar.Update(gameTime);
       _villagerSection.Scrollbar.Update(gameTime);
 
-      if(GameMouse.Rectangle.Intersects(this.WindowRectangle))
+      if (GameMouse.Rectangle.Intersects(this.WindowRectangle))
       {
-        GameMouse.ClickableObjects.Add(this);
+        GameMouse.AddObject(this);
       }
       else
       {
@@ -210,9 +224,9 @@ namespace VillageGUI.Interface.Windows
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
-      foreach (var button in _jobsSection.Items)
+      foreach (Button button in _jobsSection.Items)
       {
-        button.Update(GameMouse.Rectangle, _jobsSection.Items, mouseRectangleWithCamera_Jobs, windowRectangle);
+        button.Update(GameMouse.Rectangle, (List<Button>)_jobsSection.Items, mouseRectangleWithCamera_Jobs, windowRectangle);
       }
     }
 
@@ -229,9 +243,9 @@ namespace VillageGUI.Interface.Windows
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
-      foreach (var button in _villagerSection.Items)
+      foreach (VillagerInformationPanel panel in _villagerSection.Items)
       {
-        button.Update(GameMouse.Rectangle, _villagerSection.Items, mouseRectangleWithCamera_Items, windowRectangle);
+        panel.Update();
       }
     }
 
@@ -244,11 +258,11 @@ namespace VillageGUI.Interface.Windows
 
       DrawWindow(gameTime, spriteBatch);
 
-      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X, (int)Position.Y + 35, 190, Texture.Height - 35);
+      graphics.GraphicsDevice.Viewport = new Viewport(_jobsSection.Area);
 
       DrawJobButtons(gameTime, spriteBatch);
 
-      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
+      graphics.GraphicsDevice.Viewport = new Viewport(_villagerSection.Area);
 
       DrawVillagerButtons(gameTime, spriteBatch);
 
@@ -275,38 +289,7 @@ namespace VillageGUI.Interface.Windows
       spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _jobsSection.Matrix);
 
       foreach (var button in _jobsSection.Items)
-      {
-        switch (button.CurrentState)
-        {
-          case ButtonStates.Nothing:
-
-            button.Color = Color.White;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ButtonStates.Hovering:
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ButtonStates.Clicked:
-
-            // This will be removed
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.05f;
-
-            break;
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
-
         button.Draw(gameTime, spriteBatch);
-      }
 
       spriteBatch.End();
     }
@@ -316,38 +299,7 @@ namespace VillageGUI.Interface.Windows
       spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _villagerSection.Matrix);
 
       foreach (var button in _villagerSection.Items)
-      {
-        switch (button.CurrentState)
-        {
-          case ButtonStates.Nothing:
-
-            button.Color = Color.White;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ButtonStates.Hovering:
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ButtonStates.Clicked:
-
-            // This will be removed
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.05f;
-
-            break;
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
-
         button.Draw(gameTime, spriteBatch);
-      }
 
       spriteBatch.End();
     }

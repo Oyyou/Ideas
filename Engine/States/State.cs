@@ -1,4 +1,5 @@
-﻿using Engine.Interface.Windows;
+﻿using Engine.Input;
+using Engine.Interface.Windows;
 using Engine.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -92,6 +93,9 @@ namespace Engine.States
         _windows.Add(Window.Clone() as Window);
       }
 
+      Console.WriteLine(string.Join("\n", GameMouse.ClickableObjects.Select(c => c.ToString()).ToArray()));
+
+      GameMouse.ClickableObjects.Remove(Window);
       Window = null;
     }
 
@@ -111,6 +115,8 @@ namespace Engine.States
       var window = _windows.Where(c => c.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
 
       Window = window ?? throw new Exception($"Window '{name}' doesn't exist");
+
+      Window.SetPositions();
     }
 
     public abstract void PostUpdate(GameTime gameTime);

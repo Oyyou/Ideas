@@ -47,11 +47,11 @@ namespace VillageGUI.Interface.Windows
       get
       {
 
-        return new Vector2(0, MathHelper.Clamp(-Scrollbar._innerY + 60, -1000, 2400));
+        return new Vector2(0, MathHelper.Clamp(-Scrollbar._innerY, -1000, 2400));
       }
     }
 
-    public IEnumerable<Button> Items;
+    public IEnumerable<Control> Items;
 
     public void UnloadContent()
     {
@@ -163,6 +163,17 @@ namespace VillageGUI.Interface.Windows
       }
     }
 
+    public override void UnloadContent()
+    {
+      Texture.Dispose();
+
+      _categorySection.UnloadContent();
+
+      _itemSection.UnloadContent();
+
+      _queueWindow.UnloadContent();
+    }
+
     private void CategoryClicked(object sender)
     {
       var button = sender as Button;
@@ -232,125 +243,6 @@ namespace VillageGUI.Interface.Windows
         _itemManager.AddToQueue(button.Item);
     }
 
-    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
-    {
-      if (!_hasUpdated)
-        return;
-
-      var original = graphics.GraphicsDevice.Viewport;
-
-      DrawWindow(gameTime, spriteBatch);
-
-      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
-
-      DrawButtons(gameTime, spriteBatch);
-
-      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X, (int)Position.Y + 35, 190, Texture.Height - 35);
-
-      DrawCategories(gameTime, spriteBatch);
-
-      graphics.GraphicsDevice.Viewport = original;
-
-      _queueWindow.Draw(gameTime, spriteBatch, graphics);
-    }
-
-    protected void DrawButtons(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _itemSection.Matrix);
-
-      foreach (var button in _itemSection.Items)
-      {
-        switch (button.CurrentState)
-        {
-          case ButtonStates.Nothing:
-
-            button.Color = Color.White;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ButtonStates.Hovering:
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ButtonStates.Clicked:
-
-            // This will be removed
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.2f;
-
-            break;
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
-
-        button.Draw(gameTime, spriteBatch);
-      }
-
-      spriteBatch.End();
-    }
-
-    protected void DrawCategories(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _categorySection.Matrix);
-
-      foreach (var button in _categorySection.Items)
-      {
-        switch (button.CurrentState)
-        {
-          case ButtonStates.Nothing:
-
-            button.Color = Color.White;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ButtonStates.Hovering:
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.0f;
-
-            break;
-          case ButtonStates.Clicked:
-
-            // This will be removed
-
-            button.Color = Color.YellowGreen;
-
-            button.Scale = 1.05f;
-
-            break;
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
-
-        button.Draw(gameTime, spriteBatch);
-      }
-
-      spriteBatch.End();
-    }
-
-    protected void DrawWindow(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
-
-      spriteBatch.Draw(Texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
-
-      _itemSection.Scrollbar.Draw(gameTime, spriteBatch);
-
-      _categorySection.Scrollbar.Draw(gameTime, spriteBatch);
-
-      spriteBatch.DrawString(_font, Name, new Vector2(Position.X + 10, Position.Y + 10), Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.1f);
-
-      spriteBatch.End();
-    }
-
     public override void SetPositions()
     {
       var screenWidth = Game1.ScreenWidth;
@@ -364,11 +256,8 @@ namespace VillageGUI.Interface.Windows
       _categorySection.Area = new Rectangle((int)Position.X, (int)Position.Y + 35, 190, Texture.Height - 35);
       _categorySection.Scrollbar.Position = new Vector2((Position.X + 170), Position.Y + 35);
 
-      _itemSection.Area = new Rectangle((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
-      _itemSection.Scrollbar.Position = new Vector2((Position.X + Texture.Width) - 20 - 10, Position.Y + 35);
-
       var x = _spaceBetween + (_categorySection.Items.FirstOrDefault().Rectangle.Width / 2);
-      var y = Position.Y + 3;
+      var y = (_categorySection.Area.Y + (_categorySection.Items.FirstOrDefault().Rectangle.Height / 2)) + 3;
 
       var categories = Enum.GetNames(typeof(ItemCategories)).ToList();
 
@@ -378,6 +267,9 @@ namespace VillageGUI.Interface.Windows
         y += item.Rectangle.Height + 5;
       }
 
+      _itemSection.Area = new Rectangle((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
+      _itemSection.Scrollbar.Position = new Vector2((Position.X + Texture.Width) - 20 - 10, Position.Y + 35);
+
       SetItemsPositions();
     }
 
@@ -385,17 +277,16 @@ namespace VillageGUI.Interface.Windows
     {
       if (_itemSection.Items.Count() > 0)
       {
-        var buttonHeight = _itemSection.Items.FirstOrDefault().Texture.Height;
-        var buttonWidth = _itemSection.Items.FirstOrDefault().Texture.Width;
+        var buttonHeight = _itemSection.Items.FirstOrDefault().Rectangle.Height;
+        var buttonWidth = _itemSection.Items.FirstOrDefault().Rectangle.Width;
 
         var x = _spaceBetween + (buttonWidth / 2);
-
-        var y = Position.Y + 3;
+        var y = (_itemSection.Area.Y + (buttonHeight / 2)) + 3;
 
         foreach (var button in _itemSection.Items)
         {
           button.Position = new Vector2(x, y);
-          x += button.Texture.Width + _spaceBetween;
+          x += button.Rectangle.Width + _spaceBetween;
 
           if ((x + (button.Rectangle.Width / 2)) > (_itemSection.Area.X))
           {
@@ -435,46 +326,8 @@ namespace VillageGUI.Interface.Windows
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
-      foreach (var button in _itemSection.Items)
-      {
-        switch (button.CurrentState)
-        {
-          case ButtonStates.Nothing:
-
-            if (mouseRectangleWithCamera_Items.Intersects(button.Rectangle) && mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ButtonStates.Hovering;
-
-            break;
-          case ButtonStates.Hovering:
-
-            if (!mouseRectangleWithCamera_Items.Intersects(button.Rectangle) || !mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ButtonStates.Nothing;
-
-            if (GameMouse.Clicked)
-            {
-              foreach (var b in _itemSection.Items)
-                b.CurrentState = ButtonStates.Nothing;
-
-              button.OnClick();
-            }
-
-            break;
-
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
-      }
-    }
-
-    public override void UnloadContent()
-    {
-      Texture.Dispose();
-
-      _categorySection.UnloadContent();
-
-      _itemSection.UnloadContent();
-
-      _queueWindow.UnloadContent();
+      foreach (Button button in _itemSection.Items)
+        button.Update(mouseRectangle, (List<Button>)_itemSection.Items, mouseRectangleWithCamera_Items, windowRectangle);
     }
 
     private void UpdateCategories()
@@ -492,47 +345,65 @@ namespace VillageGUI.Interface.Windows
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
+      foreach (Button button in _categorySection.Items)
+        button.Update(mouseRectangle, (List<Button>)_categorySection.Items, mouseRectangleWithCamera_Categories, windowRectangle);
+    }
+
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
+    {
+      if (!_hasUpdated)
+        return;
+
+      var original = graphics.GraphicsDevice.Viewport;
+
+      DrawWindow(gameTime, spriteBatch);
+
+      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
+
+      DrawButtons(gameTime, spriteBatch);
+
+      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X, (int)Position.Y + 35, 190, Texture.Height - 35);
+
+      DrawCategories(gameTime, spriteBatch);
+
+      graphics.GraphicsDevice.Viewport = original;
+
+      _queueWindow.Draw(gameTime, spriteBatch, graphics);
+    }
+
+    protected void DrawButtons(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _itemSection.Matrix);
+
+      foreach (var button in _itemSection.Items)
+        button.Draw(gameTime, spriteBatch);
+
+      spriteBatch.End();
+    }
+
+    protected void DrawCategories(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _categorySection.Matrix);
+
       foreach (var button in _categorySection.Items)
-      {
-        switch (button.CurrentState)
-        {
-          case ButtonStates.Nothing:
+        button.Draw(gameTime, spriteBatch);
 
-            if (mouseRectangleWithCamera_Categories.Intersects(button.Rectangle) && mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ButtonStates.Hovering;
+      spriteBatch.End();
+    }
 
-            break;
-          case ButtonStates.Hovering:
+    protected void DrawWindow(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
 
-            if (!mouseRectangleWithCamera_Categories.Intersects(button.Rectangle) || !mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ButtonStates.Nothing;
+      spriteBatch.Draw(Texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
 
-            if (GameMouse.Clicked)
-            {
-              foreach (var b in _categorySection.Items)
-                b.CurrentState = ButtonStates.Nothing;
+      _itemSection.Scrollbar.Draw(gameTime, spriteBatch);
 
-              button.CurrentState = ButtonStates.Clicked;
+      _categorySection.Scrollbar.Draw(gameTime, spriteBatch);
 
-              button.OnClick();
-            }
+      spriteBatch.DrawString(_font, Name, new Vector2(Position.X + 10, Position.Y + 10), Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.1f);
 
-            break;
-          case ButtonStates.Clicked:
-
-            //if (clicked && (mouseRectangleWithCamera_Categories.Intersects(windowRectangle)) && !_categorySection.Items.Any(c => c != button && c.Rectangle.Intersects(mouseRectangleWithCamera_Categories))) // Check if we're clicking somewhere that isn't on any button
-            //{
-            //  foreach (var b in _categorySection.Items)
-            //    b.CurrentState = ToolbarButtonStates.Nothing;
-
-            //  button.CurrentState = ToolbarButtonStates.Hovering;
-            //}
-
-            break;
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
-      }
+      spriteBatch.End();
     }
   }
 }

@@ -18,7 +18,7 @@ namespace VillageGUI.Interface.Buttons
     Clicked,
   }
 
-  public class Button : IClickable
+  public class Button : Control, IClickable
   {
     public Action<Button> Click;
 
@@ -32,11 +32,11 @@ namespace VillageGUI.Interface.Buttons
 
     public Color PenColor;
 
-    public Vector2 Position;
+    public override Vector2 Position { get; set; }
 
     public ButtonStates PreviousState;
 
-    public Rectangle Rectangle
+    public override Rectangle Rectangle
     {
       get
       {
@@ -95,8 +95,15 @@ namespace VillageGUI.Interface.Buttons
 
           if (isHovering)
           {
-            GameMouse.ClickableObjects.Add(this);
-            this.CurrentState = ButtonStates.Hovering;
+            GameMouse.AddObject(this);
+            if (GameMouse.ValidObject == this)
+            {
+              this.CurrentState = ButtonStates.Hovering;
+            }
+            else
+            {
+              GameMouse.ClickableObjects.Remove(this);
+            }
           }
 
           break;
@@ -107,13 +114,14 @@ namespace VillageGUI.Interface.Buttons
           if (mouseRectangleWithCamera != null && windowRectangle != null)
             notHovering = !mouseRectangleWithCamera.Value.Intersects(this.Rectangle) || !mouseRectangle.Intersects(windowRectangle.Value);
 
-          if (notHovering)
+          if (notHovering || GameMouse.ValidObject != this)
           {
             GameMouse.ClickableObjects.Remove(this);
             this.CurrentState = ButtonStates.Nothing;
+            break;
           }
 
-          if (GameMouse.ClickedObject == this)
+          if (GameMouse.Clicked)
           {
             foreach (var b in buttons)
             {
@@ -126,17 +134,52 @@ namespace VillageGUI.Interface.Buttons
 
           break;
 
+        case ButtonStates.Clicked:
+
+          break;
+
         default:
           throw new Exception("Unknown ButtonState: " + this.CurrentState.ToString());
       }
     }
-
-
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      switch (this.CurrentState)
+      {
+        case ButtonStates.Nothing:
+
+          this.Color = Color.White;
+
+          this.Scale = 1.0f;
+
+          break;
+        case ButtonStates.Hovering:
+
+          this.Color = Color.YellowGreen;
+
+          this.Scale = 1.0f;
+
+          break;
+        case ButtonStates.Clicked:
+
+          DrawClicked();
+
+          break;
+        default:
+          throw new Exception("Unknown ToolbarButtonState: " + this.CurrentState.ToString());
+      }
+
       spriteBatch.Draw(Texture, Position, null, Color, 0f, Origin, Scale, SpriteEffects.None, Layer);
 
       DrawText(spriteBatch);
+    }
+
+    protected virtual void DrawClicked()
+    {
+      this.Color = Color.YellowGreen;
+
+      this.Scale = 1.05f;
     }
 
     protected virtual void DrawText(SpriteBatch spriteBatch)
@@ -152,10 +195,11 @@ namespace VillageGUI.Interface.Buttons
 
     public void OnClick()
     {
+      CurrentState = ButtonStates.Clicked;
       Click?.Invoke(this);
     }
 
-    public void UnloadContent()
+    public override void UnloadContent()
     {
       Texture.Dispose();
     }
