@@ -14,6 +14,7 @@ using VillageBackend.Models;
 using VillageBackend.Managers;
 using VillageGUI.Interface.Buttons;
 using Microsoft.Xna.Framework.Input;
+using Engine.Input;
 
 namespace VillageGUI
 {
@@ -77,15 +78,17 @@ namespace VillageGUI
       {
         new Button(buttonTexture, buttonFont)
         {
-          Position = new Vector2(100, 50),
+          Position = new Vector2(320, 280),
           Text = "Add building",
-          Click = AddBuilding
+          Click = AddBuilding,
+          Layer = 0.70f,
         },
         new Button(buttonTexture, buttonFont)
         {
-          Position = new Vector2(100, 110),
+          Position = new Vector2(320, 340),
           Text = "Add villager",
-          Click = AddVillager
+          Click = AddVillager,
+          Layer = 0.70f,
         },
       };
     }
@@ -119,41 +122,13 @@ namespace VillageGUI
 
     public override void Update(GameTime gameTime)
     {
-      _previousMouseState = _currentMouseState;
-      _currentMouseState = Mouse.GetState();
+      GameMouse.Update();
 
       var clicked = _currentMouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
-
-      var mouseRectangle = new Rectangle(_currentMouseState.X, _currentMouseState.Y, 1, 1);
-
+      
       foreach (var button in _buttons)
       {
-        switch (button.CurrentState)
-        {
-          case ButtonStates.Nothing:
-
-            if (mouseRectangle.Intersects(button.Rectangle))
-              button.CurrentState = ButtonStates.Hovering;
-
-            break;
-          case ButtonStates.Hovering:
-
-            if (!mouseRectangle.Intersects(button.Rectangle))
-              button.CurrentState = ButtonStates.Nothing;
-
-            if (clicked)
-            {
-              foreach (var b in _buttons)
-                b.CurrentState = ButtonStates.Nothing;
-
-              button.OnClick();
-            }
-
-            break;
-
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
+        button.Update(GameMouse.Rectangle, _buttons);
       }
 
       _toolbar.Update(gameTime);

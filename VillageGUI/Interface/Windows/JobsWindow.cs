@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VillageBackend.Managers;
+using Engine.Input;
 
 namespace VillageGUI.Interface.Windows
 {
@@ -33,7 +34,7 @@ namespace VillageGUI.Interface.Windows
 
     #endregion
 
-    public JobsWindow(ContentManager content, JobManager jobManager, VillagerManager villagerManager) 
+    public JobsWindow(ContentManager content, JobManager jobManager, VillagerManager villagerManager)
       : base(content)
     {
       _jobManager = jobManager;
@@ -89,7 +90,8 @@ namespace VillageGUI.Interface.Windows
         return new Button(_buttonTexture, _buttonFont)
         {
           Text = c.Name,
-          Click = JobClicked
+          Click = JobClicked,
+          Layer = 0.75f,
         };
       }).ToList();
 
@@ -103,7 +105,8 @@ namespace VillageGUI.Interface.Windows
           var button = new Button(_buttonTexture, _buttonFont)
           {
             Text = c.Name,
-            Click = JobClicked
+            Click = JobClicked,
+            Layer = 0.75f,
           };
 
           return button;
@@ -142,7 +145,7 @@ namespace VillageGUI.Interface.Windows
 
       _villagerSection.Area = new Rectangle((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
       _villagerSection.Scrollbar.Position = new Vector2((Position.X + Texture.Width) - 20 - 10, Position.Y + 35);
-      
+
       if (_villagerSection.Items.Count() > 0)
       {
         var buttonHeight = _villagerSection.Items.FirstOrDefault().Texture.Height;
@@ -157,7 +160,7 @@ namespace VillageGUI.Interface.Windows
           button.Position = new Vector2(x, y);
           x += button.Texture.Width + 10;
 
-          if ((x + (button.Rectangle.Width / 2)) > (_villagerSection.Area.X))
+          if ((x + (button.Rectangle.Width / 2)) > (_villagerSection.Area.Width))
           {
             x = 10 + (buttonWidth / 2);
             y += buttonHeight + 10;
@@ -181,8 +184,14 @@ namespace VillageGUI.Interface.Windows
       _jobsSection.Scrollbar.Update(gameTime);
       _villagerSection.Scrollbar.Update(gameTime);
 
-      _previousMouseState = _currentMouseState;
-      _currentMouseState = Mouse.GetState();
+      if(GameMouse.Rectangle.Intersects(this.WindowRectangle))
+      {
+        GameMouse.ClickableObjects.Add(this);
+      }
+      else
+      {
+        GameMouse.ClickableObjects.Remove(this);
+      }
 
       UpdateJobButtons();
       UpdateVillagerButtons();
@@ -192,59 +201,18 @@ namespace VillageGUI.Interface.Windows
     {
       var translation = _jobsSection.Matrix.Translation;
 
-      var mouseRectangle = new Rectangle(_currentMouseState.Position.X, _currentMouseState.Position.Y, 1, 1);
-
-      var mouseRectangleWithCamera_Categories = new Rectangle(
-        (int)((_currentMouseState.X - Position.X) - translation.X),
-        (int)((_currentMouseState.Y - (Position.Y + 35)) - translation.Y),
+      var mouseRectangleWithCamera_Jobs = new Rectangle(
+        (int)((GameMouse.CurrentMouse.X - Position.X) - translation.X),
+        (int)((GameMouse.CurrentMouse.Y - (Position.Y + 35)) - translation.Y),
         1,
         1
       );
-
-      var clicked = _currentMouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
       foreach (var button in _jobsSection.Items)
       {
-        switch (button.CurrentState)
-        {
-          case ButtonStates.Nothing:
-
-            if (mouseRectangleWithCamera_Categories.Intersects(button.Rectangle) && mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ButtonStates.Hovering;
-
-            break;
-          case ButtonStates.Hovering:
-
-            if (!mouseRectangleWithCamera_Categories.Intersects(button.Rectangle) || !mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ButtonStates.Nothing;
-
-            if (clicked)
-            {
-              foreach (var b in _jobsSection.Items)
-                b.CurrentState = ButtonStates.Nothing;
-
-              button.CurrentState = ButtonStates.Clicked;
-
-              button.OnClick();
-            }
-
-            break;
-          case ButtonStates.Clicked:
-
-            //if (clicked && (mouseRectangleWithCamera_Categories.Intersects(windowRectangle)) && !_categorySection.Items.Any(c => c != button && c.Rectangle.Intersects(mouseRectangleWithCamera_Categories))) // Check if we're clicking somewhere that isn't on any button
-            //{
-            //  foreach (var b in _categorySection.Items)
-            //    b.CurrentState = ToolbarButtonStates.Nothing;
-
-            //  button.CurrentState = ToolbarButtonStates.Hovering;
-            //}
-
-            break;
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
+        button.Update(GameMouse.Rectangle, _jobsSection.Items, mouseRectangleWithCamera_Jobs, windowRectangle);
       }
     }
 
@@ -252,47 +220,18 @@ namespace VillageGUI.Interface.Windows
     {
       var translation = _villagerSection.Matrix.Translation;
 
-      var mouseRectangle = new Rectangle(_currentMouseState.Position.X, _currentMouseState.Position.Y, 1, 1);
-
       var mouseRectangleWithCamera_Items = new Rectangle(
-        (int)((_currentMouseState.X - (Position.X + 190)) - translation.X),
-        (int)((_currentMouseState.Y - (Position.Y + 35)) - translation.Y),
+        (int)((GameMouse.CurrentMouse.X - (Position.X + 190)) - translation.X),
+        (int)((GameMouse.CurrentMouse.Y - (Position.Y + 35)) - translation.Y),
         1,
         1
       );
-
-      var clicked = _currentMouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
       foreach (var button in _villagerSection.Items)
       {
-        switch (button.CurrentState)
-        {
-          case ButtonStates.Nothing:
-
-            if (mouseRectangleWithCamera_Items.Intersects(button.Rectangle) && mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ButtonStates.Hovering;
-
-            break;
-          case ButtonStates.Hovering:
-
-            if (!mouseRectangleWithCamera_Items.Intersects(button.Rectangle) || !mouseRectangle.Intersects(windowRectangle))
-              button.CurrentState = ButtonStates.Nothing;
-
-            if (clicked)
-            {
-              foreach (var b in _villagerSection.Items)
-                b.CurrentState = ButtonStates.Nothing;
-
-              button.OnClick();
-            }
-
-            break;
-
-          default:
-            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
-        }
+        button.Update(GameMouse.Rectangle, _villagerSection.Items, mouseRectangleWithCamera_Items, windowRectangle);
       }
     }
 
@@ -320,13 +259,13 @@ namespace VillageGUI.Interface.Windows
     {
       spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
 
-      spriteBatch.Draw(Texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
-      
+      spriteBatch.Draw(Texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
+
       _jobsSection.Scrollbar.Draw(gameTime, spriteBatch);
 
       _villagerSection.Scrollbar.Draw(gameTime, spriteBatch);
 
-      spriteBatch.DrawString(_font, Name, new Vector2(Position.X + 10, Position.Y + 10), Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.1f);
+      spriteBatch.DrawString(_font, Name, new Vector2(Position.X + 10, Position.Y + 10), Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer + 0.01f);
 
       spriteBatch.End();
     }

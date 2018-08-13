@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VillageBackend.Managers;
 using VillageBackend.Models;
+using Engine.Input;
 
 namespace VillageGUI.Interface.Windows
 {
@@ -127,14 +128,9 @@ namespace VillageGUI.Interface.Windows
 
     public override void Update(GameTime gameTime)
     {
-      _previousMouseState = _currentMouseState;
-      _currentMouseState = Mouse.GetState();
-
       _hasUpdated = true;
 
-      var clicked = _currentMouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
-
-      var mouseRectangle = new Rectangle(_currentMouseState.Position.X, _currentMouseState.Position.Y, 1, 1);
+      var mouseRectangle = GameMouse.Rectangle;
 
       foreach (var button in _queuedItemButtons)
       {
@@ -158,7 +154,7 @@ namespace VillageGUI.Interface.Windows
             if (!mouseRectangle.Intersects(button.Rectangle) || !mouseRectangle.Intersects(WindowRectangle))
               button.CurrentState = ButtonStates.Nothing;
 
-            if (clicked)
+            if (GameMouse.Clicked)
               button.OnClick();
 
             break;

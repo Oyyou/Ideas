@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Engine.Input;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,17 +11,13 @@ using System.Threading.Tasks;
 
 namespace Engine.Interface.Windows
 {
-  public abstract class Window : ICloneable
+  public abstract class Window : ICloneable, IClickable
   {
     protected ContentManager _content;
-
-    protected MouseState _currentMouseState;
 
     protected SpriteFont _font;
 
     protected bool _hasUpdated;
-
-    protected MouseState _previousMouseState;
 
     public bool Close { get; set; }
 
@@ -40,6 +37,8 @@ namespace Engine.Interface.Windows
 
     public Texture2D Texture { get; protected set; }
 
+    public float Layer { get; set; }
+
     public Window(ContentManager content)
     {
       Close = false;
@@ -53,6 +52,8 @@ namespace Engine.Interface.Windows
       _hasUpdated = false;
 
       Texture = content.Load<Texture2D>("Interface/Window");
+
+      Layer = 0.9f;
     }
 
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch, GraphicsDeviceManager graphics);

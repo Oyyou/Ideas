@@ -14,6 +14,7 @@ using VillageBackend.Models;
 using VillageBackend.Managers;
 using System.IO;
 using Engine.Interface.Windows;
+using Engine.Input;
 
 namespace VillageGUI.Interface.Windows
 {
@@ -412,9 +413,6 @@ namespace VillageGUI.Interface.Windows
       _itemSection.Scrollbar.Update(gameTime);
       _categorySection.Scrollbar.Update(gameTime);
 
-      _previousMouseState = _currentMouseState;
-      _currentMouseState = Mouse.GetState();
-
       UpdateItems();
 
       UpdateCategories();
@@ -426,16 +424,14 @@ namespace VillageGUI.Interface.Windows
     {
       var translation = _itemSection.Matrix.Translation;
 
-      var mouseRectangle = new Rectangle(_currentMouseState.Position.X, _currentMouseState.Position.Y, 1, 1);
+      var mouseRectangle = GameMouse.Rectangle;
 
       var mouseRectangleWithCamera_Items = new Rectangle(
-        (int)((_currentMouseState.X - (Position.X + 190)) - translation.X),
-        (int)((_currentMouseState.Y - (Position.Y + 35)) - translation.Y),
+        (int)((GameMouse.CurrentMouse.X - (Position.X + 190)) - translation.X),
+        (int)((GameMouse.CurrentMouse.Y - (Position.Y + 35)) - translation.Y),
         1,
         1
       );
-
-      var clicked = _currentMouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
@@ -454,7 +450,7 @@ namespace VillageGUI.Interface.Windows
             if (!mouseRectangleWithCamera_Items.Intersects(button.Rectangle) || !mouseRectangle.Intersects(windowRectangle))
               button.CurrentState = ButtonStates.Nothing;
 
-            if (clicked)
+            if (GameMouse.Clicked)
             {
               foreach (var b in _itemSection.Items)
                 b.CurrentState = ButtonStates.Nothing;
@@ -485,16 +481,14 @@ namespace VillageGUI.Interface.Windows
     {
       var translation = _categorySection.Matrix.Translation;
 
-      var mouseRectangle = new Rectangle(_currentMouseState.Position.X, _currentMouseState.Position.Y, 1, 1);
+      var mouseRectangle = GameMouse.Rectangle;
 
       var mouseRectangleWithCamera_Categories = new Rectangle(
-        (int)((_currentMouseState.X - Position.X) - translation.X),
-        (int)((_currentMouseState.Y - (Position.Y + 35)) - translation.Y),
+        (int)((GameMouse.CurrentMouse.X - Position.X) - translation.X),
+        (int)((GameMouse.CurrentMouse.Y - (Position.Y + 35)) - translation.Y),
         1,
         1
       );
-
-      var clicked = _currentMouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
@@ -513,7 +507,7 @@ namespace VillageGUI.Interface.Windows
             if (!mouseRectangleWithCamera_Categories.Intersects(button.Rectangle) || !mouseRectangle.Intersects(windowRectangle))
               button.CurrentState = ButtonStates.Nothing;
 
-            if (clicked)
+            if (GameMouse.Clicked)
             {
               foreach (var b in _categorySection.Items)
                 b.CurrentState = ButtonStates.Nothing;

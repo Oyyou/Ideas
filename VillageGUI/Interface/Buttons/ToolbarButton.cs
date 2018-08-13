@@ -10,13 +10,6 @@ using System.Threading.Tasks;
 
 namespace VillageGUI.Interface.Buttons
 {
-  public enum ButtonStates
-  {
-    Nothing,
-    Hovering,
-    Clicked,
-  }
-
   public class ToolbarButton : Button
   {
     /// <summary>

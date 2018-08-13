@@ -51,6 +51,8 @@
     <Compile Include="Controls\ComboBox.cs" />
     <Compile Include="FX\GrassParticle.cs" />
     <Compile Include="GameEngine.cs" />
+    <Compile Include="Input\GameMouse.cs" />
+    <Compile Include="Input\IClickable.cs" />
     <Compile Include="Managers\AnimationManager.cs" />
     <Compile Include="Models\Animation.cs" />
     <Compile Include="Models\GameModel.cs" />
