@@ -57,6 +57,8 @@ namespace VillageGUI
 
       Window.ClientSizeChanged += Window_ClientSizeChanged;
 
+      Window.AllowUserResizing = false;
+
       IsMouseVisible = true;
 
       base.Initialize();

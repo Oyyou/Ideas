@@ -24,9 +24,7 @@ namespace VillageGUI.Interface.Windows
 
     private SpriteFont _buttonFont;
 
-    private JobManager _jobManager;
-
-    private VillagerManager _villagerManager;
+    private GameManagers _gameManagers;
 
     public override Rectangle WindowRectangle => Rectangle;
 
@@ -37,12 +35,10 @@ namespace VillageGUI.Interface.Windows
 
     #endregion
 
-    public JobsWindow(ContentManager content, JobManager jobManager, VillagerManager villagerManager)
+    public JobsWindow(ContentManager content, GameManagers gameManager)
       : base(content)
     {
-      _jobManager = jobManager;
-
-      _villagerManager = villagerManager;
+      _gameManagers = gameManager;
 
       Name = "Jobs";
 
@@ -53,8 +49,8 @@ namespace VillageGUI.Interface.Windows
 
       _villagerInfoTexture = content.Load<Texture2D>("Interface/VillagerInfo");
 
-      _jobManager.Jobs.CollectionChanged += Jobs_CollectionChanged;
-      _villagerManager.Villagers.CollectionChanged += Villagers_CollectionChanged; ;
+      _gameManagers.JobManager.Jobs.CollectionChanged += Jobs_CollectionChanged;
+      _gameManagers.VillagerManager.Villagers.CollectionChanged += Villagers_CollectionChanged; ;
 
       _jobsSection = new WindowSection()
       {
@@ -62,13 +58,14 @@ namespace VillageGUI.Interface.Windows
         {
           Layer = this.Layer + 0.01f,
         },
-        Items = _jobManager.Jobs.Select(c =>
+        Items = _gameManagers.JobManager.Jobs.Select(c =>
           {
-            var button = new Button(_buttonTexture, _buttonFont)
+            var button = new JobButton(_buttonTexture, _buttonFont)
             {
               Text = c.Name,
               Click = JobClicked,
               Layer = this.Layer + 0.01f,
+              Job = c,
             };
 
             return button;
@@ -82,13 +79,14 @@ namespace VillageGUI.Interface.Windows
         {
           Layer = this.Layer + 0.01f,
         },
-        Items = _villagerManager.Villagers.Select(c =>
+        Items = _gameManagers.VillagerManager.Villagers.Select(c =>
         {
-          return new VillagerInformationPanel(_content)
+          return new VillagerInformationPanel(_content, _gameManagers)
           {
             //Text = c.Name,
             //Click = JobClicked,
             Layer = this.Layer + 0.01f,
+            Villager = c,
           };
         }).ToList(),
       };
@@ -96,39 +94,41 @@ namespace VillageGUI.Interface.Windows
       SetPositions();
     }
 
-    private void Villagers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void Jobs_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-      _villagerSection.Items = _villagerManager.Villagers.Select(c =>
+      _jobsSection.Items = _gameManagers.JobManager.Jobs.Select(c =>
       {
-        return new VillagerInformationPanel(_content)
+        return new JobButton(_buttonTexture, _buttonFont)
         {
-          //Text = c.Name,
-          //Click = JobClicked,
+          Text = c.Name,
+          Click = JobClicked,
           Layer = this.Layer + 0.01f,
+          Job = c,
         };
       }).ToList();
 
       SetPositions();
     }
 
-    private void Jobs_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void Villagers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-      _jobsSection.Items = _jobManager.Jobs.Select(c =>
+      _villagerSection.Items = _gameManagers.VillagerManager.Villagers.Select(c =>
+      {
+        return new VillagerInformationPanel(_content, _gameManagers)
         {
-          return new Button(_buttonTexture, _buttonFont)
-          {
-            Text = c.Name,
-            Click = JobClicked,
-            Layer = this.Layer + 0.01f,
-          };
-        }).ToList();
+          Layer = this.Layer + 0.01f,
+          Villager = c,
+        };
+      }).ToList();
 
       SetPositions();
     }
 
     private void JobClicked(object obj)
     {
+      var jobButton = obj as JobButton;
 
+      _gameManagers.JobManager.SelectedJob = jobButton.Job;
     }
 
     public override void SetPositions()
@@ -191,6 +191,8 @@ namespace VillageGUI.Interface.Windows
       _villagerSection.UnloadContent();
     }
 
+    #region Update
+
     public override void Update(GameTime gameTime)
     {
       _hasUpdated = true;
@@ -224,9 +226,9 @@ namespace VillageGUI.Interface.Windows
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
-      foreach (Button button in _jobsSection.Items)
+      foreach (JobButton button in _jobsSection.Items)
       {
-        button.Update(GameMouse.Rectangle, (List<Button>)_jobsSection.Items, mouseRectangleWithCamera_Jobs, windowRectangle);
+        button.Update(GameMouse.Rectangle, (List<JobButton>)_jobsSection.Items, mouseRectangleWithCamera_Jobs, windowRectangle);
       }
     }
 
@@ -245,9 +247,13 @@ namespace VillageGUI.Interface.Windows
 
       foreach (VillagerInformationPanel panel in _villagerSection.Items)
       {
-        panel.Update();
+        panel.Update(GameMouse.Rectangle, mouseRectangleWithCamera_Items, windowRectangle);
       }
     }
+
+    #endregion
+
+    #region Draw
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
     {
@@ -303,5 +309,7 @@ namespace VillageGUI.Interface.Windows
 
       spriteBatch.End();
     }
+
+    #endregion
   }
 }

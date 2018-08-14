@@ -28,15 +28,7 @@ namespace VillageGUI
 
     private Resources _resources;
 
-    #region Managers
-
-    private ItemManager _itemManager;
-
-    private JobManager _jobManager;
-
-    private VillagerManager _villagerManager;
-
-    #endregion
+    private GameManagers _gameManagers;
 
     private List<Button> _buttons;
 
@@ -56,17 +48,16 @@ namespace VillageGUI
         Wood = int.MaxValue,
       };
 
-      _itemManager = new ItemManager(_resources);
-
-      _jobManager = new JobManager();
-
-      _villagerManager = new VillagerManager();
+      _gameManagers = new GameManagers();
+      _gameManagers.ItemManager = new ItemManager(_gameManagers, _resources);
+      _gameManagers.JobManager = new JobManager(_gameManagers);
+      _gameManagers.VillagerManager = new VillagerManager(_gameManagers);
 
       // The reason I load windows like this is so that all of the loading is down at once, rather than when we first call a window
       _windows = new List<Window>()
       {
-        new CraftingWindow(_content, _itemManager),
-        new JobsWindow(_content, _jobManager, _villagerManager),
+        new CraftingWindow(_content, _gameManagers.ItemManager),
+        new JobsWindow(_content, _gameManagers),
       };
 
       _toolbar = new Toolbar(this, gameModel.ContentManger);
@@ -95,12 +86,12 @@ namespace VillageGUI
 
     private void AddVillager(object obj)
     {
-      _villagerManager.Add(new Villager());
+      _gameManagers.VillagerManager.Add(new Villager());
     }
 
     private void AddBuilding(object obj)
     {
-      _jobManager.Add(new Job() { Name = "BlackSmith", VillagerId = null, BuildingId = 1 });
+      _gameManagers.JobManager.Add(new Job() { Name = "BlackSmith" });
     }
 
     public override void OnScreenResize()

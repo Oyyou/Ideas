@@ -8,10 +8,17 @@ namespace VillageBackend.Models
 {
   public class Job
   {
+    private static int _ids;
+
     public string Name { get; set; }
 
-    public int? VillagerId { get; set; }
+    public readonly int Id;
 
-    public int BuildingId { get; set; }
+    public Job()
+    {
+      _ids++;
+
+      Id = _ids;
+    }
   }
 }

@@ -23,6 +23,8 @@ namespace VillageBackend.Models
 
     public readonly string Name;
 
+    public int? JobId { get; set; }
+
     public Villager()
     {
       _ids++;

@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
+    <Compile Include="Managers\GameManagers.cs" />
     <Compile Include="Managers\ItemManager.cs" />
     <Compile Include="Managers\JobManager.cs" />
     <Compile Include="Managers\VillagerManager.cs" />

@@ -4,18 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
+using VillageBackend.Models;
 
 namespace VillageGUI.Interface.Buttons
 {
-  public class VillagerInfoButton : Button
+  public class JobButton : Button
   {
-    public VillagerInfoButton(Texture2D texture, SpriteFont font) : base(texture, font)
-    {
-    }
+    public Job Job { get; set; }
 
-    protected override void DrawClicked()
+    public JobButton(Texture2D texture, SpriteFont font)
+      : base(texture, font)
     {
-      CurrentState = ButtonStates.Hovering;
     }
   }
 }

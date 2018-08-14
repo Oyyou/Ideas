@@ -10,10 +10,19 @@ namespace VillageBackend.Managers
 {
   public class JobManager
   {
+    private GameManagers _gameManagers;
+
     public ObservableCollection<Job> Jobs { get; private set; }
 
-    public JobManager()
+    /// <summary>
+    /// The job that's been selected on the "JobMenu"
+    /// </summary>
+    public Job SelectedJob { get; set; }
+
+    public JobManager(GameManagers gameManagers)
     {
+      _gameManagers = gameManagers;
+
       Jobs = new ObservableCollection<Job>();
     }
 

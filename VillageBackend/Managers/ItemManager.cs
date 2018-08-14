@@ -12,6 +12,8 @@ namespace VillageBackend.Managers
 {
   public class ItemManager
   {
+    private GameManagers _gameManagers;
+
     /// <summary>
     /// All items that have been crafted
     /// </summary>
@@ -27,9 +29,11 @@ namespace VillageBackend.Managers
     /// </summary>
     public ObservableCollection<ItemV2> QueuedItems { get; private set; }
 		
-	  public ItemManager(Resources resources)
+	  public ItemManager(GameManagers gameManagers, Resources resources)
 		{
-			Resources = resources;
+      _gameManagers = gameManagers;
+
+      Resources = resources;
 
       QueuedItems = new ObservableCollection<ItemV2>();
 		}
