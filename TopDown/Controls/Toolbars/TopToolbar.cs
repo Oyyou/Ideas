@@ -25,11 +25,6 @@ namespace TopDown.Controls.Toolbars
       _gameScreen.State = GameStates.InventoryMenu;
     }
 
-    private void JobsButton_Click(object sender, EventArgs e)
-    {
-      _gameScreen.State = GameStates.JobMenu;
-    }
-
     public override void LoadContent(ContentManager content)
     {
       _toolbarSprite = new Sprite(content.Load<Texture2D>("Controls/Toolbar_Top"));
@@ -38,16 +33,12 @@ namespace TopDown.Controls.Toolbars
       var buildButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Build"));
       buildButton.Click += BuildButton_Click;
 
-      var jobsButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Jobs"));
-      jobsButton.Click += JobsButton_Click;
-
       var inventoryButton = new ToolbarButton(content.Load<Texture2D>("Controls/Icons/Inventory"));
       inventoryButton.Click += InventoryButton_Click;
 
       _icons = new List<Button>()
       {
         buildButton,
-        jobsButton,
         inventoryButton,
       };
 

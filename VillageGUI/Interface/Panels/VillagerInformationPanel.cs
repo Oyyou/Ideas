@@ -64,6 +64,7 @@ namespace VillageGUI.Interface.Panels
       {
         Layer = Layer + 0.1f,
         Text = "-",
+        Click = OnMinusClick
       };
 
       _buttons = new List<VillagerInfoButton>()
@@ -73,6 +74,11 @@ namespace VillageGUI.Interface.Panels
       };
 
       Colour = Color.White;
+    }
+
+    private void OnMinusClick(Button obj)
+    {
+      Villager.JobId = null;
     }
 
     private void OnAddClick(Button obj)

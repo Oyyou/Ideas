@@ -54,13 +54,9 @@
     <Compile Include="Controls\GameSpeedController.cs" />
     <Compile Include="Controls\InspectMenu\InspectMenuWindow.cs" />
     <Compile Include="Controls\InventoryMenu\InventoryMenuWindow.cs" />
-    <Compile Include="Controls\JobMenu\JobMenuButton.cs" />
-    <Compile Include="Controls\JobMenu\JobMenuSubButton.cs" />
-    <Compile Include="Controls\JobMenu\JobMenuWindow.cs" />
     <Compile Include="Controls\MenuWindow.cs" />
     <Compile Include="Controls\Notifications.cs" />
     <Compile Include="Controls\Toolbars\Toolbar.cs" />
-    <Compile Include="Controls\Toolbars\BottomToolbar.cs" />
     <Compile Include="Controls\Toolbars\ToolbarButton.cs" />
     <Compile Include="Controls\Toolbars\TopToolbar.cs" />
     <Compile Include="Furnitures\Bed.cs" />
@@ -93,7 +89,6 @@
     <Compile Include="Resources\Rock.cs" />
     <Compile Include="Sprites\NPC.cs" />
     <Compile Include="Sprites\Path.cs" />
-    <Compile Include="Sprites\Player.cs" />
     <Compile Include="Screens\GameScreen.cs" />
     <Compile Include="Screens\MenuScreen.cs" />
     <Compile Include="Traits\Trait.cs" />

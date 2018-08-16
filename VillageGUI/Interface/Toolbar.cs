@@ -45,6 +45,10 @@ namespace VillageGUI.Interface
         {
           Click = Squad_Click,
         },
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Inventory"), Keys.I)
+        {
+          Click = Inventory_Click,
+        },
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Crafting"), Keys.C)
         {
           Click = Crafting_Click,
@@ -56,6 +60,11 @@ namespace VillageGUI.Interface
       };
 
       SetButtonPositions();
+    }
+
+    private void Inventory_Click(Button obj)
+    {
+      _state.OpenWindow("Inventory");
     }
 
     public void OnScreenResize()

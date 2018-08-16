@@ -54,6 +54,7 @@
     <Compile Include="Interface\Toolbar.cs" />
     <Compile Include="Interface\Buttons\ToolbarButton.cs" />
     <Compile Include="Interface\Windows\CraftingWindow.cs" />
+    <Compile Include="Interface\Windows\InventoryWindow.cs" />
     <Compile Include="Interface\Windows\JobsWindow.cs" />
     <Compile Include="Interface\Windows\QueueWindow.cs" />
     <Compile Include="Program.cs" />

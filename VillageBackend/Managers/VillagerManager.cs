@@ -39,7 +39,7 @@ namespace VillageBackend.Managers
         if (v.JobId == null)
           continue;
 
-        if (v.JobId == job.Id)
+        if (v.JobId.Value == job.Id)
           v.JobId = null;
       }
 
@@ -56,6 +56,17 @@ namespace VillageBackend.Managers
     public bool HasJob(Villager villager)
     {
       return villager.JobId != null;
+    }
+
+    public void FireByJobId(int jobId)
+    {
+      foreach(var villager in Villagers.Where(c => c.JobId != null))
+      {
+        if(villager.JobId.Value == jobId)
+        {
+          villager.JobId = null;
+        }
+      }
     }
   }
 }

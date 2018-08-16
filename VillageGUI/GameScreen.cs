@@ -58,6 +58,7 @@ namespace VillageGUI
       {
         new CraftingWindow(_content, _gameManagers.ItemManager),
         new JobsWindow(_content, _gameManagers),
+        new InventoryWindow(_content),
       };
 
       _toolbar = new Toolbar(this, gameModel.ContentManger);

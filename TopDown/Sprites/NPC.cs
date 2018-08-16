@@ -37,7 +37,7 @@ namespace TopDown.Sprites
     /// <summary>
     /// Construct a building
     /// </summary>
-    public event WorkEvent Construct;
+    public event Action<NPC, GameTime> Construct;
 
     /// <summary>
     /// We don't need the NPCs to collide with anything
@@ -60,7 +60,7 @@ namespace TopDown.Sprites
     /// <summary>
     /// Demolish a building
     /// </summary>
-    public event WorkEvent Demolish;
+    public event Action<NPC, GameTime> Demolish;
 
     /// <summary>
     /// The image shown on the "Job Menu"
@@ -93,11 +93,11 @@ namespace TopDown.Sprites
     {
       get
       {
-        return base.Position + new Vector2(0, _animationManager.FrameHeight  - 32);
+        return base.Position + new Vector2(0, _animationManager.FrameHeight - 32);
       }
       set
       {
-        base.Position = value - new Vector2(0, _animationManager.FrameHeight  - 32);
+        base.Position = value - new Vector2(0, _animationManager.FrameHeight - 32);
       }
     }
 
@@ -105,12 +105,10 @@ namespace TopDown.Sprites
 
     public Villager Villager { get; set; }
 
-    public delegate void WorkEvent(NPC npc, GameTime gameTime);
-
     /// <summary>
     /// The event gained from the workplace
     /// </summary>
-    public event WorkEvent Work;
+    public Action<NPC, GameTime> Work;
 
     /// <summary>
     /// Where the NPC works (TODO: add a schedule per workplace, or NPC)
@@ -121,29 +119,23 @@ namespace TopDown.Sprites
 
     #region Methods
 
-    public void AssignJob()
+    public NPC(Dictionary<string, Animation> animations, GameScreen gameScreen) : base(animations)
     {
-      var jb = _gameScreen.JobMenu.JobButton.JobBuilding;
+      _gameScreen = gameScreen;
 
-      // Remove the same job from any NPC that is currently working said job
-      foreach (var npc in _gameScreen.NPCComponents.Where(c => c.Workplace == jb))
+      _walkingPath = new List<Vector2>();
+
+      var animation = _animations.First().Value;
+
+      DisplaySprite = new Sprite(animation.Texture)
       {
-        npc.Unemploy();
-      }
+        SourceRectangle = new Rectangle(0, 0, animation.FrameWidth, animation.FrameHeight),
+        Scale = 0.5f,
+      };
 
-      _walkingPath.Clear();
+      Villager = new Villager();
 
-      Workplace = jb;
-
-      Job = Workplace.Name;
-
-      Work += Workplace.Work;
-
-      if (Construct != null)
-        Construct -= Construct;
-
-      if (Demolish != null)
-        Demolish -= Demolish;
+      Job = "Unemployed";
     }
 
     public override void LoadContent(ContentManager content)
@@ -163,23 +155,22 @@ namespace TopDown.Sprites
       };
     }
 
-    public NPC(Dictionary<string, Animation> animations, GameScreen gameScreen) : base(animations)
+    public void AssignJob()
     {
-      _gameScreen = gameScreen;
+      if (this.Villager.JobId == null)
+        return;
 
-      _walkingPath = new List<Vector2>();
+      var jb = _gameScreen.BuildingComponents.Where(c => c.Job.Id == this.Villager.JobId.Value).FirstOrDefault();
 
-      var animation = _animations.First().Value;
+      _walkingPath.Clear();
 
-      DisplaySprite = new Sprite(animation.Texture)
-      {
-        SourceRectangle = new Rectangle(0, 0, animation.FrameWidth, animation.FrameHeight),
-        Scale = 0.5f,
-      };
+      Workplace = jb;
 
-      Villager = new Villager();
+      Job = Workplace.Name;
 
-      Job = "Unemployed";
+      Work = Workplace.Work;
+      Construct = null;
+      Demolish = null;
     }
 
     protected override void SetAnimation()
@@ -208,8 +199,13 @@ namespace TopDown.Sprites
 
     public void Unemploy()
     {
+      // if they're already unemployed, no point in doing the rest
+      if (Work == null)
+        return;
+
       _walkingPath.Clear();
-      Work -= Workplace.Work;
+      Villager.JobId = null;
+      Work = null;
       Workplace = null;
       Job = "Unemployed";
     }
@@ -229,6 +225,15 @@ namespace TopDown.Sprites
         _defaultLayer = Layer;
 
       Layer = _defaultLayer.Value;
+
+      if (Villager.JobId != null)
+      {
+        AssignJob();
+      }
+      else
+      {
+        Unemploy();
+      }
 
       foreach (var building in _gameScreen.BuildingComponents)
       {

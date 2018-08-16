@@ -10,6 +10,8 @@ namespace Engine.Input
 {
   public static class GameMouse
   {
+    private static Matrix _transform = Matrix.Identity;
+
     /// <summary>
     /// These are objects the mouse is currently hovering over
     /// </summary>
@@ -45,6 +47,27 @@ namespace Engine.Input
       }
     }
 
+    public static Rectangle RectangleWithCamera
+    {
+      get
+      {
+        if (_transform == Matrix.Identity)
+          return Rectangle;
+
+        var scale = Matrix.Invert(_transform).Scale;
+        var translation = _transform.Translation;
+
+        var rectangle = new Rectangle(
+          (int)((CurrentMouse.X - translation.X) * scale.X),
+          (int)((CurrentMouse.Y - translation.Y) * scale.Y),
+          1,
+          1
+        );
+
+        return rectangle;
+      }
+    }
+
     public static void AddObject(IClickable clickableObject)
     {
       if (!ClickableObjects.Contains(clickableObject))
@@ -55,6 +78,13 @@ namespace Engine.Input
     {
       PreviousMouse = CurrentMouse;
       CurrentMouse = Mouse.GetState();
+    }
+
+    public static void Update(Matrix transform)
+    {
+      Update();
+
+      _transform = transform;
     }
   }
 }

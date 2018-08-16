@@ -32,7 +32,6 @@ namespace VillageGUI.Interface.Windows
     private WindowSection _jobsSection;
 
     private WindowSection _villagerSection;
-
     #endregion
 
     public JobsWindow(ContentManager content, GameManagers gameManager)
@@ -96,6 +95,8 @@ namespace VillageGUI.Interface.Windows
 
     private void Jobs_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
+      var added = e.Action == NotifyCollectionChangedAction.Add;
+
       _jobsSection.Items = _gameManagers.JobManager.Jobs.Select(c =>
       {
         return new JobButton(_buttonTexture, _buttonFont)

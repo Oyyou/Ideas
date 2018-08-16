@@ -16,6 +16,7 @@ using static TopDown.Logic.Pathfinder;
 using TopDown.Sprites;
 using Engine.Controls;
 using VillageBackend.Models;
+using Engine.Input;
 
 namespace TopDown.Buildings
 {
@@ -28,7 +29,7 @@ namespace TopDown.Buildings
     Demolishing,
   }
 
-  public class Building : Component
+  public class Building : Component, IClickable
   {
     public class DoorLocation
     {
@@ -682,11 +683,7 @@ namespace TopDown.Buildings
 
     private void HireButton_Click(object sender, EventArgs e)
     {
-      _gameScreen.State = GameStates.JobMenu;
-
-      _gameScreen.JobMenu.SetButtons();
-      _gameScreen.JobMenu.JobButton = _gameScreen.JobMenu.Buttons.Where(c => c.JobBuilding == this).FirstOrDefault();
-      _gameScreen.JobMenu.JobButton.IsSelected = true;
+      //_gameScreen.OpenWindow("Jobs");
     }
 
     private void FireButton_Click(object sender, EventArgs e)
@@ -785,9 +782,23 @@ namespace TopDown.Buildings
             component.Update(gameTime);
           }
 
-          if (GameScreen.Mouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle) && GameScreen.Mouse.LeftClicked)
+          if (GameMouse.RectangleWithCamera.Intersects(_spriteInside.Rectangle))
           {
-            _showButtons = !_showButtons;
+            GameMouse.AddObject(this);
+
+            if (GameMouse.Clicked)
+            {
+              Console.WriteLine("And here");
+              if (GameMouse.ValidObject == this)
+                _showButtons = !_showButtons;
+              else _showButtons = false;
+
+              Console.WriteLine(GameMouse.ValidObject);
+            }
+          }
+          else
+          {
+            GameMouse.ClickableObjects.Remove(this);
           }
 
           if (_showButtons)

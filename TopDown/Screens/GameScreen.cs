@@ -21,7 +21,6 @@ using TopDown.Controls.BuildMenu;
 using TopDown.Controls.InspectMenu;
 using TopDown.Controls.InventoryMenu;
 using TopDown.Controls.ItemMenu;
-using TopDown.Controls.JobMenu;
 using TopDown.Controls.Toolbars;
 using TopDown.Core;
 using TopDown.Furnitures;
@@ -32,6 +31,7 @@ using TopDown.Sprites;
 using VillageBackend.Managers;
 using VillageBackend.Models;
 using static TopDown.Logic.Pathfinder;
+using Engine.Input;
 
 namespace TopDown.States
 {
@@ -54,8 +54,6 @@ namespace TopDown.States
     PlacingBuilding,
     ItemMenu,
     PlacingItems,
-    JobMenu,
-    CraftingMenu,
     InventoryMenu,
     InspectMenu,
   }
@@ -72,11 +70,7 @@ namespace TopDown.States
 
     #region Managers
 
-    private ItemManager _itemManager;
-
-    private JobManager _jobManager;
-
-    private VillagerManager _villagerManager;
+    private GameManagers _gameManagers;
 
     #endregion
 
@@ -121,8 +115,6 @@ namespace TopDown.States
     public InventoryMenuWindow InventoryMenu { get; set; }
 
     public ItemMenu ItemMenu { get; set; }
-
-    public JobMenuWindow JobMenu;
 
     public static Controls.Keyboard Keyboard;
 
@@ -191,7 +183,7 @@ namespace TopDown.States
       SelectedBuilding = building;
 
       AddComponent(component: building);
-      _jobManager.Add(building.Job);
+      _gameManagers.JobManager.Add(building.Job);
     }
 
     public void AddComponent(Component component)
@@ -274,7 +266,7 @@ namespace TopDown.States
       npc.LoadContent(_content);
 
       GameComponents.Add(npc);
-      _villagerManager.Add(npc.Villager);
+      _gameManagers.VillagerManager.Add(npc.Villager);
     }
 
     public void Inspect(Building building)
@@ -358,8 +350,6 @@ namespace TopDown.States
 
       _buildMenu = new BuildMenuWindow(this);
 
-      JobMenu = new JobMenuWindow(this);
-
       InspectMenu = new InspectMenuWindow(this);
 
       InventoryMenu = new InventoryMenuWindow(this);
@@ -389,11 +379,13 @@ namespace TopDown.States
         Wood = 100,
       };
 
-      _itemManager = new ItemManager(Resources);
+      _gameManagers = new GameManagers();
 
-      _jobManager = new JobManager();
+      _gameManagers.ItemManager = new ItemManager(_gameManagers, Resources);
 
-      _villagerManager = new VillagerManager();
+      _gameManagers.JobManager = new JobManager(_gameManagers);
+
+      _gameManagers.VillagerManager = new VillagerManager(_gameManagers);
 
       _toolbar = new VillageGUI.Interface.Toolbar(this, gameModel.ContentManger);
 
@@ -418,8 +410,9 @@ namespace TopDown.States
       Console.WriteLine("-->Windows");
       _windows = new List<Window>()
       {
-        new CraftingWindow(_content, _itemManager),
-        new JobsWindow(_content, _jobManager, _villagerManager),
+        new CraftingWindow(_content, _gameManagers.ItemManager),
+        new JobsWindow(_content, _gameManagers),
+        new InventoryWindow(_content),
       };
 
       Console.WriteLine("-->Map");
@@ -536,7 +529,6 @@ namespace TopDown.States
         _buildMenu,
         InspectMenu,
         InventoryMenu,
-        JobMenu,
         ItemMenu,
         Notifications,
         new GameSpeedController(),
@@ -595,7 +587,7 @@ namespace TopDown.States
 
             blacksmith.State = BuildingStates.Built;
             GameComponents.Add(blacksmith);
-            _jobManager.Add(blacksmith.Job);
+            _gameManagers.JobManager.Add(blacksmith.Job);
 
             break;
 
@@ -665,7 +657,7 @@ namespace TopDown.States
               };
 
               npc.LoadContent(_content);
-              _villagerManager.Add(npc.Villager);
+              _gameManagers.VillagerManager.Add(npc.Villager);
 
               GameComponents.Add(npc);
             }
@@ -797,12 +789,6 @@ namespace TopDown.States
       if (Keyboard.IsKeyPressed(Keys.B))
         State = GameStates.BuildMenu;
 
-      if (Keyboard.IsKeyPressed(Keys.J))
-        State = GameStates.JobMenu;
-
-      if (Keyboard.IsKeyPressed(Keys.C))
-        State = GameStates.CraftingMenu;
-
       if (Keyboard.IsKeyPressed(Keys.I))
         State = GameStates.InventoryMenu;
 
@@ -858,6 +844,8 @@ namespace TopDown.States
 
     public override void Update(GameTime gameTime)
     {
+      GameMouse.Update(_camera.Transform);
+
       if (Keyboard.IsKeyPressed(Keys.T))
         Notifications.Add(Time, "This is a test notification");
 
@@ -897,18 +885,6 @@ namespace TopDown.States
         case GameStates.PlacingItems:
 
           PlacingItemsUpdate(gameTime);
-
-          break;
-
-        case GameStates.JobMenu:
-
-          MenuUpdate(gameTime, Keys.J);
-
-          break;
-
-        case GameStates.CraftingMenu:
-
-          MenuUpdate(gameTime, Keys.C);
 
           break;
 
