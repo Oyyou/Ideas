@@ -40,5 +40,33 @@
       "Stone": 1,
       "Wood": 1
     }
+  },
+  {
+    "Name": "Staff",
+    "CraftTime": 5,
+    "ExperienceValue": 1,
+    "Damage": 1,
+    "AttackSpeed": 2,
+    "Range": 2,
+    "ResourceCost": {
+      "Food": 0,
+      "Gold": 2,
+      "Stone": 1,
+      "Wood": 1
+    }
+  },
+  {
+    "Name": "Bow",
+    "CraftTime": 5,
+    "ExperienceValue": 1,
+    "Damage": 1,
+    "AttackSpeed": 1,
+    "Range": 4,
+    "ResourceCost": {
+      "Food": 0,
+      "Gold": 2,
+      "Stone": 1,
+      "Wood": 1
+    }
   }
 ]

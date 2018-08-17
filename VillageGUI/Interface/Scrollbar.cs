@@ -85,9 +85,9 @@ namespace VillageGUI.Interface
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(texture:_outer, position:Position, color:Color.White, layerDepth: Layer);
+      spriteBatch.Draw(texture: _outer, position:Position, color:Color.White, layerDepth: Layer);
 
-      spriteBatch.Draw(texture: _inner, destinationRectangle: _innerRectangle, color: Color.White, layerDepth: Layer);
+      spriteBatch.Draw(texture: _inner, destinationRectangle: _innerRectangle, color: Color.White, layerDepth: Layer + 0.01f);
     }
   }
 }

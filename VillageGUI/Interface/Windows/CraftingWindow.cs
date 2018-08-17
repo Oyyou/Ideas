@@ -62,7 +62,7 @@ namespace VillageGUI.Interface.Windows
 
   public class CraftingWindow : Window
   {
-    private ItemManager _itemManager;
+    private GameManagers _gameManagers;
 
     #region Items
     private List<Weapon> _weapons;
@@ -71,42 +71,111 @@ namespace VillageGUI.Interface.Windows
     #endregion
 
     #region Sections
+    private List<WindowSection> _sections;
+
     private WindowSection _categorySection;
 
+    private WindowSection _villagerSection;
+
     private WindowSection _itemSection;
+
+    private WindowSection _queueSection;
     #endregion
 
     private const int _spaceBetween = 10;
 
-    private QueueWindow _queueWindow;
+    //private QueueWindow _queueWindow;
+
+    private Texture2D _buttonTexture;
+    private SpriteFont _buttonFont;
 
     /// <summary>
     /// The item to be created
     /// </summary>
     public ItemV2 Item { get; private set; }
 
-    public override Rectangle WindowRectangle { get => new Rectangle(Rectangle.X, Rectangle.Y, Rectangle.Width + 10 + _queueWindow.Rectangle.Width, Rectangle.Height); }
+    public override Rectangle WindowRectangle { get => Rectangle; }
 
-    public CraftingWindow(ContentManager content, ItemManager itemManager) : base(content)
+    public CraftingWindow(ContentManager content, GraphicsDevice graphicsDevice, GameManagers gameManagers) : base(content)
     {
-      _itemManager = itemManager;
+      _gameManagers = gameManagers;
 
       Name = "Crafting";
 
-      Texture = content.Load<Texture2D>("Interface/Window2x_1y");
+      var width = 750;
+      var height = 360;
 
-      _queueWindow = new QueueWindow(content, itemManager);
+      Texture = new Texture2D(graphicsDevice, width, height);// content.Load<Texture2D>("Interface/Window2x_1y");
+
+      var colours = new Color[width * height];
+
+      var boarderWidth = 2;
+
+      int index = 0;
+
+      for (int y = 0; y < height; y++)
+      {
+        for (int x = 0; x < width; x++)
+        {
+          var colour = new Color(43, 43, 43, 200);
+
+          if (x < boarderWidth || x > (width - 1) - boarderWidth ||
+             y < boarderWidth || y > (height - 1) - boarderWidth)
+            colour = new Color(0, 0, 0, 200);
+
+          colours[index++] = colour;
+        }
+      }
+
+      Texture.SetData(colours);
+
+      _buttonTexture = content.Load<Texture2D>("Interface/Button");
+      _buttonFont = content.Load<SpriteFont>("Fonts/Font");
+
+      //_queueWindow = new QueueWindow(content, _gameManagers.ItemManager);
 
       _categorySection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content),
+        Scrollbar = new Scrollbar(content)
+        {
+          Layer = this.Layer + 0.01f,
+        },
+        Items = new List<Button>(),
+      };
+
+      _villagerSection = new WindowSection()
+      {
+        Scrollbar = new Scrollbar(content)
+        {
+          Layer = this.Layer + 0.01f,
+        },
         Items = new List<Button>(),
       };
 
       _itemSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content),
+        Scrollbar = new Scrollbar(content)
+        {
+          Layer = this.Layer + 0.01f,
+        },
         Items = new List<Button>(),
+      };
+
+      _queueSection = new WindowSection()
+      {
+        Scrollbar = new Scrollbar(content)
+        {
+          Layer = this.Layer + 0.01f,
+        },
+        Items = new List<Button>(),
+      };
+
+      _sections = new List<WindowSection>()
+      {
+        _categorySection,
+        _villagerSection,
+        _itemSection,
+        _queueSection,
       };
 
       var buttonTexture = content.Load<Texture2D>("Interface/Button");
@@ -120,9 +189,8 @@ namespace VillageGUI.Interface.Windows
         {
           Text = c,
           Click = CategoryClicked,
+          Layer = this.Layer + 0.01f,
         };
-
-
       }).ToList();
 
       LoadItems();
@@ -167,34 +235,60 @@ namespace VillageGUI.Interface.Windows
     {
       Texture.Dispose();
 
-      _categorySection.UnloadContent();
-
-      _itemSection.UnloadContent();
-
-      _queueWindow.UnloadContent();
+      foreach (var section in _sections)
+        section.UnloadContent();
     }
 
     private void CategoryClicked(object sender)
     {
       var button = sender as Button;
 
+      var category = (ItemCategories)Enum.Parse(typeof(ItemCategories), button.Text);
+
+      _villagerSection.Items = _gameManagers.VillagerManager.Villagers.Select(c =>
+        new VillagerButton(_buttonTexture, _buttonFont)
+        {
+          Layer = this.Layer + 0.01f,
+          Text = c.Name,
+          Category = category,
+          Click = VillagerClicked,
+          Villager = c,
+        }
+      ).ToList();
+
+      _itemSection.Items = new List<ItemButton>();
+      _queueSection.Items = new List<ItemButton>();
+
+      SetSectionPositions(_villagerSection);
+    }
+
+    private void VillagerClicked(Button button)
+    {
+      var villagerButton = button as VillagerButton;
+
+      var villagerId = villagerButton.Villager.Id;
+
       _itemSection.Items = new List<Button>();
 
-      var category = (ItemCategories)Enum.Parse(typeof(ItemCategories), button.Text);
+      var category = villagerButton.Category;
 
       switch (category)
       {
         case ItemCategories.Weapon:
-          _itemSection.Items = _weapons.Select(c =>
+          _itemSection.Items = _weapons
+            .Where(c => _gameManagers.ItemManager.CanCraft(villagerButton.Villager, c))
+            .Select(c =>
           {
             return GetItemButton(c);
           }).ToList();
           break;
         case ItemCategories.Armour:
-          _itemSection.Items = _armours.Select(c =>
-          {
-            return GetItemButton(c);
-          }).ToList();
+          _itemSection.Items = _armours
+            .Where(c => _gameManagers.ItemManager.CanCraft(villagerButton.Villager, c))
+            .Select(c =>
+            {
+              return GetItemButton(c);
+            }).ToList();
           break;
         case ItemCategories.Tool:
 
@@ -212,10 +306,39 @@ namespace VillageGUI.Interface.Windows
           throw new Exception("Unknown category: " + category);
       }
 
-      SetItemsPositions();
+      _villagerId = villagerId;
+
+      _queueSection.Items = _gameManagers.ItemManager.QueuedItems
+        .Where(c => c.CrafterId == villagerId)
+        .Select(c => GetQueueButton(c)).ToList();
+
+      SetSectionPositions(_itemSection);
+      SetSectionPositions(_queueSection);
     }
 
     private ItemButton GetItemButton(ItemV2 item)
+    {
+      var button = new ItemButton(GetItemTexture(item), item)
+      {
+        Click = ItemClicked,
+        Layer = this.Layer + 0.01f,
+      };
+
+      return button;
+    }
+
+    private ItemButton GetQueueButton(ItemV2 item)
+    {
+      var button = new ItemButton(GetItemTexture(item), item)
+      {
+        Click = QueueClicked,
+        Layer = this.Layer + 0.01f,
+      };
+
+      return button;
+    }
+
+    private Texture2D GetItemTexture(ItemV2 item)
     {
       var fullPath = $"{Directory.GetCurrentDirectory()}\\Content\\Interface\\ItemIcons\\{item.Name}.xnb";
 
@@ -224,23 +347,42 @@ namespace VillageGUI.Interface.Windows
       if (File.Exists(fullPath))
         content = "Interface/ItemIcons/" + item.Name;
 
-      var button = new ItemButton(_content.Load<Texture2D>(content), item)
-      {
-        Click = ItemClicked,
-      };
-
-      return button;
+      var texture = _content.Load<Texture2D>(content);
+      return texture;
     }
 
+    private int _villagerId;
     private void ItemClicked(object sender)
     {
       var button = sender as ItemButton;
       Console.WriteLine($"Item button '{button.Item.Name}' clicked");
 
       Item = button.Item;
+      Item.CrafterId = _villagerId;
 
-      if (Resources.CanAfford(_itemManager.Resources, button.Item.ResourceCost))
-        _itemManager.AddToQueue(button.Item);
+      if (Resources.CanAfford(_gameManagers.ItemManager.Resources, Item.ResourceCost))
+        _gameManagers.ItemManager.AddToQueue(Item.Clone() as ItemV2);
+
+      _queueSection.Items = _gameManagers.ItemManager.QueuedItems
+        .Where(c => c.CrafterId == _villagerId)
+        .Select(c => GetQueueButton(c)).ToList();
+
+      SetSectionPositions(_queueSection);
+    }
+
+    private void QueueClicked(object sender)
+    {
+      var button = sender as ItemButton;
+
+      Item = button.Item;
+
+      _gameManagers.ItemManager.QueuedItems.Remove(Item);
+
+      _queueSection.Items = _gameManagers.ItemManager.QueuedItems
+        .Where(c => c.CrafterId == _villagerId)
+        .Select(c => GetQueueButton(c)).ToList();
+
+      SetSectionPositions(_queueSection);
     }
 
     public override void SetPositions()
@@ -250,49 +392,49 @@ namespace VillageGUI.Interface.Windows
 
       Position = new Vector2((screenWidth / 2) - (WindowRectangle.Width / 2), screenHeight - Texture.Height - 100);
 
-      _queueWindow.Position = new Vector2(Position.X + this.Rectangle.Width + 10, Position.Y);
-      _queueWindow.SetPositions();
+      var y = (int)Position.Y + 35;
 
-      _categorySection.Area = new Rectangle((int)Position.X, (int)Position.Y + 35, 190, Texture.Height - 35);
-      _categorySection.Scrollbar.Position = new Vector2((Position.X + 170), Position.Y + 35);
+      var height = Texture.Height - 35;
 
-      var x = _spaceBetween + (_categorySection.Items.FirstOrDefault().Rectangle.Width / 2);
-      var y = (_categorySection.Area.Y + (_categorySection.Items.FirstOrDefault().Rectangle.Height / 2)) + 3;
+      _categorySection.Area = new Rectangle((int)Position.X, y, 190, height);
+      _categorySection.Scrollbar.Position = new Vector2(_categorySection.Area.X + _categorySection.Area.Width - 20, y);
 
-      var categories = Enum.GetNames(typeof(ItemCategories)).ToList();
+      _villagerSection.Area = new Rectangle(_categorySection.Area.Right, y, 190, height);
+      _villagerSection.Scrollbar.Position = new Vector2(_villagerSection.Area.X + _villagerSection.Area.Width - 20, y);
 
-      foreach (var item in _categorySection.Items)
-      {
-        item.Position = new Vector2(x, y);
-        y += item.Rectangle.Height + 5;
-      }
+      _itemSection.Area = new Rectangle(_villagerSection.Area.Right, y, 210, height);
+      _itemSection.Scrollbar.Position = new Vector2(_itemSection.Area.X + _itemSection.Area.Width - 20, y);
 
-      _itemSection.Area = new Rectangle((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
-      _itemSection.Scrollbar.Position = new Vector2((Position.X + Texture.Width) - 20 - 10, Position.Y + 35);
+      _queueSection.Area = new Rectangle(_itemSection.Area.Right, y, Texture.Width - (_categorySection.Area.Width + _villagerSection.Area.Width + _itemSection.Area.Width) - 10, height);
+      _queueSection.Scrollbar.Position = new Vector2(_queueSection.Area.X + _queueSection.Area.Width - 20, y);
 
-      SetItemsPositions();
+      foreach (var section in _sections)
+        SetSectionPositions(section);
     }
 
-    private void SetItemsPositions()
+    private void SetSectionPositions(WindowSection section)
     {
-      if (_itemSection.Items.Count() > 0)
+      if (section.Items == null)
+        return;
+
+      if (section.Items.Count() == 0)
+        return;
+
+      var buttonHeight = section.Items.FirstOrDefault().Rectangle.Height;
+      var buttonWidth = section.Items.FirstOrDefault().Rectangle.Width;
+
+      var x = _spaceBetween + (buttonWidth / 2);
+      var y = (section.Area.Y + (buttonHeight / 2)) + 3;
+
+      foreach (var button in section.Items)
       {
-        var buttonHeight = _itemSection.Items.FirstOrDefault().Rectangle.Height;
-        var buttonWidth = _itemSection.Items.FirstOrDefault().Rectangle.Width;
+        button.Position = new Vector2(x, y);
+        x += button.Rectangle.Width + _spaceBetween;
 
-        var x = _spaceBetween + (buttonWidth / 2);
-        var y = (_itemSection.Area.Y + (buttonHeight / 2)) + 3;
-
-        foreach (var button in _itemSection.Items)
+        if ((x + (button.Rectangle.Width / 2)) > (section.Area.Width))
         {
-          button.Position = new Vector2(x, y);
-          x += button.Rectangle.Width + _spaceBetween;
-
-          if ((x + (button.Rectangle.Width / 2)) > (_itemSection.Area.X))
-          {
-            x = _spaceBetween + (buttonWidth / 2);
-            y += buttonHeight + _spaceBetween;
-          }
+          x = _spaceBetween + (buttonWidth / 2);
+          y += buttonHeight + _spaceBetween;
         }
       }
     }
@@ -301,14 +443,63 @@ namespace VillageGUI.Interface.Windows
     {
       _hasUpdated = true;
 
-      _itemSection.Scrollbar.Update(gameTime);
-      _categorySection.Scrollbar.Update(gameTime);
+      foreach (var section in _sections)
+        section.Scrollbar.Update(gameTime);
 
-      UpdateItems();
+      if (GameMouse.Rectangle.Intersects(this.WindowRectangle))
+      {
+        GameMouse.AddObject(this);
+      }
+      else
+      {
+        GameMouse.ClickableObjects.Remove(this);
+      }
 
       UpdateCategories();
 
-      _queueWindow.Update(gameTime);
+      UpdateVillagers();
+
+      UpdateItems();
+
+      UpdateQueue();
+    }
+
+    private void UpdateCategories()
+    {
+      var translation = _categorySection.Matrix.Translation;
+
+      var mouseRectangle = GameMouse.Rectangle;
+
+      var mouseRectangleWithCamera = new Rectangle(
+        (int)((GameMouse.CurrentMouse.X - (_categorySection.Area.X)) - translation.X),
+        (int)((GameMouse.CurrentMouse.Y - (_categorySection.Area.Y)) - translation.Y),
+        1,
+        1
+      );
+
+      var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+
+      foreach (Button button in _categorySection.Items)
+        button.Update(mouseRectangle, (List<Button>)_categorySection.Items, mouseRectangleWithCamera, windowRectangle);
+    }
+
+    private void UpdateVillagers()
+    {
+      var translation = _villagerSection.Matrix.Translation;
+
+      var mouseRectangle = GameMouse.Rectangle;
+
+      var mouseRectangleWithCamera = new Rectangle(
+        (int)((GameMouse.CurrentMouse.X - (_villagerSection.Area.X)) - translation.X),
+        (int)((GameMouse.CurrentMouse.Y - (_villagerSection.Area.Y)) - translation.Y),
+        1,
+        1
+      );
+
+      var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+
+      foreach (VillagerButton button in _villagerSection.Items)
+        button.Update(mouseRectangle, (List<VillagerButton>)_villagerSection.Items, mouseRectangleWithCamera, windowRectangle);
     }
 
     private void UpdateItems()
@@ -318,35 +509,35 @@ namespace VillageGUI.Interface.Windows
       var mouseRectangle = GameMouse.Rectangle;
 
       var mouseRectangleWithCamera_Items = new Rectangle(
-        (int)((GameMouse.CurrentMouse.X - (Position.X + 190)) - translation.X),
-        (int)((GameMouse.CurrentMouse.Y - (Position.Y + 35)) - translation.Y),
+        (int)((GameMouse.CurrentMouse.X - (_itemSection.Area.X)) - translation.X),
+        (int)((GameMouse.CurrentMouse.Y - (_itemSection.Area.Y)) - translation.Y),
         1,
         1
       );
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
-      foreach (Button button in _itemSection.Items)
-        button.Update(mouseRectangle, (List<Button>)_itemSection.Items, mouseRectangleWithCamera_Items, windowRectangle);
+      foreach (ItemButton button in _itemSection.Items)
+        button.Update(mouseRectangle, (List<ItemButton>)_itemSection.Items, mouseRectangleWithCamera_Items, windowRectangle);
     }
 
-    private void UpdateCategories()
+    private void UpdateQueue()
     {
-      var translation = _categorySection.Matrix.Translation;
+      var translation = _queueSection.Matrix.Translation;
 
       var mouseRectangle = GameMouse.Rectangle;
 
-      var mouseRectangleWithCamera_Categories = new Rectangle(
-        (int)((GameMouse.CurrentMouse.X - Position.X) - translation.X),
-        (int)((GameMouse.CurrentMouse.Y - (Position.Y + 35)) - translation.Y),
+      var mouseRectangleWithCamera = new Rectangle(
+        (int)((GameMouse.CurrentMouse.X - (_queueSection.Area.X)) - translation.X),
+        (int)((GameMouse.CurrentMouse.Y - (_queueSection.Area.Y)) - translation.Y),
         1,
         1
       );
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
-      foreach (Button button in _categorySection.Items)
-        button.Update(mouseRectangle, (List<Button>)_categorySection.Items, mouseRectangleWithCamera_Categories, windowRectangle);
+      foreach (ItemButton button in _queueSection.Items)
+        button.Update(mouseRectangle, (List<ItemButton>)_queueSection.Items, mouseRectangleWithCamera, windowRectangle);
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
@@ -358,37 +549,19 @@ namespace VillageGUI.Interface.Windows
 
       DrawWindow(gameTime, spriteBatch);
 
-      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
+      foreach (var section in _sections)
+      {
+        graphics.GraphicsDevice.Viewport = new Viewport(section.Area);
 
-      DrawButtons(gameTime, spriteBatch);
+        spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: section.Matrix);
 
-      graphics.GraphicsDevice.Viewport = new Viewport((int)Position.X, (int)Position.Y + 35, 190, Texture.Height - 35);
+        foreach (var button in section.Items)
+          button.Draw(gameTime, spriteBatch);
 
-      DrawCategories(gameTime, spriteBatch);
+        spriteBatch.End();
+      }
 
       graphics.GraphicsDevice.Viewport = original;
-
-      _queueWindow.Draw(gameTime, spriteBatch, graphics);
-    }
-
-    protected void DrawButtons(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _itemSection.Matrix);
-
-      foreach (var button in _itemSection.Items)
-        button.Draw(gameTime, spriteBatch);
-
-      spriteBatch.End();
-    }
-
-    protected void DrawCategories(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _categorySection.Matrix);
-
-      foreach (var button in _categorySection.Items)
-        button.Draw(gameTime, spriteBatch);
-
-      spriteBatch.End();
     }
 
     protected void DrawWindow(GameTime gameTime, SpriteBatch spriteBatch)
@@ -397,9 +570,8 @@ namespace VillageGUI.Interface.Windows
 
       spriteBatch.Draw(Texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
 
-      _itemSection.Scrollbar.Draw(gameTime, spriteBatch);
-
-      _categorySection.Scrollbar.Draw(gameTime, spriteBatch);
+      foreach (var section in _sections)
+        section.Scrollbar.Draw(gameTime, spriteBatch);
 
       spriteBatch.DrawString(_font, Name, new Vector2(Position.X + 10, Position.Y + 10), Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.1f);
 

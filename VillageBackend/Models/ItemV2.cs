@@ -7,7 +7,7 @@ using static VillageBackend.Enums;
 
 namespace VillageBackend.Models
 {
-  public abstract class ItemV2
+  public abstract class ItemV2 : ICloneable
   {
     public ItemCategories Category { get; set; }
     
@@ -39,5 +39,10 @@ namespace VillageBackend.Models
     /// The resources used to craft the item
     /// </summary>
     public Resources ResourceCost { get; set; }
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
+    }
   }
 }

@@ -410,9 +410,9 @@ namespace TopDown.States
       Console.WriteLine("-->Windows");
       _windows = new List<Window>()
       {
-        new CraftingWindow(_content, _gameManagers.ItemManager),
+        new CraftingWindow(_content, _graphicsDevice, _gameManagers),
         new JobsWindow(_content, _gameManagers),
-        new InventoryWindow(_content),
+        new InventoryWindow(_content, _graphicsDevice, _gameManagers.ItemManager),
       };
 
       Console.WriteLine("-->Map");

@@ -53,12 +53,21 @@ namespace VillageGUI
       _gameManagers.JobManager = new JobManager(_gameManagers);
       _gameManagers.VillagerManager = new VillagerManager(_gameManagers);
 
+      _gameManagers.ItemManager.Items = new List<ItemV2>()
+      {
+        new Weapon() { Name = "Axe", Category = VillageBackend.Enums.ItemCategories.Weapon },
+        new Weapon() { Name = "Sword", Category = VillageBackend.Enums.ItemCategories.Weapon },
+        new Weapon() { Name = "Spear", Category = VillageBackend.Enums.ItemCategories.Weapon },
+        new Weapon() { Name = "Axe", Category = VillageBackend.Enums.ItemCategories.Weapon },
+        new Weapon() { Name = "Axe", Category = VillageBackend.Enums.ItemCategories.Weapon },
+      };
+
       // The reason I load windows like this is so that all of the loading is down at once, rather than when we first call a window
       _windows = new List<Window>()
       {
-        new CraftingWindow(_content, _gameManagers.ItemManager),
+        new CraftingWindow(_content, _graphicsDevice, _gameManagers),
         new JobsWindow(_content, _gameManagers),
-        new InventoryWindow(_content),
+        new InventoryWindow(_content, _graphicsDevice, _gameManagers.ItemManager),
       };
 
       _toolbar = new Toolbar(this, gameModel.ContentManger);
@@ -87,7 +96,7 @@ namespace VillageGUI
 
     private void AddVillager(object obj)
     {
-      _gameManagers.VillagerManager.Add(new Villager());
+      _gameManagers.VillagerManager.Add(new Villager() { });
     }
 
     private void AddBuilding(object obj)

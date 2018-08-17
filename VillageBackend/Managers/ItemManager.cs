@@ -17,7 +17,7 @@ namespace VillageBackend.Managers
     /// <summary>
     /// All items that have been crafted
     /// </summary>
-    public List<ItemV2> Items { get; private set; }
+    public List<ItemV2> Items { get; set; }
 
     /// <summary>
     /// The resources from the actual game
@@ -44,6 +44,16 @@ namespace VillageBackend.Managers
         throw new Exception("Check to see if the item is affordable before adding to q");
       
 			QueuedItems.Add(item);
+    }
+
+    /// <summary>
+    /// Can the villager craft this item
+    /// </summary>
+    /// <param name="villager">The selected villager</param>
+    /// <param name="item">The item required for crafting</param>
+    public bool CanCraft(Villager villager, ItemV2 item)
+    {
+      return true;
     }
 		
 		public void Update(GameTime gameTime)
