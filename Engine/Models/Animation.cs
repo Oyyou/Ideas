@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Engine.Models
 {
-  public class Animation
+  public class Animation : ICloneable
   {
     public readonly int FrameCount;
 
@@ -26,6 +26,11 @@ namespace Engine.Models
       FrameCount = frameCount;
 
       Speed = 0.2f;
+    }
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
     }
   }
 }

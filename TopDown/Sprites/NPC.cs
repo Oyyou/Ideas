@@ -224,6 +224,8 @@ namespace TopDown.Sprites
       if (_defaultLayer == null)
         _defaultLayer = Layer;
 
+      Velocity = Vector2.Zero;
+
       Layer = _defaultLayer.Value;
 
       if (Villager.JobId != null)

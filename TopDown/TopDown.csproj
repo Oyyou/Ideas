@@ -87,6 +87,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Rock.cs" />
+    <Compile Include="Sprites\Chicken.cs" />
     <Compile Include="Sprites\NPC.cs" />
     <Compile Include="Sprites\Path.cs" />
     <Compile Include="Screens\GameScreen.cs" />

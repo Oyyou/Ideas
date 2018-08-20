@@ -17,7 +17,7 @@ namespace VillageBackend.Managers
     /// <summary>
     /// All items that have been crafted
     /// </summary>
-    public List<ItemV2> Items { get; set; }
+    public List<ItemV2> Items { get; private set; }
 
     /// <summary>
     /// The resources from the actual game
@@ -36,6 +36,8 @@ namespace VillageBackend.Managers
       Resources = resources;
 
       QueuedItems = new ObservableCollection<ItemV2>();
+
+      Items = new List<ItemV2>();
 		}
     
     public void AddToQueue(ItemV2 item)

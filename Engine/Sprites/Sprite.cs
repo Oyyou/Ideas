@@ -159,7 +159,7 @@ namespace Engine.Sprites
       foreach (var sprite in Components)
         sprite.Draw(gameTime, spriteBatch);
 
-      Velocity = Vector2.Zero;
+      //Velocity = Vector2.Zero;
     }
 
     private void Initialise()
@@ -343,6 +343,19 @@ namespace Engine.Sprites
 
       foreach (var sprite in Components)
         sprite.Update(gameTime);
+    }
+
+    public override object Clone()
+    {
+      var sprite = base.Clone() as Sprite;
+
+      if (_animations != null)
+      {
+        sprite._animations = this._animations.ToDictionary(c => c.Key, v => v.Value.Clone() as Animation);
+        sprite._animationManager = sprite._animationManager.Clone() as AnimationManager;
+      }
+
+      return sprite;
     }
   }
 }

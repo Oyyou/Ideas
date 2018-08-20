@@ -9,11 +9,14 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using TopDown.Sprites;
 using VillageBackend.Models;
+using Engine.Models;
 
 namespace TopDown.Buildings.Labour
 {
   public class Farm : Building
   {
+    private Chicken _chickenPrefab;
+
     protected override List<Wall> Walls
     {
       get
@@ -67,6 +70,17 @@ namespace TopDown.Buildings.Labour
 
       foreach (var button in _buttons)
         button.LoadContent(content);
+
+      var chickenAnimations = new Dictionary<string, Animation>()
+      {
+        { "Peck", new Animation(content.Load<Texture2D>("Sprites/Animals/Chicken_Peck"), 3) },
+        { "Walk", new Animation(content.Load<Texture2D>("Sprites/Animals/Chicken_Walk"), 4) },
+      };
+
+      _chickenPrefab = new Chicken(chickenAnimations)
+      {
+        Layer = this.Layer + 0.01f,
+      };
     }
 
     protected override void SetDoorLocations()
@@ -118,6 +132,21 @@ namespace TopDown.Buildings.Labour
 
       if (npc.Position != workPosition)
         npc.WalkTo(workPosition);
+    }
+
+    protected override void OnBuilt()
+    {
+      var chicken1 = _chickenPrefab.Clone() as Chicken;
+      var chicken2 = _chickenPrefab.Clone() as Chicken;
+      var chicken3 = _chickenPrefab.Clone() as Chicken;
+
+      chicken1.Position = new Vector2(Position.X + 32, Position.Y + 128);
+      chicken2.Position = new Vector2(Position.X + 96, Position.Y + 36);
+      chicken3.Position = new Vector2(Position.X + 224, Position.Y + 160);
+
+      Components.Add(chicken1);
+      Components.Add(chicken2);
+      Components.Add(chicken3);
     }
   }
 }

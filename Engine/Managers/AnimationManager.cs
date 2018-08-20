@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Engine.Managers
 {
-  public class AnimationManager : Component
+  public class AnimationManager : ICloneable
   {
     private float _timer;
 
@@ -32,11 +32,23 @@ namespace Engine.Managers
       get { return Animation.FrameWidth; }
     }
 
+    public bool IsFinished
+    {
+      get
+      {
+        return CurrentFrame == Animation.FrameCount - 1;
+      }
+    }
+
     public int PreviousFrame { get; private set; }
 
     public float Scale { get; set; }
 
     public SpriteEffects SpriteEffect { get; set; }
+
+    public float Layer { get; set; }
+
+    public Vector2 Position { get; set; }
 
     public AnimationManager(Animation animation)
     {
@@ -47,7 +59,7 @@ namespace Engine.Managers
       SpriteEffect = SpriteEffects.None;
     }
 
-    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       var layer = Layer;// + Position.Y / 100000;
 
@@ -69,7 +81,7 @@ namespace Engine.Managers
       _updated = false;
     }
 
-    public override void LoadContent(ContentManager content)
+    public void LoadContent(ContentManager content)
     {
 
     }
@@ -92,12 +104,12 @@ namespace Engine.Managers
       _timer = 0;
     }
 
-    public override void UnloadContent()
+    public void UnloadContent()
     {
 
     }
 
-    public override void Update(GameTime gameTime)
+    public void Update(GameTime gameTime)
     {
       _updated = true;
 
@@ -114,6 +126,15 @@ namespace Engine.Managers
         if (CurrentFrame >= Animation.FrameCount)
           CurrentFrame = 0;
       }
+    }
+
+    public object Clone()
+    {
+      var animationManager = this.MemberwiseClone() as AnimationManager;
+
+      animationManager.Animation = animationManager.Animation.Clone() as Animation;
+
+      return animationManager;
     }
   }
 }

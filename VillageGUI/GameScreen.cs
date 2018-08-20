@@ -53,15 +53,6 @@ namespace VillageGUI
       _gameManagers.JobManager = new JobManager(_gameManagers);
       _gameManagers.VillagerManager = new VillagerManager(_gameManagers);
 
-      _gameManagers.ItemManager.Items = new List<ItemV2>()
-      {
-        new Weapon() { Name = "Axe", Category = VillageBackend.Enums.ItemCategories.Weapon },
-        new Weapon() { Name = "Sword", Category = VillageBackend.Enums.ItemCategories.Weapon },
-        new Weapon() { Name = "Spear", Category = VillageBackend.Enums.ItemCategories.Weapon },
-        new Weapon() { Name = "Axe", Category = VillageBackend.Enums.ItemCategories.Weapon },
-        new Weapon() { Name = "Axe", Category = VillageBackend.Enums.ItemCategories.Weapon },
-      };
-
       // The reason I load windows like this is so that all of the loading is down at once, rather than when we first call a window
       _windows = new List<Window>()
       {
@@ -135,6 +126,8 @@ namespace VillageGUI
       _toolbar.Update(gameTime);
 
       Window?.Update(gameTime);
+
+      _gameManagers.ItemManager.Update(gameTime);
     }
 
     public override void Draw(GameTime gameTime)

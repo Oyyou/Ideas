@@ -15,6 +15,7 @@ using VillageBackend.Managers;
 using System.IO;
 using Engine.Interface.Windows;
 using Engine.Input;
+using Engine;
 
 namespace VillageGUI.Interface.Windows
 {
@@ -96,38 +97,28 @@ namespace VillageGUI.Interface.Windows
 
     public override Rectangle WindowRectangle { get => Rectangle; }
 
+    private Texture2D _test;
+
     public CraftingWindow(ContentManager content, GraphicsDevice graphicsDevice, GameManagers gameManagers) : base(content)
     {
       _gameManagers = gameManagers;
 
       Name = "Crafting";
 
-      var width = 750;
-      var height = 360;
+      var width = GameEngine.ScreenWidth - 20;
+      var height = GameEngine.ScreenHeight - 20 - 100;
 
       Texture = new Texture2D(graphicsDevice, width, height);// content.Load<Texture2D>("Interface/Window2x_1y");
 
-      var colours = new Color[width * height];
+      var outerTexture = new Texture2D(graphicsDevice, 20, height - 35 - 10); // 35 is space at top, 10 is space at bottom
+      var innerTexture = new Texture2D(graphicsDevice, 14, 1);
 
-      var boarderWidth = 2;
+      _test = new Texture2D(graphicsDevice, 1, 1);
+      _test.SetData(new Color[] { new Color(0, 150, 0, 150), });
 
-      int index = 0;
-
-      for (int y = 0; y < height; y++)
-      {
-        for (int x = 0; x < width; x++)
-        {
-          var colour = new Color(43, 43, 43, 200);
-
-          if (x < boarderWidth || x > (width - 1) - boarderWidth ||
-             y < boarderWidth || y > (height - 1) - boarderWidth)
-            colour = new Color(0, 0, 0, 200);
-
-          colours[index++] = colour;
-        }
-      }
-
-      Texture.SetData(colours);
+      SetTexture(Texture, new Color(43, 43, 43, 200), new Color(0, 0, 0, 200));
+      SetTexture(outerTexture, new Color(43, 43, 43), new Color(0, 0, 0));
+      SetTexture(innerTexture, new Color(69, 69, 69), new Color(0, 0, 0), 0);
 
       _buttonTexture = content.Load<Texture2D>("Interface/Button");
       _buttonFont = content.Load<SpriteFont>("Fonts/Font");
@@ -136,7 +127,7 @@ namespace VillageGUI.Interface.Windows
 
       _categorySection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content)
+        Scrollbar = new Scrollbar(outerTexture, innerTexture)
         {
           Layer = this.Layer + 0.01f,
         },
@@ -145,7 +136,7 @@ namespace VillageGUI.Interface.Windows
 
       _villagerSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content)
+        Scrollbar = new Scrollbar(outerTexture, innerTexture)
         {
           Layer = this.Layer + 0.01f,
         },
@@ -154,7 +145,7 @@ namespace VillageGUI.Interface.Windows
 
       _itemSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content)
+        Scrollbar = new Scrollbar(outerTexture, innerTexture)
         {
           Layer = this.Layer + 0.01f,
         },
@@ -163,7 +154,7 @@ namespace VillageGUI.Interface.Windows
 
       _queueSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content)
+        Scrollbar = new Scrollbar(outerTexture, innerTexture)
         {
           Layer = this.Layer + 0.01f,
         },
@@ -196,6 +187,29 @@ namespace VillageGUI.Interface.Windows
       LoadItems();
 
       SetPositions();
+    }
+
+    private void SetTexture(Texture2D texture, Color backgroundColour, Color borderColour, int borderWidth = 2)
+    {
+      var colours = new Color[texture.Width * texture.Height];
+
+      int index = 0;
+
+      for (int y = 0; y < texture.Height; y++)
+      {
+        for (int x = 0; x < texture.Width; x++)
+        {
+          var colour = backgroundColour;
+
+          if (x < borderWidth || x > (texture.Width - 1) - borderWidth ||
+             y < borderWidth || y > (texture.Height - 1) - borderWidth)
+            colour = borderColour;
+
+          colours[index++] = colour;
+        }
+      }
+
+      texture.SetData(colours);
     }
 
     private void LoadItems()
@@ -327,9 +341,11 @@ namespace VillageGUI.Interface.Windows
       return button;
     }
 
-    private ItemButton GetQueueButton(ItemV2 item)
+    private QueueButton GetQueueButton(ItemV2 item)
     {
-      var button = new ItemButton(GetItemTexture(item), item)
+      item.ShowCraftingProgress = true;
+
+      var button = new QueueButton(GetItemTexture(item), _test, item)
       {
         Click = QueueClicked,
         Layer = this.Layer + 0.01f,
@@ -372,7 +388,7 @@ namespace VillageGUI.Interface.Windows
 
     private void QueueClicked(object sender)
     {
-      var button = sender as ItemButton;
+      var button = sender as QueueButton;
 
       Item = button.Item;
 
@@ -390,11 +406,11 @@ namespace VillageGUI.Interface.Windows
       var screenWidth = Game1.ScreenWidth;
       var screenHeight = Game1.ScreenHeight;
 
-      Position = new Vector2((screenWidth / 2) - (WindowRectangle.Width / 2), screenHeight - Texture.Height - 100);
+      Position = new Vector2((screenWidth / 2) - (WindowRectangle.Width / 2), 10);
 
       var y = (int)Position.Y + 35;
 
-      var height = Texture.Height - 35;
+      var height = Texture.Height - 35 - 10;
 
       _categorySection.Area = new Rectangle((int)Position.X, y, 190, height);
       _categorySection.Scrollbar.Position = new Vector2(_categorySection.Area.X + _categorySection.Area.Width - 20, y);
@@ -402,10 +418,12 @@ namespace VillageGUI.Interface.Windows
       _villagerSection.Area = new Rectangle(_categorySection.Area.Right, y, 190, height);
       _villagerSection.Scrollbar.Position = new Vector2(_villagerSection.Area.X + _villagerSection.Area.Width - 20, y);
 
-      _itemSection.Area = new Rectangle(_villagerSection.Area.Right, y, 210, height);
+      var remainingWidth = Texture.Width - (_categorySection.Area.Width + _villagerSection.Area.Width);
+
+      _itemSection.Area = new Rectangle(_villagerSection.Area.Right, y, (int)Math.Ceiling(remainingWidth * 0.66d), height);
       _itemSection.Scrollbar.Position = new Vector2(_itemSection.Area.X + _itemSection.Area.Width - 20, y);
 
-      _queueSection.Area = new Rectangle(_itemSection.Area.Right, y, Texture.Width - (_categorySection.Area.Width + _villagerSection.Area.Width + _itemSection.Area.Width) - 10, height);
+      _queueSection.Area = new Rectangle(_itemSection.Area.Right, y, remainingWidth - _itemSection.Area.Width - 10, height);
       _queueSection.Scrollbar.Position = new Vector2(_queueSection.Area.X + _queueSection.Area.Width - 20, y);
 
       foreach (var section in _sections)
@@ -431,7 +449,7 @@ namespace VillageGUI.Interface.Windows
         button.Position = new Vector2(x, y);
         x += button.Rectangle.Width + _spaceBetween;
 
-        if ((x + (button.Rectangle.Width / 2)) > (section.Area.Width))
+        if ((x + (button.Rectangle.Width / 2)) > (section.Area.Width) - 30)
         {
           x = _spaceBetween + (buttonWidth / 2);
           y += buttonHeight + _spaceBetween;
@@ -536,8 +554,8 @@ namespace VillageGUI.Interface.Windows
 
       var windowRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
-      foreach (ItemButton button in _queueSection.Items)
-        button.Update(mouseRectangle, (List<ItemButton>)_queueSection.Items, mouseRectangleWithCamera, windowRectangle);
+      foreach (QueueButton button in _queueSection.Items)
+        button.Update(mouseRectangle, (List<QueueButton>)_queueSection.Items, mouseRectangleWithCamera, windowRectangle);
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, GraphicsDeviceManager graphics)

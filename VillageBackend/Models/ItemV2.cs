@@ -26,6 +26,8 @@ namespace VillageBackend.Models
     /// </summary>
     public float CraftTime { get; set; }
 
+    public bool ShowCraftingProgress { get; set; }
+
     /// <summary>
     /// Base amount of experience gained when crafted
     /// </summary>

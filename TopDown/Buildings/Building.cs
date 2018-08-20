@@ -439,6 +439,7 @@ namespace TopDown.Buildings
           _gameScreen.Notifications.Add(_gameScreen.Time, $"{npc.Name} finished building {this.Name}");
 
           State = BuildingStates.Built;
+          OnBuilt();
           //_gameScreen.State = States.GameStates.Playing;
           _gameScreen.UpdateMap();
           npc.Construct -= this.Construct;
@@ -448,6 +449,11 @@ namespace TopDown.Buildings
 
         _soundEffectInstance.Play();
       }
+    }
+
+    protected virtual void OnBuilt()
+    {
+
     }
 
     /// <summary>

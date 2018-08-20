@@ -391,12 +391,16 @@ namespace TopDown.States
 
       GameComponents = new List<Component>()
       {
-        //Player,
+        //new Chicken(chickenAnimations)
+        //{
+        //  Position = new Vector2(100, 100),
+        //  Layer = 0.1f,
+        //}
       };
 
       // The background
       var dot = new Texture2D(_graphicsDevice, 1, 1);
-      dot.SetData(new Color[] { new Color(0, 200, 0), });
+      dot.SetData(new Color[] { new Color(104, 62, 0), });
 
       GameComponents.Add(new Sprite(dot)
       {

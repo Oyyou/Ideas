@@ -48,6 +48,8 @@ namespace TopDown.Core
       if (GameScreen.Keyboard.IsKeyDown(Keys.LeftShift))
         speed *= 2;
 
+      speed = (int)Math.Ceiling(speed);
+
       if (GameScreen.Keyboard.IsKeyDown(Keys.A))
         Position.X -= speed;
       else if (GameScreen.Keyboard.IsKeyDown(Keys.D))

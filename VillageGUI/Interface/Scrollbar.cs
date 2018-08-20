@@ -48,9 +48,16 @@ namespace VillageGUI.Interface
 
     public Scrollbar(ContentManager content)
     {
-      _inner = content.Load<Texture2D>("Interface/Scrollbar_Inner");
-
       _outer = content.Load<Texture2D>("Interface/Scrollbar_Outer");
+
+      _inner = content.Load<Texture2D>("Interface/Scrollbar_Inner");
+    }
+
+    public Scrollbar(Texture2D outer, Texture2D inner)
+    {
+      _outer = outer;
+
+      _inner = inner;
     }
 
     public void Update(GameTime gameTime)

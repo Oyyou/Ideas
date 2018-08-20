@@ -52,7 +52,7 @@ namespace Engine
 
     public abstract void Update(GameTime gameTime);
 
-    public object Clone()
+    public virtual object Clone()
     {
       return this.MemberwiseClone();
     }
