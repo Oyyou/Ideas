@@ -51,14 +51,33 @@ namespace VillageGUI
       _gameManagers = new GameManagers();
       _gameManagers.ItemManager = new ItemManager(_gameManagers, _resources);
       _gameManagers.JobManager = new JobManager(_gameManagers);
+      _gameManagers.SquadManager = new SquadManager(_gameManagers);
       _gameManagers.VillagerManager = new VillagerManager(_gameManagers);
+
+      _gameManagers.SquadManager.Squads.Add(new Squad()
+      {
+        Name = "The Bois",
+        Villager_1 = new Villager() { },
+        Villager_2 = new Villager() { },
+        Villager_3 = new Villager() { },
+        Villager_4 = new Villager() { },
+      });
+
+      _gameManagers.SquadManager.Squads.Add(new Squad()
+      {
+        Name = "Bravo",
+        Villager_1 = new Villager() { },
+        Villager_2 = new Villager() { },
+      });
 
       // The reason I load windows like this is so that all of the loading is down at once, rather than when we first call a window
       _windows = new List<Window>()
       {
+        new BuildWindow(_content, _graphicsDevice, _gameManagers),
         new CraftingWindow(_content, _graphicsDevice, _gameManagers),
         new JobsWindow(_content, _gameManagers),
         new InventoryWindow(_content, _graphicsDevice, _gameManagers.ItemManager),
+        new SquadWindow(_content, _graphicsDevice, _gameManagers.SquadManager),
       };
 
       _toolbar = new Toolbar(this, gameModel.ContentManger);

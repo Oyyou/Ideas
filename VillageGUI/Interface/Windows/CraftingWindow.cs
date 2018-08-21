@@ -88,6 +88,7 @@ namespace VillageGUI.Interface.Windows
     //private QueueWindow _queueWindow;
 
     private Texture2D _buttonTexture;
+
     private SpriteFont _buttonFont;
 
     /// <summary>
@@ -116,9 +117,9 @@ namespace VillageGUI.Interface.Windows
       _test = new Texture2D(graphicsDevice, 1, 1);
       _test.SetData(new Color[] { new Color(0, 150, 0, 150), });
 
-      SetTexture(Texture, new Color(43, 43, 43, 200), new Color(0, 0, 0, 200));
-      SetTexture(outerTexture, new Color(43, 43, 43), new Color(0, 0, 0));
-      SetTexture(innerTexture, new Color(69, 69, 69), new Color(0, 0, 0), 0);
+      Helpers.SetTexture(Texture, new Color(43, 43, 43, 200), new Color(0, 0, 0, 200));
+      Helpers.SetTexture(outerTexture, new Color(43, 43, 43), new Color(0, 0, 0));
+      Helpers.SetTexture(innerTexture, new Color(69, 69, 69), new Color(0, 0, 0), 0);
 
       _buttonTexture = content.Load<Texture2D>("Interface/Button");
       _buttonFont = content.Load<SpriteFont>("Fonts/Font");
@@ -187,29 +188,6 @@ namespace VillageGUI.Interface.Windows
       LoadItems();
 
       SetPositions();
-    }
-
-    private void SetTexture(Texture2D texture, Color backgroundColour, Color borderColour, int borderWidth = 2)
-    {
-      var colours = new Color[texture.Width * texture.Height];
-
-      int index = 0;
-
-      for (int y = 0; y < texture.Height; y++)
-      {
-        for (int x = 0; x < texture.Width; x++)
-        {
-          var colour = backgroundColour;
-
-          if (x < borderWidth || x > (texture.Width - 1) - borderWidth ||
-             y < borderWidth || y > (texture.Height - 1) - borderWidth)
-            colour = borderColour;
-
-          colours[index++] = colour;
-        }
-      }
-
-      texture.SetData(colours);
     }
 
     private void LoadItems()
@@ -323,7 +301,7 @@ namespace VillageGUI.Interface.Windows
       _villagerId = villagerId;
 
       _queueSection.Items = _gameManagers.ItemManager.QueuedItems
-        .Where(c => c.CrafterId == villagerId)
+        .Where(c => c.VillagerId == villagerId)
         .Select(c => GetQueueButton(c)).ToList();
 
       SetSectionPositions(_itemSection);
@@ -374,13 +352,13 @@ namespace VillageGUI.Interface.Windows
       Console.WriteLine($"Item button '{button.Item.Name}' clicked");
 
       Item = button.Item;
-      Item.CrafterId = _villagerId;
+      Item.VillagerId = _villagerId;
 
       if (Resources.CanAfford(_gameManagers.ItemManager.Resources, Item.ResourceCost))
         _gameManagers.ItemManager.AddToQueue(Item.Clone() as ItemV2);
 
       _queueSection.Items = _gameManagers.ItemManager.QueuedItems
-        .Where(c => c.CrafterId == _villagerId)
+        .Where(c => c.VillagerId == _villagerId)
         .Select(c => GetQueueButton(c)).ToList();
 
       SetSectionPositions(_queueSection);
@@ -395,7 +373,7 @@ namespace VillageGUI.Interface.Windows
       _gameManagers.ItemManager.QueuedItems.Remove(Item);
 
       _queueSection.Items = _gameManagers.ItemManager.QueuedItems
-        .Where(c => c.CrafterId == _villagerId)
+        .Where(c => c.VillagerId == _villagerId)
         .Select(c => GetQueueButton(c)).ToList();
 
       SetSectionPositions(_queueSection);

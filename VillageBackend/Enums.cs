@@ -27,5 +27,22 @@ namespace VillageBackend
       Silver,
       Gold,
     }
+
+    public enum BuildingStates
+    {
+      Placing,
+      Placed,
+      Constructing,
+      Built,
+      Demolishing,
+    }
+
+    public enum BuildingTypes
+    {
+      Housing,
+      Labour,
+      Arts,
+      Misc,
+    }
   }
 }

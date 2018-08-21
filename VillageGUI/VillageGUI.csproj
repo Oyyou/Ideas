@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Game1.cs" />
     <Compile Include="GameScreen.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="Interface\Buttons\Button.cs" />
     <Compile Include="Interface\Buttons\ItemButton.cs" />
     <Compile Include="Interface\Buttons\JobButton.cs" />
@@ -51,14 +52,17 @@
     <Compile Include="Interface\Buttons\VillagerButton.cs" />
     <Compile Include="Interface\Buttons\VillagerInfoButton.cs" />
     <Compile Include="Interface\Control.cs" />
+    <Compile Include="Interface\Panels\SquadPanel.cs" />
     <Compile Include="Interface\Panels\VillagerInformationPanel.cs" />
     <Compile Include="Interface\Scrollbar.cs" />
     <Compile Include="Interface\Toolbar.cs" />
     <Compile Include="Interface\Buttons\ToolbarButton.cs" />
+    <Compile Include="Interface\Windows\BuildWindow.cs" />
     <Compile Include="Interface\Windows\CraftingWindow.cs" />
     <Compile Include="Interface\Windows\InventoryWindow.cs" />
     <Compile Include="Interface\Windows\JobsWindow.cs" />
     <Compile Include="Interface\Windows\QueueWindow.cs" />
+    <Compile Include="Interface\Windows\SquadWindow.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -94,6 +98,7 @@
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <PropertyGroup>
     <PreBuildEvent>if not exist $(TargetDir)\Content mkdir $(TargetDir)\Content
+
 if not exist $(TargetDir)\Content\Items mkdir $(TargetDir)\Content\Items
 xcopy "$(SolutionDir)VillageBackend\Content\*.json" "$(TargetDir)\Content\Items" /Y</PreBuildEvent>
   </PropertyGroup>

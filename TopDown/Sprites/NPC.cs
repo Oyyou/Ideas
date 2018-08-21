@@ -158,19 +158,22 @@ namespace TopDown.Sprites
     public void AssignJob()
     {
       if (this.Villager.JobId == null)
-        return;
+        return;      
 
-      var jb = _gameScreen.BuildingComponents.Where(c => c.Job.Id == this.Villager.JobId.Value).FirstOrDefault();
-
-      _walkingPath.Clear();
+      var jb = _gameScreen.BuildingComponents.Where(c => c.Job != null && c.Job.Id == this.Villager.JobId.Value).FirstOrDefault();
 
       Workplace = jb;
+
+      if (Work == Workplace.Work)
+        return;
 
       Job = Workplace.Name;
 
       Work = Workplace.Work;
       Construct = null;
       Demolish = null;
+
+      _walkingPath.Clear();
     }
 
     protected override void SetAnimation()
@@ -251,6 +254,8 @@ namespace TopDown.Sprites
           _walkingPath.RemoveAt(0);
       }
 
+      //Villager.IsAtWork = false;
+
       var isWorkHours = _gameScreen.Time.Hour >= 8 && _gameScreen.Time.Hour < 17;
       var goWork = Work != null && isWorkHours;
       var build = Construct != null && isWorkHours;
@@ -288,16 +293,14 @@ namespace TopDown.Sprites
     public void WalkTo(Vector2 target)
     {
       if (Position == target)
-      {
-        return;
-      }
+        return;      
 
       if (_walkingPath.Count == 0)
         _walkingPath = _gameScreen.PathFinder.FindPath(Position, target);
 
       var targetPosition = _walkingPath.Count > 0 ? _walkingPath.FirstOrDefault() : Position;
 
-      var speed = 1f * Engine.States.State.GameSpeed;
+      var speed = 1f;// * Engine.States.State.GameSpeed;
 
       //while ((Position.X + speed) % speed != 0)
       //  speed--;

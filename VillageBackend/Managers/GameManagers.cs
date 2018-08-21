@@ -12,6 +12,8 @@ namespace VillageBackend.Managers
 
     public JobManager JobManager { get; set; }
 
+    public SquadManager SquadManager { get; set; }
+
     public VillagerManager VillagerManager { get; set; }
   }
 }

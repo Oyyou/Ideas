@@ -14,7 +14,7 @@ namespace VillageBackend.Models
     /// <summary>
     /// The id of the villager who crafted the item
     /// </summary>
-    public int CrafterId { get; set; }
+    public int VillagerId { get; set; }
     
     /// <summary>
     /// The amount of time spent crafting the item

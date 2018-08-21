@@ -60,9 +60,12 @@ namespace VillageBackend.Managers
 		
 		public void Update(GameTime gameTime)
 		{
-			foreach (var items in QueuedItems.GroupBy(c => c.CrafterId))
+			foreach (var items in QueuedItems.GroupBy(c => c.VillagerId))
 			{
 				var firstItem = items.FirstOrDefault();
+
+        if (!_gameManagers.VillagerManager.GetById(firstItem.VillagerId).IsAtWork)
+          continue;
 				
 				if (firstItem != null)
 				{
@@ -70,6 +73,8 @@ namespace VillageBackend.Managers
 					
 					if (firstItem.CraftingTime >= firstItem.CraftTime)
 					{
+            _gameManagers.VillagerManager.ApplyExerience(firstItem.VillagerId, firstItem.ExperienceValue);
+
 						Items.Add(firstItem);
 						QueuedItems.Remove(firstItem);
 					}

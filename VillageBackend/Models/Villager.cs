@@ -25,6 +25,10 @@ namespace VillageBackend.Models
 
     public int? JobId { get; set; }
 
+    public float Experience { get; set; }
+
+    public bool IsAtWork { get; set; }
+
     public Villager()
     {
       _ids++;

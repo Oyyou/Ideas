@@ -33,6 +33,7 @@ namespace TopDown.Sprites
 
     public Chicken(Dictionary<string, Animation> animations) : base(animations)
     {
+      DoSomething();
     }
 
     public override void Update(GameTime gameTime)
@@ -43,39 +44,38 @@ namespace TopDown.Sprites
         _startPosition = Position;
 
       if (_timer > 5f)
-      {
-        var value = GameEngine.Random.Next(0, 3);
-
-        switch (value)
-        {
-          case 0:
-            Velocity = Vector2.Zero;
-            _animationManager.Play(_animations["Peck"]);
-            _timer = 3f;
-            break;
-
-          case 1:
-            Walk();
-            _timer = 0f;
-
-            break;
-
-          case 2:
-            Velocity = Vector2.Zero;
-            _animationManager.Stop();
-            _timer = 0f;
-            break;
-        }
-      }
+        DoSomething();
 
       if (_animationManager != null)
         _animationManager.Update(gameTime);
 
-      var newPos = Position + Velocity;
+      ClampPosition();
+    }
 
-      var area = 32;
+    private void DoSomething()
+    {
+      var value = GameEngine.Random.Next(0, 3);
 
-      Position = Vector2.Clamp(newPos, _startPosition.Value - new Vector2(area, area), _startPosition.Value + new Vector2(area, area));
+      switch (value)
+      {
+        case 0:
+          Velocity = Vector2.Zero;
+          _animationManager.Play(_animations["Peck"]);
+          _timer = 3f;
+          break;
+
+        case 1:
+          Walk();
+          _timer = 0f;
+
+          break;
+
+        case 2:
+          Velocity = Vector2.Zero;
+          _animationManager.Stop();
+          _timer = 0f;
+          break;
+      }
     }
 
     private void Walk()
@@ -91,6 +91,15 @@ namespace TopDown.Sprites
         _animationManager.SpriteEffect = Microsoft.Xna.Framework.Graphics.SpriteEffects.FlipHorizontally;
       else if (Velocity.X > 0)
         _animationManager.SpriteEffect = Microsoft.Xna.Framework.Graphics.SpriteEffects.None;
+    }
+
+    private void ClampPosition()
+    {
+      var newPos = Position + Velocity;
+
+      var area = 32;
+
+      Position = Vector2.Clamp(newPos, _startPosition.Value - new Vector2(area, area), _startPosition.Value + new Vector2(area, area));
     }
   }
 }

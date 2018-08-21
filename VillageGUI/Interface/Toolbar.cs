@@ -40,6 +40,10 @@ namespace VillageGUI.Interface
 
       _buttons = new List<ToolbarButton>()
       {
+        new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Build"), Keys.B)
+        {
+          Click = Build_Click
+        },
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Map"), Keys.M),
         new ToolbarButton(content.Load<Texture2D>("Interface/ToolbarIcons/Squad"), Keys.S)
         {
@@ -60,6 +64,11 @@ namespace VillageGUI.Interface
       };
 
       SetButtonPositions();
+    }
+
+    private void Build_Click(Button obj)
+    {
+      _state.OpenWindow("Build");
     }
 
     private void Inventory_Click(Button obj)
@@ -215,7 +224,7 @@ namespace VillageGUI.Interface
 
     private void Squad_Click(object sender)
     {
-      //_game.OpenWindow(new Window(_content));
+      _state.OpenWindow("Squads");
     }
 
     public void UnloadContent()

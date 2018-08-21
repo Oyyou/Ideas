@@ -125,22 +125,6 @@ namespace TopDown.Buildings.Labour
       };
     }
 
-    private void CraftItem(NPC npc, GameTime gameTime)
-    {
-      npc.CraftingItem.CraftingTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-      if (npc.CraftingItem.CraftingTime >= npc.CraftingItem.CraftTime)
-      {
-        _gameScreen.Notifications.Add(_gameScreen.Time, $"{npc.CraftingItem.Name} crafted by {npc.Name} at [BlacksmitheryName]");
-
-        npc.Skills.Blacksmith.Experience += npc.CraftingItem.ExperienceValue;
-
-        _gameScreen.InventoryItems.Add(npc.CraftingItem);
-        npc.CraftingItems.Remove(npc.CraftingItem);
-        npc.CraftingItem = null;
-      }
-    }
-
     public override void LoadContent(ContentManager content)
     {
       base.LoadContent(content);
@@ -204,23 +188,7 @@ namespace TopDown.Buildings.Labour
       }
       else
       {
-        if (npc.CraftingItem != null)
-        {
-          CraftItem(npc, gameTime);
-        }
-        else
-        {
-          if (npc.CraftingItems.Count > 0)
-          {
-            // Assign the first item in the queue to the NPC
-            npc.CraftingItem = npc.CraftingItems.First();
-          }
-
-          if (npc.CraftingItem != null)
-          {
-            CraftItem(npc, gameTime);
-          }
-        }
+        npc.Villager.IsAtWork = true;
       }
     }
   }

@@ -49,11 +49,8 @@
     <Compile Include="Buildings\Labour\Farm.cs" />
     <Compile Include="Buildings\Labour\Mine.cs" />
     <Compile Include="Buildings\OptionsButton.cs" />
-    <Compile Include="Controls\CraftingMenu\CraftingMenuSubButton.cs" />
-    <Compile Include="Controls\CraftingMenu\CraftingMenuWindow.cs" />
     <Compile Include="Controls\GameSpeedController.cs" />
     <Compile Include="Controls\InspectMenu\InspectMenuWindow.cs" />
-    <Compile Include="Controls\InventoryMenu\InventoryMenuWindow.cs" />
     <Compile Include="Controls\MenuWindow.cs" />
     <Compile Include="Controls\Notifications.cs" />
     <Compile Include="Controls\Toolbars\Toolbar.cs" />
@@ -80,7 +77,6 @@
     <Compile Include="Items\Item.cs" />
     <Compile Include="Logic\Pathfinder.cs" />
     <Compile Include="ItemStats\ItemStats.cs" />
-    <Compile Include="Managers\ExperienceManager.cs" />
     <Compile Include="Skills\Skill.cs" />
     <Compile Include="Skills\Skills.cs" />
     <Compile Include="ItemStats\WeaponStats.cs" />
@@ -134,6 +130,7 @@
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <PropertyGroup>
     <PreBuildEvent>if not exist $(TargetDir)\Content mkdir $(TargetDir)\Content
+
 if not exist $(TargetDir)\Content\Items mkdir $(TargetDir)\Content\Items
 xcopy "$(SolutionDir)VillageBackend\Content\*.json" "$(TargetDir)\Content\Items" /Y</PreBuildEvent>
   </PropertyGroup>

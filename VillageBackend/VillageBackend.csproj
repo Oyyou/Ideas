@@ -46,11 +46,13 @@
     <Compile Include="Managers\GameManagers.cs" />
     <Compile Include="Managers\ItemManager.cs" />
     <Compile Include="Managers\JobManager.cs" />
+    <Compile Include="Managers\SquadManager.cs" />
     <Compile Include="Managers\VillagerManager.cs" />
     <Compile Include="Models\Armour.cs" />
     <Compile Include="Models\ItemV2.cs" />
     <Compile Include="Models\Job.cs" />
     <Compile Include="Models\Resources.cs" />
+    <Compile Include="Models\Squad.cs" />
     <Compile Include="Models\Villager.cs" />
     <Compile Include="Models\Weapon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,6 +69,12 @@
     <None Include="Content\Weapon.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.csproj">
+      <Project>{7fb609dd-9800-434e-9a22-b617e9c8cb81}</Project>
+      <Name>Engine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />

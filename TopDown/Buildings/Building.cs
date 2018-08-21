@@ -440,7 +440,7 @@ namespace TopDown.Buildings
 
           State = BuildingStates.Built;
           OnBuilt();
-          //_gameScreen.State = States.GameStates.Playing;
+
           _gameScreen.UpdateMap();
           npc.Construct -= this.Construct;
         }

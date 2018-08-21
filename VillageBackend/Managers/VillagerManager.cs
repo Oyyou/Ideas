@@ -32,6 +32,16 @@ namespace VillageBackend.Managers
         Villagers.Remove(villager);
     }
 
+    public void ApplyExerience(int villagerId, float value)
+    {
+      var villager = GetById(villagerId);
+
+      if (villager == null)
+        return;
+
+      villager.Experience += value;
+    }
+
     public void AssignJob(Villager villager, Job job)
     {
       foreach (var v in Villagers)
@@ -67,6 +77,11 @@ namespace VillageBackend.Managers
           villager.JobId = null;
         }
       }
+    }
+
+    public Villager GetById(int villagerId)
+    {
+      return Villagers.Where(c => c.Id == villagerId).FirstOrDefault();
     }
   }
 }
