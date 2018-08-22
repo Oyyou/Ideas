@@ -61,7 +61,6 @@
     <Compile Include="Interface\Windows\CraftingWindow.cs" />
     <Compile Include="Interface\Windows\InventoryWindow.cs" />
     <Compile Include="Interface\Windows\JobsWindow.cs" />
-    <Compile Include="Interface\Windows\QueueWindow.cs" />
     <Compile Include="Interface\Windows\SquadWindow.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,16 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TopDown.Furnitures;
 using TopDown.States;
 
 namespace TopDown.Buildings.Housing
 {
   public class SmallHouse : Building
   {
+    private Texture2D _bedTexture;
+
     public const int MaxResidents = 2;
 
     public int ResidentCount { get; set; }
@@ -76,6 +80,13 @@ namespace TopDown.Buildings.Housing
     {
     }
 
+    public override void LoadContent(ContentManager content)
+    {
+      base.LoadContent(content);
+
+      _bedTexture = content.Load<Texture2D>("Furniture/Bed");
+    }
+
     protected override void SetDoorLocations()
     {
       DoorLocations = new List<DoorLocation>()
@@ -86,6 +97,15 @@ namespace TopDown.Buildings.Housing
           IsValid = false,
         },
       };
+    }
+
+    public override void OnBuilt()
+    {
+      Components.Add(new Bed(_bedTexture, _gameScreen)
+      {
+        State = PlacableObjectStates.Placed,
+        Position = Position + new Vector2(64, 0),
+      });
     }
   }
 }

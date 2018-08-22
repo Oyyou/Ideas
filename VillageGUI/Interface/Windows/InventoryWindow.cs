@@ -1,4 +1,5 @@
-﻿using Engine.Input;
+﻿using Engine;
+using Engine.Input;
 using Engine.Interface.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -40,7 +41,17 @@ namespace VillageGUI.Interface.Windows
 
       Name = "Inventory";
 
-      Texture = content.Load<Texture2D>("Interface/Window2x_1y");
+      var width = GameEngine.ScreenWidth - 20;
+      var height = GameEngine.ScreenHeight - 20 - 100;
+
+      Texture = new Texture2D(graphicsDevice, width, height);// content.Load<Texture2D>("Interface/Window2x_1y");
+
+      var outerTexture = new Texture2D(graphicsDevice, 20, height - 35 - 10); // 35 is space at top, 10 is space at bottom
+      var innerTexture = new Texture2D(graphicsDevice, 14, 1);
+
+      Helpers.SetTexture(Texture, new Color(43, 43, 43, 200), new Color(0, 0, 0, 200));
+      Helpers.SetTexture(outerTexture, new Color(43, 43, 43), new Color(0, 0, 0));
+      Helpers.SetTexture(innerTexture, new Color(69, 69, 69), new Color(0, 0, 0), 0);
 
       _buttonTexture = content.Load<Texture2D>("Interface/Button");
       _buttonFont = content.Load<SpriteFont>("Fonts/Font");
@@ -49,7 +60,7 @@ namespace VillageGUI.Interface.Windows
 
       _leftSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content)
+        Scrollbar = new Scrollbar(outerTexture, innerTexture)
         {
           Layer = this.Layer + 0.01f,
         },
@@ -65,7 +76,7 @@ namespace VillageGUI.Interface.Windows
 
       _rightSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content)
+        Scrollbar = new Scrollbar(outerTexture, innerTexture)
         {
           Layer = this.Layer + 0.01f,
         },
@@ -83,7 +94,7 @@ namespace VillageGUI.Interface.Windows
         .Where(c => c.Category == category)
         .Select(c => GetItemButton(c)).ToList();
 
-      SetItemsPositions();
+      SetSectionPositions(_rightSection);
     }
 
     private ItemButton GetItemButton(ItemV2 item)
@@ -106,11 +117,20 @@ namespace VillageGUI.Interface.Windows
 
     public override void SetPositions()
     {
-      Position = new Vector2((Game1.ScreenWidth / 2) - (WindowRectangle.Width / 2),
-        Game1.ScreenHeight - Texture.Height - 100);
+      var screenWidth = Game1.ScreenWidth;
+      var screenHeight = Game1.ScreenHeight;
 
-      _leftSection.Area = new Rectangle((int)Position.X, (int)Position.Y + 35, 190, Texture.Height - 35);
-      _leftSection.Scrollbar.Position = new Vector2((Position.X + 170), Position.Y + 35);
+      Position = new Vector2((screenWidth / 2) - (WindowRectangle.Width / 2), 10);
+
+      var sectionY = (int)Position.Y + 35;
+
+      var height = Texture.Height - 35 - 10;
+
+      _leftSection.Area = new Rectangle((int)Position.X, sectionY, 190, height);
+      _leftSection.Scrollbar.Position = new Vector2(_leftSection.Area.X + _leftSection.Area.Width - 20, sectionY);
+
+      _rightSection.Area = new Rectangle(_leftSection.Area.Right, sectionY, Texture.Width - _leftSection.Area.Width - 10, height);
+      _rightSection.Scrollbar.Position = new Vector2(_rightSection.Area.X + _rightSection.Area.Width - 20, sectionY);
 
       var x = 10 + (_leftSection.Items.FirstOrDefault().Rectangle.Width / 2);
       var y = (_leftSection.Area.Y + (_leftSection.Items.FirstOrDefault().Rectangle.Height / 2)) + 3;
@@ -121,32 +141,35 @@ namespace VillageGUI.Interface.Windows
         y += item.Rectangle.Height + 5;
       }
 
-      _rightSection.Area = new Rectangle((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
-      _rightSection.Scrollbar.Position = new Vector2((Position.X + Texture.Width) - 20 - 10, Position.Y + 35);
-
-      SetItemsPositions();
+      SetSectionPositions(_leftSection);
+      SetSectionPositions(_rightSection);
     }
 
-    private void SetItemsPositions()
+    private void SetSectionPositions(WindowSection section)
     {
-      if (_rightSection.Items.Count() > 0)
+      if (section.Items == null)
+        return;
+
+      if (section.Items.Count() == 0)
+        return;
+
+      var spaceBetween = 10;
+
+      var buttonHeight = section.Items.FirstOrDefault().Rectangle.Height;
+      var buttonWidth = section.Items.FirstOrDefault().Rectangle.Width;
+
+      var x = spaceBetween + (buttonWidth / 2);
+      var y = (section.Area.Y + (buttonHeight / 2)) + 3;
+
+      foreach (var button in section.Items)
       {
-        var buttonHeight = _rightSection.Items.FirstOrDefault().Rectangle.Height;
-        var buttonWidth = _rightSection.Items.FirstOrDefault().Rectangle.Width;
+        button.Position = new Vector2(x, y);
+        x += button.Rectangle.Width + spaceBetween;
 
-        var x = 10 + (buttonWidth / 2);
-        var y = (_rightSection.Area.Y + (buttonHeight / 2)) + 3;
-
-        foreach (var button in _rightSection.Items)
+        if ((x + (button.Rectangle.Width / 2)) > (section.Area.Right) - 30)
         {
-          button.Position = new Vector2(x, y);
-          x += button.Rectangle.Width + 10;
-
-          if ((x + (button.Rectangle.Width / 2)) > (_rightSection.Area.X))
-          {
-            x = 10 + (buttonWidth / 2);
-            y += buttonHeight + 10;
-          }
+          x = spaceBetween + (buttonWidth / 2);
+          y += buttonHeight + spaceBetween;
         }
       }
     }

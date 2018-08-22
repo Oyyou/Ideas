@@ -427,7 +427,7 @@ namespace VillageGUI.Interface.Windows
         button.Position = new Vector2(x, y);
         x += button.Rectangle.Width + _spaceBetween;
 
-        if ((x + (button.Rectangle.Width / 2)) > (section.Area.Width) - 30)
+        if ((x + (button.Rectangle.Width / 2)) > (section.Area.Right) - 30)
         {
           x = _spaceBetween + (buttonWidth / 2);
           y += buttonHeight + _spaceBetween;

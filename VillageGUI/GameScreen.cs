@@ -75,7 +75,7 @@ namespace VillageGUI
       {
         new BuildWindow(_content, _graphicsDevice, _gameManagers),
         new CraftingWindow(_content, _graphicsDevice, _gameManagers),
-        new JobsWindow(_content, _gameManagers),
+        new JobsWindow(_content, _graphicsDevice, _gameManagers),
         new InventoryWindow(_content, _graphicsDevice, _gameManagers.ItemManager),
         new SquadWindow(_content, _graphicsDevice, _gameManagers.SquadManager),
       };

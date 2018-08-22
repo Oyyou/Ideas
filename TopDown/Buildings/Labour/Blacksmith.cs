@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TopDown.Furnitures;
 using TopDown.Sprites;
 using TopDown.States;
 using VillageBackend.Models;
@@ -115,6 +116,8 @@ namespace TopDown.Buildings.Labour
       }
     }
 
+    private Texture2D _anvilTexture;
+
     public Blacksmith(GameScreen gameState, Texture2D textureInside, Texture2D textureOutsideTop, Texture2D textureOutsideBottom) : base(gameState, textureInside, textureOutsideTop, textureOutsideBottom)
     {
       Name = "Blacksmith";
@@ -136,6 +139,8 @@ namespace TopDown.Buildings.Labour
         _fireButton,
         _hireButton,
       };
+
+      _anvilTexture = content.Load<Texture2D>("Furniture/Anvil");
 
       foreach (var button in _buttons)
         button.LoadContent(content);
@@ -171,6 +176,15 @@ namespace TopDown.Buildings.Labour
           IsValid = false,
         },
       };
+    }
+
+    public override void OnBuilt()
+    {
+      Components.Add(new Furniture(_anvilTexture, _gameScreen)
+      {
+        State = PlacableObjectStates.Placed,
+        Position = this.Position + new Vector2(64, 64),
+      });
     }
 
     public override void Work(NPC npc, GameTime gameTime)

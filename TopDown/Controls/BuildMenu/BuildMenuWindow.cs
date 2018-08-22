@@ -190,120 +190,11 @@ namespace TopDown.Controls.BuildMenu
         },
       };
 
-      var bed = new ItemMenuButton(_mainButtonTexture, _font)
-      {
-        Text = "Bed",
-        Parent = smallHouse,
-        IsRequired = true,
-        PlacingObject = new Bed(_content.Load<Texture2D>("Furniture/Bed"), _gameScreen)
-        {
-          State = PlacableObjectStates.Placing,
-          Position = GameScreen.Mouse.PositionWithCamera,
-        },
-      };
-
-      bed.Click += Item_Click;
-
-      var toilet = new ItemMenuButton(_mainButtonTexture, _font)
-      {
-        Text = "Toilet",
-        Parent = smallHouse,
-        PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Toilet"), _gameScreen)
-        {
-          State = PlacableObjectStates.Placing,
-          Position = GameScreen.Mouse.PositionWithCamera,
-        },
-      };
-
-      toilet.Click += Item_Click;
-
-      smallHouse.Items = new List<ItemMenuButton>()
-      {
-        bed,
-        toilet,
-      };
+      smallHouse.Items = new List<ItemMenuButton>();
 
       smallHouse.Click += SubButton_Click;
 
       return smallHouse;
-    }
-
-    private BuildMenuSubButton GetTavern()
-    {
-      var tavern = new BuildMenuSubButton(_subButtonTexture, _font)
-      {
-        Building = new Tavern(_gameScreen, _content.Load<Texture2D>("Buildings/Tavern/In"), _content.Load<Texture2D>("Buildings/Tavern/Out_Top"), _content.Load<Texture2D>("Buildings/Tavern/Out_Bottom"))
-        {
-          State = Buildings.BuildingStates.Placing,
-        },
-        Text = "Tavern",
-        Layer = 0.99f,
-        GameScreenSetValue = States.GameStates.PlacingBuilding,
-        ResourceCost = new VillageBackend.Models.Resources()
-        {
-          Food = 5,
-          Gold = 1,
-          Wood = 10,
-          Stone = 10,
-        },
-      };
-
-      var bar = new ItemMenuButton(_mainButtonTexture, _font)
-      {
-        Amount = 1,
-        Text = "Bar",
-        Parent = tavern,
-        PlacingObject = new Bar(_content.Load<Texture2D>("Furniture/Bar"), _gameScreen)
-        {
-          State = PlacableObjectStates.Placing,
-          Position = GameScreen.Mouse.PositionWithCamera,
-        },
-        CollisionRectangles = new List<Rectangle>()
-        {
-          new Rectangle()
-        },
-      };
-
-      bar.Click += Item_Click;
-
-      var stool = new ItemMenuButton(_mainButtonTexture, _font)
-      {
-        Amount = 9,
-        Text = "Stool",
-        Parent = tavern,
-        PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Stool"), _gameScreen)
-        {
-          State = PlacableObjectStates.Placing,
-          Position = GameScreen.Mouse.PositionWithCamera,
-        },
-      };
-
-      stool.Click += Item_Click;
-
-      var booth = new ItemMenuButton(_mainButtonTexture, _font)
-      {
-        Amount = 2,
-        Text = "Booth",
-        Parent = tavern,
-        PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Booth"), _gameScreen)
-        {
-          State = PlacableObjectStates.Placing,
-          Position = GameScreen.Mouse.PositionWithCamera,
-        },
-      };
-
-      booth.Click += Item_Click;
-
-      tavern.Items = new List<ItemMenuButton>()
-      {
-        bar,
-        stool,
-        booth,
-      };
-
-      tavern.Click += SubButton_Click;
-
-      return tavern;
     }
 
     private void SubButton_Click(object sender, EventArgs e)
@@ -341,24 +232,7 @@ namespace TopDown.Controls.BuildMenu
 
       blacksmith.Click += SubButton_Click;
 
-      var anvil = new ItemMenuButton(_mainButtonTexture, _font)
-      {
-        Text = "Anvil",
-        Parent = blacksmith,
-        //Layer = _background.Layer + 0.01f,
-        PlacingObject = new Furniture(_content.Load<Texture2D>("Furniture/Anvil"), _gameScreen)
-        {
-          State = PlacableObjectStates.Placing,
-          Position = GameScreen.Mouse.PositionWithCamera,
-        },
-      };
-
-      anvil.Click += Item_Click;
-
-      blacksmith.Items = new List<ItemMenuButton>()
-      {
-        anvil,
-      };
+      blacksmith.Items = new List<ItemMenuButton>();
 
       var farm = new BuildMenuSubButton(_subButtonTexture, _font)
       {
@@ -449,30 +323,10 @@ namespace TopDown.Controls.BuildMenu
 
       labourButton.Click += LabourButton_Click;
 
-      var artsButton = new Button(_mainButtonTexture, _font)
-      {
-        Text = "Arts",
-        Position = new Vector2(labourButton.Position.X, labourButton.Rectangle.Bottom + 5),
-        Layer = 0.99f
-      };
-
-      artsButton.Click += ArtsButton_Click;
-
-      var miscButton = new Button(_mainButtonTexture, _font)
-      {
-        Text = "Misc",
-        Position = new Vector2(artsButton.Position.X, artsButton.Rectangle.Bottom + 5),
-        Layer = 0.99f
-      };
-
-      miscButton.Click += MiscButton_Click;
-
       _buttons = new List<Button>()
       {
         housingButton,
         labourButton,
-        artsButton,
-        miscButton,
       };
 
       foreach (var button in _buttons)

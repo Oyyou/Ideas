@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using VillageBackend.Managers;
 using Engine.Input;
 using VillageGUI.Interface.Panels;
+using Engine;
 
 namespace VillageGUI.Interface.Windows
 {
@@ -34,14 +35,24 @@ namespace VillageGUI.Interface.Windows
     private WindowSection _villagerSection;
     #endregion
 
-    public JobsWindow(ContentManager content, GameManagers gameManager)
+    public JobsWindow(ContentManager content, GraphicsDevice graphicsDevice, GameManagers gameManager)
       : base(content)
     {
       _gameManagers = gameManager;
 
       Name = "Jobs";
 
-      Texture = content.Load<Texture2D>("Interface/Window2x_1y");
+      var width = GameEngine.ScreenWidth - 20;
+      var height = GameEngine.ScreenHeight - 20 - 100;
+
+      Texture = new Texture2D(graphicsDevice, width, height);// content.Load<Texture2D>("Interface/Window2x_1y");
+
+      var outerTexture = new Texture2D(graphicsDevice, 20, height - 35 - 10); // 35 is space at top, 10 is space at bottom
+      var innerTexture = new Texture2D(graphicsDevice, 14, 1);
+
+      Helpers.SetTexture(Texture, new Color(43, 43, 43, 200), new Color(0, 0, 0, 200));
+      Helpers.SetTexture(outerTexture, new Color(43, 43, 43), new Color(0, 0, 0));
+      Helpers.SetTexture(innerTexture, new Color(69, 69, 69), new Color(0, 0, 0), 0);
 
       _buttonTexture = content.Load<Texture2D>("Interface/Button");
       _buttonFont = content.Load<SpriteFont>("Fonts/Font");
@@ -53,7 +64,7 @@ namespace VillageGUI.Interface.Windows
 
       _jobsSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content)
+        Scrollbar = new Scrollbar(outerTexture, innerTexture)
         {
           Layer = this.Layer + 0.01f,
         },
@@ -74,7 +85,7 @@ namespace VillageGUI.Interface.Windows
 
       _villagerSection = new WindowSection()
       {
-        Scrollbar = new Scrollbar(content)
+        Scrollbar = new Scrollbar(outerTexture, innerTexture)
         {
           Layer = this.Layer + 0.01f,
         },
@@ -134,11 +145,20 @@ namespace VillageGUI.Interface.Windows
 
     public override void SetPositions()
     {
-      Position = new Vector2((Game1.ScreenWidth / 2) - (WindowRectangle.Width / 2),
-        Game1.ScreenHeight - Texture.Height - 100);
+      var screenWidth = Game1.ScreenWidth;
+      var screenHeight = Game1.ScreenHeight;
 
-      _jobsSection.Area = new Rectangle((int)Position.X, (int)Position.Y + 35, 190, Texture.Height - 35);
-      _jobsSection.Scrollbar.Position = new Vector2((Position.X + 170), Position.Y + 35);
+      Position = new Vector2((screenWidth / 2) - (WindowRectangle.Width / 2), 10);
+
+      var sectionY = (int)Position.Y + 35;
+
+      var height = Texture.Height - 35 - 10;
+
+      _jobsSection.Area = new Rectangle((int)Position.X, sectionY, 190, height);
+      _jobsSection.Scrollbar.Position = new Vector2(_jobsSection.Area.X + _jobsSection.Area.Width - 20, sectionY);
+
+      _villagerSection.Area = new Rectangle((int)Position.X + 190, sectionY, Texture.Width - _jobsSection.Area.Width - 10, height);
+      _villagerSection.Scrollbar.Position = new Vector2(_villagerSection.Area.X + _villagerSection.Area.Width - 20, sectionY);
 
       var jobItem = _jobsSection.Items.FirstOrDefault();
 
@@ -156,9 +176,6 @@ namespace VillageGUI.Interface.Windows
           y += item.Rectangle.Height + 5;
         }
       }
-
-      _villagerSection.Area = new Rectangle((int)Position.X + 190, (int)Position.Y + 35, Texture.Width - 170, Texture.Height - 35);
-      _villagerSection.Scrollbar.Position = new Vector2((Position.X + Texture.Width) - 20 - 10, Position.Y + 35);
 
       var villagerItem = _villagerSection.Items.FirstOrDefault();
 

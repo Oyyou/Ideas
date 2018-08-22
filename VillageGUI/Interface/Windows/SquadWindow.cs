@@ -75,10 +75,9 @@ namespace VillageGUI.Interface.Windows
 
       var height = Texture.Height - 35 - 10;
 
-      _squadSection.Area = new Rectangle((int)Position.X, y, Texture.Width - 20, height);
+      _squadSection.Area = new Rectangle((int)Position.X, y, Texture.Width - 10, height);
       _squadSection.Scrollbar.Position = new Vector2(_squadSection.Area.X + _squadSection.Area.Width - 20, y);
-
-
+      
       var t = _squadManager.Squads.Select(c => new SquadPanel(_content, _graphicsDevice, c, _squadSection)).ToList();
       t.Add(new SquadPanel(_content, _graphicsDevice, null, _squadSection));
 

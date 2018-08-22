@@ -134,7 +134,7 @@ namespace TopDown.Buildings.Labour
         npc.WalkTo(workPosition);
     }
 
-    protected override void OnBuilt()
+    public override void OnBuilt()
     {
       var chicken1 = _chickenPrefab.Clone() as Chicken;
       var chicken2 = _chickenPrefab.Clone() as Chicken;

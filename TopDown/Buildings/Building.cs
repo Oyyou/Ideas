@@ -451,7 +451,7 @@ namespace TopDown.Buildings
       }
     }
 
-    protected virtual void OnBuilt()
+    public virtual void OnBuilt()
     {
 
     }
