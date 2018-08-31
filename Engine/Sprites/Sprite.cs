@@ -18,6 +18,16 @@ namespace Engine.Sprites
     public string Type { get; set; }
 
     public string TexturePath { get; set; }
+
+    public Vector2 Position { get; set; }
+
+    public Color Colour { get; set; }
+
+    public float Rotation { get; set; }
+
+    public Vector2 Origin { get; set; }
+
+    public float Layer { get; set; }
   }
 
   public class Sprite : Component, ICloneable
@@ -29,6 +39,10 @@ namespace Engine.Sprites
     private Color _color;
 
     private float _layer;
+
+    private float _rotation;
+
+    private Vector2 _origin;
 
     private float _scale;
 
@@ -63,6 +77,8 @@ namespace Engine.Sprites
 
         if (_animationManager != null)
           _animationManager.Color = _color;
+
+        SO.Colour = _color;
       }
     }
 
@@ -75,12 +91,22 @@ namespace Engine.Sprites
 
         if (_animationManager != null)
           _animationManager.Layer = _layer;
+
+        SO.Layer = _layer;
       }
     }
 
     public float? LifeTimer;
 
-    public Vector2 Origin { get; set; }
+    public Vector2 Origin
+    {
+      get { return _origin; }
+      set
+      {
+        _origin = value;
+        SO.Origin = _origin;
+      }
+    }
 
     public override Vector2 Position
     {
@@ -91,10 +117,21 @@ namespace Engine.Sprites
 
         if (_animationManager != null)
           _animationManager.Position = value;
+
+        SO.Position = new Vector2(Rectangle.X, Rectangle.Y);
       }
     }
 
-    public float Rotation;
+    public float Rotation
+    {
+      get { return _rotation; }
+      set
+      {
+        _rotation = value;
+
+        SO.Rotation = value;
+      }
+    }
 
     public float Scale
     {
@@ -158,16 +195,16 @@ namespace Engine.Sprites
       SourceRectangle = new Rectangle(0, 0, _texture.Width, _texture.Height);
 
       Initialise();
-
-      SO = new SerializableObject()
-      {
-        Type = this.GetType().ToString(),
-        TexturePath = _texture.Name,
-      };
     }
 
     private void Initialise()
     {
+      SO = new SerializableObject()
+      {
+        Type = this.GetType().ToString(),
+        TexturePath = _texture != null ? _texture.Name : "",
+      };
+
       Components = new List<Component>();
 
       Color = Color.White;

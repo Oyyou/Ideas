@@ -31,6 +31,8 @@ using VillageBackend.Managers;
 using VillageBackend.Models;
 using static TopDown.Logic.Pathfinder;
 using Engine.Input;
+using Newtonsoft.Json;
+using System.Reflection;
 
 namespace TopDown.States
 {
@@ -142,8 +144,6 @@ namespace TopDown.States
     }
 
     public Pathfinder PathFinder;
-
-    //public TopDown.Sprites.Player Player { get; private set; }
 
     public VillageBackend.Models.Resources Resources { get; set; }
 
@@ -401,7 +401,7 @@ namespace TopDown.States
       {
         new BuildWindow(_content, _graphicsDevice, GameManagers),
         new CraftingWindow(_content, _graphicsDevice, GameManagers),
-        new JobsWindow(_content, GameManagers),
+        new JobsWindow(_content, _graphicsDevice, GameManagers),
         new InventoryWindow(_content, _graphicsDevice, GameManagers.ItemManager),
         new SquadWindow(_content, _graphicsDevice, GameManagers.SquadManager),
       };
@@ -475,11 +475,10 @@ namespace TopDown.States
 
               case 9:
                 GameComponents.Add(
-                  new Path(texture)
+                  new Path(_content.Load<Texture2D>("Sprites/Paths/StonePath"))
                   {
                     Layer = 0.1f,
                     Position = position,
-                    SourceRectangle = sourceRectangle,
                   }
                 );
                 break;
@@ -554,19 +553,20 @@ namespace TopDown.States
                 case "Building":
 
                   blacksmith.Position = position;
+                  blacksmith.OnBuilt();
 
                   break;
 
                 case "Anvil":
-                  var anvil = new Furniture(_content.Load<Texture2D>("Furniture/Anvil"), this)
-                  {
-                    Position = position,
-                    State = PlacableObjectStates.Placed,
-                  };
+                  //var anvil = new Furniture(_content.Load<Texture2D>("Furniture/Anvil"), this)
+                  //{
+                  //  Position = position,
+                  //  State = PlacableObjectStates.Placed,
+                  //};
 
-                  anvil.LoadContent(_content);
+                  //anvil.LoadContent(_content);
 
-                  blacksmith.Components.Add(anvil);
+                  //blacksmith.Components.Add(anvil);
 
                   break;
 
@@ -599,19 +599,11 @@ namespace TopDown.States
                 case "Building":
 
                   smallHouse.Position = position;
+                  smallHouse.OnBuilt();
 
                   break;
 
                 case "Bed":
-                  var bed = new Bed(_content.Load<Texture2D>("Furniture/Bed"), this)
-                  {
-                    Position = position,
-                    State = PlacableObjectStates.Placed,
-                  };
-
-                  bed.LoadContent(_content);
-
-                  smallHouse.Components.Add(bed);
 
                   break;
 
@@ -666,6 +658,74 @@ namespace TopDown.States
       var timeEnded = DateTime.Now.TimeOfDay;
 
       Console.WriteLine("Total load time: " + (timeEnded - timeStarted));
+
+      var jsonSettings = new JsonSerializerSettings()
+      {
+        //TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full,
+        //ObjectCreationHandling = ObjectCreationHandling.Replace,
+        //ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+        //MissingMemberHandling = MissingMemberHandling.Ignore,
+        //TypeNameHandling = TypeNameHandling.All,
+        Formatting = Formatting.Indented,
+        //PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+      };
+
+      var fileName = $"Test.json";
+
+      //SaveData(jsonSettings, fileName);
+
+      //LoadData(jsonSettings, fileName);
+    }
+
+    private void SaveData(JsonSerializerSettings jsonSettings, string fileName)
+    {
+      var gameComponenets = GameComponents.Where(c => c is Path).Cast<Sprite>().Select(c => c.SO).ToList();
+      var jsonFile = JsonConvert.SerializeObject(gameComponenets, Formatting.Indented, jsonSettings);
+
+      using (var str = new System.IO.StreamWriter(fileName))
+      {
+        str.Write(jsonFile);
+      }
+    }
+
+    private void LoadData(JsonSerializerSettings jsonSettings, string fileName)
+    {
+      var newComponents = JsonConvert.DeserializeObject<List<SerializableObject>>(System.IO.File.ReadAllText(fileName), jsonSettings);
+
+      foreach (var component in newComponents)
+      {
+        Assembly soAssembly = Assembly.Load("Engine");
+        Type soType = soAssembly.GetType("Engine.Sprites.SerializableObject");
+
+        var soObject = (SerializableObject)Activator.CreateInstance(soType);
+
+        Assembly spriteAssembly = Assembly.Load("TopDown");
+        Type spriteType = spriteAssembly.GetType(component.Type);
+
+        Sprite sprite = null;
+
+        switch (spriteType.Name)
+        {
+          case "Path":
+            sprite = (Path)Activator.CreateInstance(spriteType, _content.Load<Texture2D>(component.TexturePath));
+            break;
+
+          case "SmallHouse":
+
+            break;
+
+          default:
+            throw new Exception("Unexpected name: " + spriteType.Name);
+        }
+
+        sprite.Color = soObject.Colour;
+        sprite.Position = soObject.Position;
+        sprite.Rotation = soObject.Rotation;
+        sprite.Origin = soObject.Origin;
+        sprite.Layer = soObject.Layer;
+
+        GameComponents.Add(sprite);
+      }
     }
 
     private void MenuUpdate(GameTime gameTime, Keys? menuKey)

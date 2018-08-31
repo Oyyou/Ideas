@@ -104,7 +104,7 @@ namespace TopDown.Buildings.Housing
       Components.Add(new Bed(_bedTexture, _gameScreen)
       {
         State = PlacableObjectStates.Placed,
-        Position = Position + new Vector2(64, 0),
+        Position = Position + new Vector2(64, 32),
       });
     }
   }

@@ -51,6 +51,8 @@
     <Compile Include="Interface\Buttons\QueueButton.cs" />
     <Compile Include="Interface\Buttons\VillagerButton.cs" />
     <Compile Include="Interface\Buttons\VillagerInfoButton.cs" />
+    <Compile Include="Interface\Combat\HeroButton.cs" />
+    <Compile Include="Interface\Combat\HeroPanel.cs" />
     <Compile Include="Interface\Control.cs" />
     <Compile Include="Interface\Panels\SquadPanel.cs" />
     <Compile Include="Interface\Panels\VillagerInformationPanel.cs" />

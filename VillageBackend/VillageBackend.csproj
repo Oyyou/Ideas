@@ -43,12 +43,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
+    <Compile Include="Graphics\Sprite.cs" />
+    <Compile Include="Graphics\Hero.cs" />
     <Compile Include="Managers\GameManagers.cs" />
     <Compile Include="Managers\ItemManager.cs" />
     <Compile Include="Managers\JobManager.cs" />
     <Compile Include="Managers\SquadManager.cs" />
     <Compile Include="Managers\VillagerManager.cs" />
     <Compile Include="Models\Armour.cs" />
+    <Compile Include="Models\Building.cs" />
     <Compile Include="Models\ItemV2.cs" />
     <Compile Include="Models\Job.cs" />
     <Compile Include="Models\Resources.cs" />

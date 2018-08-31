@@ -1,20 +1,23 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CombatTest.Screens;
+using Engine;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using VillageBackend.Managers;
 
 namespace CombatTest
 {
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
-  public class Game1 : Game
+  public class Game1 : GameEngine
   {
-    GraphicsDeviceManager graphics;
-    SpriteBatch spriteBatch;
+    private GameManagers _gameManagers;
 
     public Game1()
     {
-      graphics = new GraphicsDeviceManager(this);
+      _graphics = new GraphicsDeviceManager(this);
       Content.RootDirectory = "Content";
     }
 
@@ -26,9 +29,43 @@ namespace CombatTest
     /// </summary>
     protected override void Initialize()
     {
-      // TODO: Add your initialization logic here
+      var height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
+
+      var width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+
+      _graphics.PreferredBackBufferHeight = Math.Max(height, 480);
+
+      _graphics.PreferredBackBufferWidth = Math.Max(width, 800);
+
+      _graphics.ApplyChanges();
+
+      ScreenHeight = _graphics.PreferredBackBufferHeight;
+
+      ScreenWidth = _graphics.PreferredBackBufferWidth;
+
+      ScreenRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
+
+      Window.ClientSizeChanged += Window_ClientSizeChanged;
+
+      Window.AllowUserResizing = false;
+
+      IsMouseVisible = true;
 
       base.Initialize();
+    }
+
+    private void Window_ClientSizeChanged(object sender, System.EventArgs e)
+    {
+      _graphics.PreferredBackBufferHeight = MathHelper.Clamp(_graphics.PreferredBackBufferHeight, 480, 1400);
+      _graphics.PreferredBackBufferWidth = MathHelper.Clamp(_graphics.PreferredBackBufferWidth, 800, 2560);
+      _graphics.ApplyChanges();
+
+      ScreenHeight = _graphics.PreferredBackBufferHeight;
+      ScreenWidth = _graphics.PreferredBackBufferWidth;
+
+      ScreenRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
+
+      _currentState.OnScreenResize();
     }
 
     /// <summary>
@@ -38,9 +75,34 @@ namespace CombatTest
     protected override void LoadContent()
     {
       // Create a new SpriteBatch, which can be used to draw textures.
-      spriteBatch = new SpriteBatch(GraphicsDevice);
+      _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-      // TODO: use this.Content to load your game content here
+      _gameModel = new Engine.Models.GameModel()
+      {
+        ContentManger = Content,
+        Game = this,
+        GraphicsDeviceManager = _graphics,
+        SpriteBatch = _spriteBatch,
+      };
+      
+      _gameManagers = new GameManagers();
+      _gameManagers.SquadManager = new SquadManager(_gameManagers);
+      _gameManagers.VillagerManager = new VillagerManager(_gameManagers);
+
+      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager());
+      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager());
+      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager());
+      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager());
+
+      _gameManagers.SquadManager.Add("Beta",
+        _gameManagers.VillagerManager.Villagers[0],
+        _gameManagers.VillagerManager.Villagers[1],
+        _gameManagers.VillagerManager.Villagers[2],
+        _gameManagers.VillagerManager.Villagers[3]);
+      
+      _currentState = new CombatScreen(_gameManagers.SquadManager.Squads[0]);
+
+      _currentState.LoadContent(_gameModel);
     }
 
     /// <summary>
@@ -59,10 +121,9 @@ namespace CombatTest
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Update(GameTime gameTime)
     {
-      if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-        Exit();
+      _currentState.Update(gameTime);
 
-      // TODO: Add your update logic here
+      _currentState.PostUpdate(gameTime);
 
       base.Update(gameTime);
     }
@@ -73,9 +134,7 @@ namespace CombatTest
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Draw(GameTime gameTime)
     {
-      GraphicsDevice.Clear(Color.CornflowerBlue);
-
-      // TODO: Add your drawing code here
+      _currentState.Draw(gameTime);
 
       base.Draw(gameTime);
     }

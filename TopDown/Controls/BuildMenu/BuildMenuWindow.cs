@@ -323,10 +323,19 @@ namespace TopDown.Controls.BuildMenu
 
       labourButton.Click += LabourButton_Click;
 
+      var miscButton = new Button(_mainButtonTexture, _font)
+      {
+        Text = "Misc",
+        Position = new Vector2(housingButton.Position.X, housingButton.Rectangle.Bottom + 5),
+        Layer = 0.99f
+      };
+
+      miscButton.Click += MiscButton_Click;
       _buttons = new List<Button>()
       {
         housingButton,
         labourButton,
+        miscButton,
       };
 
       foreach (var button in _buttons)

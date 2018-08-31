@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cameras\Camera_2D.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Controls\Button.cs" />
     <Compile Include="Controls\ComboBoxItem.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="GameEngine.cs" />
     <Compile Include="Input\GameMouse.cs" />
     <Compile Include="Input\IClickable.cs" />
+    <Compile Include="Logic\Pathfinder.cs" />
     <Compile Include="Managers\AnimationManager.cs" />
     <Compile Include="Models\Animation.cs" />
     <Compile Include="Models\GameModel.cs" />
