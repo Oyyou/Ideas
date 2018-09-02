@@ -14,6 +14,8 @@ namespace VillageBackend.Graphics
 
     protected Texture2D _texture;
 
+    public bool IsFixedLayer = false;
+
     public Vector2 Position { get; set; }
 
     public Rectangle Rectangle
@@ -31,6 +33,8 @@ namespace VillageBackend.Graphics
         return new Rectangle((int)Position.X, (int)Position.Y + 64, _texture.Width, _texture.Height - 64);
       }
     }
+
+    public Rectangle? SourceRectangle { get; set; } = null;
 
     public Color Colour { get; set; } = Color.White;
 
@@ -52,6 +56,29 @@ namespace VillageBackend.Graphics
       _texture = texture;
     }
 
+    public Sprite(Texture2D texture, int frameCount, int frameWidth, int frameHeight)
+      :this(texture)
+    {
+      SourceRectangle = GetSourceRectangle(texture, frameCount, frameWidth, frameHeight);
+    }
+
+    private Rectangle? GetSourceRectangle(Texture2D texture, int frameCount, int frameWidth, int frameHeight)
+    {
+      int index = 0;
+      for (int y = 0; y < texture.Height / frameHeight; y++)
+      {
+        for (int x = 0; x < texture.Width / frameWidth; x++)
+        {
+          if (index == frameCount)
+            return new Rectangle(x * frameWidth, y * frameHeight, frameWidth, frameHeight);
+
+          index++;
+        }
+      }
+
+      return null;
+    }
+
     public virtual void Update(GameTime gameTime)
     {
 
@@ -59,7 +86,7 @@ namespace VillageBackend.Graphics
 
     public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(_texture, Position, null, Colour * Opacity, 0f, Origin, 1f, SpriteEffects.None, GridRectangle.Y / 1000f);
+      spriteBatch.Draw(_texture, Position, SourceRectangle, Colour * Opacity, 0f, Origin, 1f, SpriteEffects.None, IsFixedLayer ? Layer : 0.3f + ((float)GridRectangle.Y / 1000f));
     }
   }
 }

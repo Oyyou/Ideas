@@ -5,17 +5,29 @@ using System.Linq;
 
 namespace Engine.Logic
 {
+  public enum PathStatus
+  {
+    Valid,
+    Invalid,
+  }
 
-  public class Pathfinder
+  public static class Pathfinder
   {
     /// <summary>
     /// Characters that we can walk on
     /// </summary>
-    private string _walkableCharacters = "0";
+    private static string _walkableCharacters = "0";
 
-    public List<Point> Find(char[,] map, Point start, Point end)
+    public static List<Point> Path { get; set; }
+
+    public static List<string> Errors { get; set; }
+
+    public static PathStatus Find(char[,] map, Point start, Point end)
     {
-      ValidatePositions(map, start, end);
+      var pathStatus = ValidatePositions(map, start, end);
+
+      if (pathStatus == PathStatus.Invalid)
+        return PathStatus.Invalid;
 
       // nodes that have already been analyzed and have a path from the start to them
       var closedSet = new List<Point>();
@@ -55,7 +67,9 @@ namespace Engine.Logic
         if (current.X == end.X && current.Y == end.Y)
         {
           // generate the found path
-          return ReconstructPath(cameFrom, end);
+          Path = ReconstructPath(cameFrom, end);
+
+          return PathStatus.Valid;
         }
 
         // move current node from open to closed
@@ -106,14 +120,18 @@ namespace Engine.Logic
         }
       }
 
+      Errors = new List<string>();
+
       // unable to figure out a path, abort.
-      throw new Exception(
+      Errors.Add(
           string.Format(
               "unable to find a path between ({0},{1}) and ({2},{3})",
               start.X, start.Y,
               end.X, end.Y
           )
       );
+
+      return PathStatus.Invalid;
     }
 
     /// <summary>
@@ -122,25 +140,47 @@ namespace Engine.Logic
     /// <param name="map">What we need to navigate through</param>
     /// <param name="start">Where we start</param>
     /// <param name="end">Where we end</param>
-    private void ValidatePositions(char[,] map, Point start, Point end)
+    private static PathStatus ValidatePositions(char[,] map, Point start, Point end)
     {
+      Errors = new List<string>();
+
       if (start.X < 0)
-        throw new Exception("Start.X isn't on map: " + start.X);
+        Errors.Add("Start.X isn't on map: " + start.X);
       if (start.X >= map.GetLength(1))
-        throw new Exception("Start.Y isn't on map: " + start.Y);
+        Errors.Add("Start.Y isn't on map: " + start.Y);
       if (end.X < 0)
-        throw new Exception("End.X isn't on map: " + end.X);
+        Errors.Add("End.X isn't on map: " + end.X);
       if (end.X >= map.GetLength(0))
-        throw new Exception("End.Y isn't on map: " + end.Y);
+        Errors.Add("End.Y isn't on map: " + end.Y);
 
-      var startCharacter = map[start.Y, start.X];
-      var endCharacter = map[end.Y, end.X];
+      try
+      {
+        var startCharacter = map[start.Y, start.X];
 
-      if (!_walkableCharacters.Contains(startCharacter))
-        throw new Exception(string.Format("Start position ({0}) is on 'unwalkable' character: {1}", start.ToString(), startCharacter));
+        if (!_walkableCharacters.Contains(startCharacter))
+          Errors.Add(string.Format("Start position ({0}) is on 'unwalkable' character: {1}", start.ToString(), startCharacter));
+      }
+      catch (IndexOutOfRangeException e)
+      {
+        Errors.Add(e.ToString());
+      }
 
-      if (!_walkableCharacters.Contains(endCharacter))
-        throw new Exception(string.Format("Start position ({0}) is on 'unwalkable' character: {1}", end.ToString(), endCharacter));
+      try
+      {
+        var endCharacter = map[end.Y, end.X];
+
+        if (!_walkableCharacters.Contains(endCharacter))
+          Errors.Add(string.Format("Start position ({0}) is on 'unwalkable' character: {1}", end.ToString(), endCharacter));
+      }
+      catch (IndexOutOfRangeException e)
+      {
+        Errors.Add(e.ToString());
+      }
+
+      if (Errors.Count > 0)
+        return PathStatus.Invalid;
+
+      return PathStatus.Valid;
     }
 
     /// <summary>
@@ -148,7 +188,7 @@ namespace Engine.Logic
     /// </summary>
     /// <param name="node">The center node to be analyzed.</param>
     /// <returns>A list of nodes neighboring the node that are accessible.</returns>
-    private IEnumerable<Point> GetNeighbourNodes(char[,] map, Point node)
+    private static IEnumerable<Point> GetNeighbourNodes(char[,] map, Point node)
     {
       var nodes = new List<Point>();
 
@@ -186,7 +226,7 @@ namespace Engine.Logic
     /// <param name="cameFrom">A list of nodes and the origin to that node.</param>
     /// <param name="current">The destination node being sought out.</param>
     /// <returns>The shortest path from the start to the destination node.</returns>
-    private List<Point> ReconstructPath(Dictionary<Point, Point> cameFrom, Point current)
+    private static List<Point> ReconstructPath(Dictionary<Point, Point> cameFrom, Point current)
     {
       if (!cameFrom.Keys.Contains(current))
         return new List<Point> { current };

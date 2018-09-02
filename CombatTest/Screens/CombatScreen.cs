@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiledReader;
 using VillageBackend.Graphics;
 using VillageBackend.Managers;
 using VillageBackend.Models;
@@ -93,11 +94,11 @@ namespace CombatTest.Screens
 
     private Camera_2D _camera;
 
-    private Pathfinder _pathfinder;
-
     private Map _map;
 
     private List<Hero> _heroes = new List<Hero>();
+
+    private List<Sprite> _tiles = new List<Sprite>();
 
     private List<Sprite> _sprites;
 
@@ -125,16 +126,16 @@ namespace CombatTest.Screens
 
       _sprites = new List<Sprite>()
       {
-        new Sprite(_content.Load<Texture2D>("Buildings/Combat/Building_01"))
-        {
-          Position = new Vector2(32, 32),
-          Layer = 0.5f,
-        },
-        new Sprite(_content.Load<Texture2D>("Buildings/Combat/Building_01"))
-        {
-          Position = new Vector2(224, 32),
-          Layer = 0.5f,
-        }
+        //new Sprite(_content.Load<Texture2D>("Buildings/Combat/Building_01"))
+        //{
+        //  Position = new Vector2(32, 32),
+        //  Layer = 0.5f,
+        //},
+        //new Sprite(_content.Load<Texture2D>("Buildings/Combat/Building_01"))
+        //{
+        //  Position = new Vector2(224, 32),
+        //  Layer = 0.5f,
+        //}
       };
 
       foreach (var villager in _squad.Villagers)
@@ -150,15 +151,52 @@ namespace CombatTest.Screens
       foreach (var sprite in _sprites)
         _map.AddObject(new Rectangle(sprite.GridRectangle.X / 32, sprite.GridRectangle.Y / 32, sprite.GridRectangle.Width / 32, sprite.GridRectangle.Height / 32));
 
-      _pathfinder = new Pathfinder();
-      var path = _pathfinder.Find(_map.GetMap(), new Point(0, 0), new Point(7, 10));
-
-      _map.Write(path);
-
       _heroPanel = new HeroPanel(_squad)
       {
         Layer = 0.9f,
       };
+
+
+      var map = TiledMap.Load("Content/TileMaps/Level_001.tmx");
+
+      //var textures = map.Tileset.Select(c => _content.Load<Texture2D>("TileMaps/" + c.Name)).ToList();
+
+      var tsxFiles = map.Tileset.Select(c => c.Source);
+
+      var roadsTexture = _content.Load<Texture2D>("Tiles/Roads");
+
+      var roadMap = new int[,]
+      {
+        { 4, 1, 1, 1, 1, 5 },
+        { 2, 9, 0, 0, 8, 3 },
+        { 2, 3, -1, -1, 2, 3 },
+        { 2, 3, -1, -1, 2, 3 },
+        { 2, 3, -1, -1, 2, 3 },
+        { 2, 3, -1, -1, 2, 3 },
+        { 2, 3, -1, -1, 2, 3 },
+        { 2, 3, -1, -1, 2, 3 },
+        { 2, 3, -1, -1, 2, 3 },
+        { 2, 10, 1, 1, 11, 3 },
+        { 7, 0, 0, 0, 0, 6 },
+      };
+
+      for (int y = 0; y < roadMap.GetLength(0); y++)
+      {
+        for (int x = 0; x < roadMap.GetLength(1); x++)
+        {
+          var value = roadMap[y, x];
+
+          if (value == -1)
+            continue;
+
+          _tiles.Add(new Sprite(roadsTexture, value, 32, 32)
+          {
+            Position = new Vector2(x * 32, y * 32),
+            Layer = 0.1f,
+            IsFixedLayer = true,
+          });
+        }
+      }
 
       _heroPanel.LoadContent(_content);
 
@@ -183,7 +221,17 @@ namespace CombatTest.Screens
         var point = new Point((int)_heroes[_heroPanel.SelectedHeroIndex].Position.X / 32,
           (int)_heroes[_heroPanel.SelectedHeroIndex].Position.Y / 32);
 
-        _heroes[_heroPanel.SelectedHeroIndex].SetPath(_pathfinder.Find(_map.GetMap(), point, targetPoint));
+        var status = Pathfinder.Find(_map.GetMap(), point, targetPoint);
+
+        if (status == PathStatus.Valid)
+        {
+          _heroes[_heroPanel.SelectedHeroIndex].SetPath(Pathfinder.Path);
+        }
+        else if (status == PathStatus.Invalid)
+        {
+          foreach (var error in Pathfinder.Errors)
+            Console.WriteLine(error);
+        }
       }
 
       foreach (var hero in _heroes)
@@ -206,6 +254,9 @@ namespace CombatTest.Screens
         BlendState.AlphaBlend,
         SamplerState.PointWrap, null, null, null,
        _camera.Transform);
+
+      foreach (var tile in _tiles)
+        tile.Draw(gameTime, _spriteBatch);
 
       foreach (var villager in _heroes)
         villager.Draw(gameTime, _spriteBatch);

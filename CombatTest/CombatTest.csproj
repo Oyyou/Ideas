@@ -68,6 +68,10 @@
       <Project>{7FB609DD-9800-434E-9A22-B617E9C8CB81}</Project>
       <Name>Engine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TiledReader\TiledReader.csproj">
+      <Project>{11a96b53-cd99-4174-b017-92a15ef14e47}</Project>
+      <Name>TiledReader</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VillageBackend\VillageBackend.csproj">
       <Project>{706F5872-EE1C-43AE-A394-028ABE0A3CB9}</Project>
       <Name>VillageBackend</Name>
