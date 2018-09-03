@@ -10,9 +10,27 @@ namespace TiledReader
   public class Tileset
   {
     [XmlAttribute("firstgid")]
-    public string FirstGId;
+    public int FirstGId;
 
-    [XmlAttribute("source")]
-    public string Source;
+    [XmlAttribute("name")]
+    public string Name;
+
+    [XmlAttribute("tilewidth")]
+    public int TileWidth;
+
+    [XmlAttribute("tileheight")]
+    public int TileHeight;
+
+    [XmlAttribute("tilecount")]
+    public int TileCount;
+
+    [XmlAttribute("columns")]
+    public int Columns;
+
+    [XmlElement("tileoffset")]
+    public TileOffset TileOffset;
+
+    [XmlElement("image")]
+    public Image Image;
   }
 }

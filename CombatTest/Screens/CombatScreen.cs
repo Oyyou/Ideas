@@ -86,6 +86,12 @@ namespace CombatTest.Screens
     }
   }
 
+  public enum CombatStates
+  {
+    PlayerTurn,
+    EnemyTurn,
+  }
+
   public class CombatScreen : State
   {
     private Squad _squad;
@@ -101,6 +107,10 @@ namespace CombatTest.Screens
     private List<Sprite> _tiles = new List<Sprite>();
 
     private List<Sprite> _sprites;
+
+    private Dictionary<int, Sprite> _spriteFactory = new Dictionary<int, Sprite>();
+
+    public CombatStates State { get; private set; }
 
     public CombatScreen(Squad squad)
     {
@@ -124,19 +134,7 @@ namespace CombatTest.Screens
         Height = 20,
       };
 
-      _sprites = new List<Sprite>()
-      {
-        //new Sprite(_content.Load<Texture2D>("Buildings/Combat/Building_01"))
-        //{
-        //  Position = new Vector2(32, 32),
-        //  Layer = 0.5f,
-        //},
-        //new Sprite(_content.Load<Texture2D>("Buildings/Combat/Building_01"))
-        //{
-        //  Position = new Vector2(224, 32),
-        //  Layer = 0.5f,
-        //}
-      };
+      _sprites = new List<Sprite>();
 
       foreach (var villager in _squad.Villagers)
       {
@@ -145,62 +143,123 @@ namespace CombatTest.Screens
           Position = new Vector2(32, 64),
           Layer = 0.4f,
           Origin = new Vector2(0, 15),
+          Villager = villager,
         });
       }
-
-      foreach (var sprite in _sprites)
-        _map.AddObject(new Rectangle(sprite.GridRectangle.X / 32, sprite.GridRectangle.Y / 32, sprite.GridRectangle.Width / 32, sprite.GridRectangle.Height / 32));
 
       _heroPanel = new HeroPanel(_squad)
       {
         Layer = 0.9f,
       };
 
+      LoadTiledMap();
 
-      var map = TiledMap.Load("Content/TileMaps/Level_001.tmx");
-
-      //var textures = map.Tileset.Select(c => _content.Load<Texture2D>("TileMaps/" + c.Name)).ToList();
-
-      var tsxFiles = map.Tileset.Select(c => c.Source);
-
-      var roadsTexture = _content.Load<Texture2D>("Tiles/Roads");
-
-      var roadMap = new int[,]
-      {
-        { 4, 1, 1, 1, 1, 5 },
-        { 2, 9, 0, 0, 8, 3 },
-        { 2, 3, -1, -1, 2, 3 },
-        { 2, 3, -1, -1, 2, 3 },
-        { 2, 3, -1, -1, 2, 3 },
-        { 2, 3, -1, -1, 2, 3 },
-        { 2, 3, -1, -1, 2, 3 },
-        { 2, 3, -1, -1, 2, 3 },
-        { 2, 3, -1, -1, 2, 3 },
-        { 2, 10, 1, 1, 11, 3 },
-        { 7, 0, 0, 0, 0, 6 },
-      };
-
-      for (int y = 0; y < roadMap.GetLength(0); y++)
-      {
-        for (int x = 0; x < roadMap.GetLength(1); x++)
-        {
-          var value = roadMap[y, x];
-
-          if (value == -1)
-            continue;
-
-          _tiles.Add(new Sprite(roadsTexture, value, 32, 32)
-          {
-            Position = new Vector2(x * 32, y * 32),
-            Layer = 0.1f,
-            IsFixedLayer = true,
-          });
-        }
-      }
+      foreach (var sprite in _sprites)
+        _map.AddObject(new Rectangle(sprite.GridRectangle.X / 32, sprite.GridRectangle.Y / 32, sprite.GridRectangle.Width / 32, sprite.GridRectangle.Height / 32));
 
       _heroPanel.LoadContent(_content);
 
       OnScreenResize();
+    }
+
+    private void LoadTiledMap()
+    {
+      Console.WriteLine("-->Map");
+      var tiledMap = TiledMap.Load("Content/TileMaps", "Level_001.tmx");
+
+      foreach (var tileset in tiledMap.Tileset)
+      {
+        var texture = _content.Load<Texture2D>("TileMaps/" + System.IO.Path.GetFileNameWithoutExtension(tileset.Image.Source));
+
+        int index = tileset.FirstGId;
+
+        for (int y = 0; y < texture.Height / tileset.TileHeight; y++)
+        {
+          for (int x = 0; x < texture.Width / tileset.TileWidth; x++)
+          {
+            Sprite sprite = null;
+
+            switch (tileset.Name)
+            {
+              case "Roads":
+
+                sprite = new Sprite(texture, index - 1, tileset.TileWidth, tileset.TileHeight)
+                {
+                  Layer = 0.1f,
+                  IsFixedLayer = true,
+                };
+
+                break;
+
+              case "Buildings":
+
+                sprite = new Sprite(texture, index - 1, tileset.TileWidth, tileset.TileHeight)
+                {
+                  Layer = 0.5f,
+                };
+
+                break;
+
+              default:
+                throw new Exception("Unknown layer: " + tileset.Name);
+            }
+
+            _spriteFactory.Add(index, sprite);
+
+            index++;
+          }
+        }
+      }
+
+      var textures = tiledMap.Tileset.Select(c => _content.Load<Texture2D>("TileMaps/" + System.IO.Path.GetFileNameWithoutExtension(c.Image.Source)));
+
+      foreach (var layer in tiledMap.Layer)
+      {
+        var lines = layer.Data.Split('\n').Where(c => !string.IsNullOrEmpty(c)).ToList();
+
+        var texture = textures.Where(c => System.IO.Path.GetFileNameWithoutExtension(c.Name) == layer.Name).FirstOrDefault();
+
+        int x = 0;
+        int y = 0;
+
+        foreach (var line in lines)
+        {
+          var values = line.Split(',').Where(c => !string.IsNullOrEmpty(c)).ToList();
+
+          foreach (var value in values)
+          {
+            var number = int.Parse(value);
+
+            if (number > 0)
+            {
+              var sprite = _spriteFactory[number].Clone() as Sprite;
+              sprite.Position = new Vector2(x * 32, y * 32);
+
+              switch (layer.Name)
+              {
+                case "Roads":
+
+                  _tiles.Add(sprite);
+
+                  break;
+
+                case "Buildings":
+
+                  _sprites.Add(sprite);
+
+                  break;
+
+                default:
+                  break;
+              }
+            }
+
+            x++;
+          }
+          y++;
+          x = 0;
+        }
+      }
     }
 
     public override void UnloadContent()
@@ -214,23 +273,42 @@ namespace CombatTest.Screens
 
       _camera.Update(gameTime);
 
+      switch (State)
+      {
+        case CombatStates.PlayerTurn:
+          PlayerUpdate(gameTime);
+          break;
+        case CombatStates.EnemyTurn:
+          EnemyUpdate(gameTime);
+          break;
+        default:
+          break;
+      }
+    }
+
+    private void PlayerUpdate(GameTime gameTime)
+    {
       if (GameMouse.ClickableObjects.Count == 0 && GameMouse.Clicked)
       {
         var targetPoint = new Point(GameMouse.RectangleWithCamera.X / 32, GameMouse.RectangleWithCamera.Y / 32);
 
-        var point = new Point((int)_heroes[_heroPanel.SelectedHeroIndex].Position.X / 32,
-          (int)_heroes[_heroPanel.SelectedHeroIndex].Position.Y / 32);
+        var hero = _heroes[_heroPanel.SelectedHeroIndex];
 
-        var status = Pathfinder.Find(_map.GetMap(), point, targetPoint);
+        if (hero.Villager.Turns > 0 && hero.WalkingPath.Count == 0)
+        {
+          var point = new Point((int)hero.Position.X / 32, (int)hero.Position.Y / 32);
 
-        if (status == PathStatus.Valid)
-        {
-          _heroes[_heroPanel.SelectedHeroIndex].SetPath(Pathfinder.Path);
-        }
-        else if (status == PathStatus.Invalid)
-        {
-          foreach (var error in Pathfinder.Errors)
-            Console.WriteLine(error);
+          var status = Pathfinder.Find(_map.GetMap(), point, targetPoint);
+
+          if (status == PathStatus.Valid)
+          {
+            hero.SetPath(Pathfinder.Path);
+          }
+          else if (status == PathStatus.Invalid)
+          {
+            foreach (var error in Pathfinder.Errors)
+              Console.WriteLine(error);
+          }
         }
       }
 
@@ -238,6 +316,25 @@ namespace CombatTest.Screens
         hero.Update(gameTime);
 
       _heroPanel.Update(gameTime);
+
+      if (_heroes.Sum(c => c.Villager.Turns) == 0) // or if we click "end turn"
+        State = CombatStates.EnemyTurn;
+    }
+
+    private void EnemyUpdate(GameTime gameTime)
+    {
+      // TODO: Implement
+
+      State = CombatStates.PlayerTurn;
+      ResetHeroes();
+    }
+
+    private void ResetHeroes()
+    {
+      foreach(var hero in _heroes)
+      {
+        hero.Villager.Turns = hero.Villager.MaxTurns;
+      }
     }
 
     public override void PostUpdate(GameTime gameTime)

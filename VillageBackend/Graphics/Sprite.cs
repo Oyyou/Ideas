@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace VillageBackend.Graphics
 {
-  public class Sprite
+  public class Sprite : ICloneable
   {
     private float _opacity = 1f;
 
@@ -87,6 +87,11 @@ namespace VillageBackend.Graphics
     public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.Draw(_texture, Position, SourceRectangle, Colour * Opacity, 0f, Origin, 1f, SpriteEffects.None, IsFixedLayer ? Layer : 0.3f + ((float)GridRectangle.Y / 1000f));
+    }
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
     }
   }
 }

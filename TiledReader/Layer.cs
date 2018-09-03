@@ -17,5 +17,8 @@ namespace TiledReader
 
     [XmlAttribute("height")]
     public string Height;
+    
+    [XmlElement("data")]
+    public string Data;
   }
 }

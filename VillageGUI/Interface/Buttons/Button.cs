@@ -77,7 +77,7 @@ namespace VillageGUI.Interface.Buttons
       Font = font;
     }
 
-    public void Update(Rectangle mouseRectangle, IEnumerable<Button> buttons)
+    public virtual void Update(Rectangle mouseRectangle, IEnumerable<Button> buttons)
     {
       this.Update(mouseRectangle, buttons, null, null);
     }

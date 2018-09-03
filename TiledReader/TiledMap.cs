@@ -71,13 +71,14 @@ namespace TiledReader
       }
     }
 
-    public static TiledMap Load(string path)
+    public static TiledMap Load(string path, string fileName)
     {
       // Deserialize it, and return the TmxMap instance.
       var xml = new XmlSerializer(typeof(TiledMap));
-      using (var stream = new StreamReader(path))
+      using (var stream = new StreamReader($"{path}/{fileName}"))
       {
         var instance = (TiledMap)xml.Deserialize(stream);
+
         return instance;
       }
     }

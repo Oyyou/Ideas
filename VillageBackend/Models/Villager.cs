@@ -29,6 +29,10 @@ namespace VillageBackend.Models
 
     public bool IsAtWork { get; set; }
 
+    public readonly int MaxTurns = 2; 
+
+    public int Turns { get; set; } = 2;
+
     public Villager()
     {
       _ids++;

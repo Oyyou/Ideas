@@ -8,6 +8,7 @@ using Engine.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using VillageBackend.Models;
 using VillageGUI.Interface.Buttons;
 
@@ -25,6 +26,10 @@ namespace VillageGUI.Interface.Combat
 
     private List<HeroButton> _heroButtons = new List<HeroButton>();
 
+    private KeyboardState _previousKeyboardState;
+
+    private KeyboardState _currentKeyboardState;
+
     public override Rectangle Rectangle
     {
       get
@@ -33,7 +38,7 @@ namespace VillageGUI.Interface.Combat
       }
     }
 
-    public int SelectedHeroIndex { get; set; }
+    public int SelectedHeroIndex { get; set; } = -1;
 
     public override Vector2 Position { get; set; }
 
@@ -54,11 +59,12 @@ namespace VillageGUI.Interface.Combat
 
       for (int i = 0; i < _squad.Villagers.Count; i++)
       {
-        _heroButtons.Add(new HeroButton(_defaultAvatar)
+        _heroButtons.Add(new HeroButton(_defaultAvatar, (Keys)Enum.Parse(typeof(Keys), "D" + (i + 1)))
         {
           Layer = this.Layer + 0.01f,
           Click = HeroButtonClicked,
           SelectedHeroIndex = i,
+          Villager = _squad.Villagers[i],
         });
       }
 
@@ -92,8 +98,59 @@ namespace VillageGUI.Interface.Combat
 
     public void Update(GameTime gameTime)
     {
+      _previousKeyboardState = _currentKeyboardState;
+      _currentKeyboardState = Keyboard.GetState();
+
+      var clicked = GameMouse.Clicked;
+
       foreach (var button in _heroButtons)
-        button.Update(GameMouse.Rectangle, _heroButtons);
+      {
+        switch (button.CurrentState)
+        {
+          case ButtonStates.Nothing:
+
+            if (GameMouse.Rectangle.Intersects(button.Rectangle))
+              button.CurrentState = ButtonStates.Hovering;
+
+            if (_previousKeyboardState != _currentKeyboardState &&
+                _currentKeyboardState.IsKeyDown(button.OpenKey))
+            {
+
+              foreach (var b in _heroButtons)
+                b.CurrentState = ButtonStates.Nothing;
+
+              button.CurrentState = ButtonStates.Clicked;
+
+              button.OnClick();
+            }
+
+            break;
+          case ButtonStates.Hovering:
+
+            if (!GameMouse.Rectangle.Intersects(button.Rectangle))
+              button.CurrentState = ButtonStates.Nothing;
+
+            if (clicked ||
+                (_previousKeyboardState != _currentKeyboardState &&
+                 _currentKeyboardState.IsKeyDown(button.OpenKey)))
+            {
+
+              foreach (var b in _heroButtons)
+                b.CurrentState = ButtonStates.Nothing;
+
+              button.CurrentState = ButtonStates.Clicked;
+
+              button.OnClick();
+            }
+
+            break;
+          case ButtonStates.Clicked:
+            
+            break;
+          default:
+            throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());
+        }
+      }
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -105,7 +162,10 @@ namespace VillageGUI.Interface.Combat
       spriteBatch.DrawString(_font, "Abilities", Position + new Vector2(300, 20), Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer + 0.01f);
 
       foreach (var button in _heroButtons)
+      {
         button.Draw(gameTime, spriteBatch);
+        spriteBatch.DrawString(_font, button.Villager.Turns.ToString(), button.Position, Color.Red, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, button.Layer + 0.01f);
+      }
     }
   }
 }

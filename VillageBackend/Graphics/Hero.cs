@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using VillageBackend.Models;
 
 namespace VillageBackend.Graphics
 {
@@ -13,6 +14,10 @@ namespace VillageBackend.Graphics
     public List<Vector2> WalkingPath { get; private set; } = new List<Vector2>();
 
     private Vector2 _velocity;
+
+    //public int Turns { get; set; } = 2;
+
+    public Villager Villager { get; set; }
 
     public override Rectangle GridRectangle
     {
@@ -51,6 +56,11 @@ namespace VillageBackend.Graphics
 
       if (WalkingPath.FirstOrDefault() == Position)
         WalkingPath.RemoveAt(0);
+
+      if (WalkingPath.Count == 0)
+      {
+        Villager.Turns--;
+      }
 
       var targetPosition = WalkingPath.Count > 0 ? WalkingPath.FirstOrDefault() : Position;
 
