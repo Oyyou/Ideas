@@ -84,14 +84,14 @@ namespace VillageGUI.Interface.Buttons
 
     public void Update(Rectangle mouseRectangle, IEnumerable<Button> buttons, Rectangle? mouseRectangleWithCamera = null, Rectangle? windowRectangle = null)
     {
+      bool isHovering = mouseRectangle.Intersects(this.Rectangle);
+
+      if (mouseRectangleWithCamera != null && windowRectangle != null)
+        isHovering = mouseRectangleWithCamera.Value.Intersects(this.Rectangle) && mouseRectangle.Intersects(windowRectangle.Value);
+
       switch (this.CurrentState)
       {
         case ButtonStates.Nothing:
-
-          bool isHovering = mouseRectangle.Intersects(this.Rectangle);
-
-          if (mouseRectangleWithCamera != null && windowRectangle != null)
-            isHovering = mouseRectangleWithCamera.Value.Intersects(this.Rectangle) && mouseRectangle.Intersects(windowRectangle.Value);
 
           if (isHovering)
           {
@@ -109,12 +109,7 @@ namespace VillageGUI.Interface.Buttons
           break;
         case ButtonStates.Hovering:
 
-          bool notHovering = !mouseRectangle.Intersects(this.Rectangle);
-
-          if (mouseRectangleWithCamera != null && windowRectangle != null)
-            notHovering = !mouseRectangleWithCamera.Value.Intersects(this.Rectangle) || !mouseRectangle.Intersects(windowRectangle.Value);
-
-          if (notHovering || GameMouse.ValidObject != this)
+          if (!isHovering || GameMouse.ValidObject != this)
           {
             GameMouse.ClickableObjects.Remove(this);
             this.CurrentState = ButtonStates.Nothing;
@@ -135,6 +130,15 @@ namespace VillageGUI.Interface.Buttons
           break;
 
         case ButtonStates.Clicked:
+
+          if (isHovering)
+          {
+            GameMouse.AddObject(this);
+          }
+          else
+          {
+            GameMouse.ClickableObjects.Remove(this);
+          }
 
           break;
 

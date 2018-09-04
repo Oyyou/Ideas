@@ -33,6 +33,11 @@ namespace VillageBackend.Models
 
     public int Turns { get; set; } = 2;
 
+    /// <summary>
+    /// The distance a villager could move with 1 turn
+    /// </summary>
+    public int Stamina { get; set; }
+
     public Villager()
     {
       _ids++;

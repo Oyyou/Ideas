@@ -89,10 +89,10 @@ namespace CombatTest
       _gameManagers.SquadManager = new SquadManager(_gameManagers);
       _gameManagers.VillagerManager = new VillagerManager(_gameManagers);
 
-      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager());
-      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager());
-      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager());
-      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager());
+      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager() { Stamina = 3, });
+      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager() { Stamina = 3, });
+      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager() { Stamina = 3, });
+      _gameManagers.VillagerManager.Add(new VillageBackend.Models.Villager() { Stamina = 3, });
 
       _gameManagers.SquadManager.Add("Beta",
         _gameManagers.VillagerManager.Villagers[0],

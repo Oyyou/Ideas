@@ -19,6 +19,8 @@ namespace VillageBackend.Graphics
 
     public Villager Villager { get; set; }
 
+    public bool HasFinishedWalking { get; private set; }
+
     public override Rectangle GridRectangle
     {
       get
@@ -33,6 +35,8 @@ namespace VillageBackend.Graphics
 
     public void SetPath(List<Point> points)
     {
+      HasFinishedWalking = false;
+
       if (WalkingPath.Count > 0)
         return;
 
@@ -60,6 +64,7 @@ namespace VillageBackend.Graphics
       if (WalkingPath.Count == 0)
       {
         Villager.Turns--;
+        HasFinishedWalking = true;
       }
 
       var targetPosition = WalkingPath.Count > 0 ? WalkingPath.FirstOrDefault() : Position;

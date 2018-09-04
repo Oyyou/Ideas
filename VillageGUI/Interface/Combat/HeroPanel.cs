@@ -110,7 +110,17 @@ namespace VillageGUI.Interface.Combat
           case ButtonStates.Nothing:
 
             if (GameMouse.Rectangle.Intersects(button.Rectangle))
-              button.CurrentState = ButtonStates.Hovering;
+            {
+              GameMouse.AddObject(button);
+              if (GameMouse.ValidObject == button)
+              {
+                button.CurrentState = ButtonStates.Hovering;
+              }
+              else
+              {
+                GameMouse.ClickableObjects.Remove(button);
+              }
+            }
 
             if (_previousKeyboardState != _currentKeyboardState &&
                 _currentKeyboardState.IsKeyDown(button.OpenKey))
@@ -127,8 +137,12 @@ namespace VillageGUI.Interface.Combat
             break;
           case ButtonStates.Hovering:
 
-            if (!GameMouse.Rectangle.Intersects(button.Rectangle))
+            if (!GameMouse.Rectangle.Intersects(button.Rectangle) || GameMouse.ValidObject != button)
+            {
+              GameMouse.ClickableObjects.Remove(button);
               button.CurrentState = ButtonStates.Nothing;
+              break;
+            }
 
             if (clicked ||
                 (_previousKeyboardState != _currentKeyboardState &&
@@ -136,7 +150,10 @@ namespace VillageGUI.Interface.Combat
             {
 
               foreach (var b in _heroButtons)
+              {
+                GameMouse.ClickableObjects.Remove(b);
                 b.CurrentState = ButtonStates.Nothing;
+              }
 
               button.CurrentState = ButtonStates.Clicked;
 
@@ -145,7 +162,16 @@ namespace VillageGUI.Interface.Combat
 
             break;
           case ButtonStates.Clicked:
-            
+
+            if (GameMouse.Rectangle.Intersects(button.Rectangle))
+            {
+              GameMouse.AddObject(button);
+            }
+            else
+            {
+              GameMouse.ClickableObjects.Remove(button);
+            }
+
             break;
           default:
             throw new Exception("Unknown ToolbarButtonState: " + button.CurrentState.ToString());

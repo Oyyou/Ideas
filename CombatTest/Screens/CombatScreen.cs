@@ -1,91 +1,24 @@
-﻿using Engine;
-using Engine.Cameras;
+﻿using Engine.Cameras;
 using Engine.Input;
 using Engine.Logic;
 using Engine.Models;
 using Engine.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TiledReader;
 using VillageBackend.Graphics;
-using VillageBackend.Managers;
 using VillageBackend.Models;
-using VillageGUI.Interface.Combat;
+using VillageBackend.World;
+using VillageGUI.Interface.Buttons;
+using VillageGUI.Interface.GUIs;
 using static Engine.Logic.Pathfinder;
 
 namespace CombatTest.Screens
 {
-  // TODO: Move to somewhere more appropriate
-  public class Map
-  {
-    public int Width { get; set; }
-
-    public int Height { get; set; }
-
-    /// <summary>
-    /// These are non-collidable objects
-    /// </summary>
-    public List<Rectangle> MapObjects { get; private set; } = new List<Rectangle>();
-
-    public void AddObject(Rectangle rectangle)
-    {
-      if (MapObjects.Any(c => c.Intersects(rectangle)))
-        throw new Exception("Object already exists in position: " + rectangle);
-
-      MapObjects.Add(rectangle);
-    }
-
-    public char[,] GetMap()
-    {
-      var map = new char[Height, Width];
-
-      for (int y = 0; y < Height; y++)
-      {
-        for (int x = 0; x < Width; x++)
-        {
-          map[y, x] = '0';
-
-          var rectangle = new Rectangle(x, y, 1, 1);
-
-          if (MapObjects.Any(c => c.Intersects(rectangle)))
-          {
-            map[y, x] = '1';
-          }
-        }
-      }
-
-      return map;
-    }
-
-    public void Write(List<Point> path = null)
-    {
-      if (path == null)
-        path = new List<Point>();
-
-      for (int y = 0; y <= Height; y++)
-      {
-        for (int x = 0; x <= Width; x++)
-        {
-          if (path.Any(c => c == new Point(x, y)))
-            Console.Write("P");
-          else if (MapObjects.Any(c => c.Intersects(new Rectangle(x, y, 1, 1))))
-            Console.Write("#");
-          else
-            Console.Write("0");
-        }
-
-        Console.WriteLine();
-      }
-
-      Console.WriteLine();
-    }
-  }
-
   public enum CombatStates
   {
     PlayerTurn,
@@ -96,11 +29,18 @@ namespace CombatTest.Screens
   {
     private Squad _squad;
 
-    private HeroPanel _heroPanel;
+    private CombatGUI _gui;
 
     private Camera_2D _camera;
 
     private Map _map;
+
+    private Grid _grid;
+
+    private PathViewer _pathViewer;
+
+    private Hero _currentHero;
+    private Hero _previousHero;
 
     private List<Hero> _heroes = new List<Hero>();
 
@@ -109,6 +49,9 @@ namespace CombatTest.Screens
     private List<Sprite> _sprites;
 
     private Dictionary<int, Sprite> _spriteFactory = new Dictionary<int, Sprite>();
+
+    private KeyboardState _currentKey;
+    private KeyboardState _previousKey;
 
     public CombatStates State { get; private set; }
 
@@ -119,7 +62,7 @@ namespace CombatTest.Screens
 
     public override void OnScreenResize()
     {
-      _heroPanel.SetPositions();
+      _gui.OnScreenResize();
     }
 
     public override void LoadContent(GameModel gameModel)
@@ -132,7 +75,13 @@ namespace CombatTest.Screens
       {
         Width = 20,
         Height = 20,
+        TileWidth = 32,
+        TileHeight = 32,
       };
+
+      _grid = new Grid(_graphicsDevice, _map);
+
+      _pathViewer = new PathViewer(_graphicsDevice, _map);
 
       _sprites = new List<Sprite>();
 
@@ -147,19 +96,24 @@ namespace CombatTest.Screens
         });
       }
 
-      _heroPanel = new HeroPanel(_squad)
+      _gui = new CombatGUI(_squad)
       {
-        Layer = 0.9f,
+        EndTurnClick = EndTurnClick,
       };
+      _gui.LoadContent(_content);
 
       LoadTiledMap();
 
       foreach (var sprite in _sprites)
         _map.AddObject(new Rectangle(sprite.GridRectangle.X / 32, sprite.GridRectangle.Y / 32, sprite.GridRectangle.Width / 32, sprite.GridRectangle.Height / 32));
 
-      _heroPanel.LoadContent(_content);
-
       OnScreenResize();
+    }
+
+    private void EndTurnClick(Button button)
+    {
+      State = CombatStates.EnemyTurn;
+      button.CurrentState = ButtonStates.Hovering;
     }
 
     private void LoadTiledMap()
@@ -264,12 +218,18 @@ namespace CombatTest.Screens
 
     public override void UnloadContent()
     {
-      _heroPanel.UnloadContent();
+      _gui.UnloadContent();
     }
 
     public override void Update(GameTime gameTime)
     {
       GameMouse.Update(_camera.Transform);
+
+      _previousKey = _currentKey;
+      _currentKey = Keyboard.GetState();
+
+      if (_previousKey.IsKeyDown(Keys.F1) && _currentKey.IsKeyUp(Keys.F1))
+        _grid.IsVisible = !_grid.IsVisible;
 
       _camera.Update(gameTime);
 
@@ -288,21 +248,35 @@ namespace CombatTest.Screens
 
     private void PlayerUpdate(GameTime gameTime)
     {
-      if (GameMouse.ClickableObjects.Count == 0 && GameMouse.Clicked)
+      /// reasons to update the pathViewer
+      ///  Clicked a different hero
+      ///  The hero has moved from A to B, and still has a turn
+
+      _previousHero = _currentHero;
+      _currentHero = _gui.SelectedHeroIndex > -1 ? _heroes[_gui.SelectedHeroIndex] : null;
+
+      if (_previousHero != _currentHero)
+      {
+        _pathViewer.SetTarget(_currentHero);
+      }
+
+      if (_currentHero != null && _currentHero.HasFinishedWalking)
+        _pathViewer.SetTarget(_currentHero);
+
+      if (GameMouse.ClickableObjects.Count == 0 && GameMouse.Clicked && _currentHero != null && _heroes.All(c => c.WalkingPath.Count == 0))
       {
         var targetPoint = new Point(GameMouse.RectangleWithCamera.X / 32, GameMouse.RectangleWithCamera.Y / 32);
 
-        var hero = _heroes[_heroPanel.SelectedHeroIndex];
-
-        if (hero.Villager.Turns > 0 && hero.WalkingPath.Count == 0)
+        if (_currentHero.Villager.Turns > 0 && _currentHero.WalkingPath.Count == 0)
         {
-          var point = new Point((int)hero.Position.X / 32, (int)hero.Position.Y / 32);
+          var point = new Point((int)_currentHero.Position.X / 32, (int)_currentHero.Position.Y / 32);
 
           var status = Pathfinder.Find(_map.GetMap(), point, targetPoint);
 
           if (status == PathStatus.Valid)
           {
-            hero.SetPath(Pathfinder.Path);
+            _currentHero.SetPath(Pathfinder.Path);
+            _pathViewer.Clear();
           }
           else if (status == PathStatus.Invalid)
           {
@@ -315,7 +289,11 @@ namespace CombatTest.Screens
       foreach (var hero in _heroes)
         hero.Update(gameTime);
 
-      _heroPanel.Update(gameTime);
+      _pathViewer.Update(gameTime);
+
+      // Only update the "_heroPanel" when nobody is moving
+      //if (_heroes.All(c => c.WalkingPath.Count == 0))
+        _gui.Update(gameTime);
 
       if (_heroes.Sum(c => c.Villager.Turns) == 0) // or if we click "end turn"
         State = CombatStates.EnemyTurn;
@@ -331,7 +309,7 @@ namespace CombatTest.Screens
 
     private void ResetHeroes()
     {
-      foreach(var hero in _heroes)
+      foreach (var hero in _heroes)
       {
         hero.Villager.Turns = hero.Villager.MaxTurns;
       }
@@ -352,8 +330,12 @@ namespace CombatTest.Screens
         SamplerState.PointWrap, null, null, null,
        _camera.Transform);
 
+      _grid.Draw(gameTime, _spriteBatch);
+
       foreach (var tile in _tiles)
         tile.Draw(gameTime, _spriteBatch);
+
+      _pathViewer.Draw(gameTime, _spriteBatch);
 
       foreach (var villager in _heroes)
         villager.Draw(gameTime, _spriteBatch);
@@ -369,11 +351,7 @@ namespace CombatTest.Screens
 
       _spriteBatch.End();
 
-      _spriteBatch.Begin(SpriteSortMode.FrontToBack);
-
-      _heroPanel.Draw(gameTime, _spriteBatch);
-
-      _spriteBatch.End();
+      _gui.Draw(gameTime, _spriteBatch);
     }
   }
 }
