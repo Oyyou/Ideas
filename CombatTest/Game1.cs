@@ -51,6 +51,10 @@ namespace CombatTest
 
       IsMouseVisible = true;
 
+      // sets fps to monitor Hz 
+      //_graphics.SynchronizeWithVerticalRetrace = false;
+      //this.IsFixedTimeStep = false;
+
       base.Initialize();
     }
 

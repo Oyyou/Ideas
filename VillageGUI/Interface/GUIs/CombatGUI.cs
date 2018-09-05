@@ -1,5 +1,6 @@
 ﻿using Engine;
 using Engine.Input;
+using Engine.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,6 +20,8 @@ namespace VillageGUI.Interface.GUIs
     private Button _endTurnButton;
 
     private HeroPanel _heroPanel;
+
+    private FrameCounter _frameCounter;
 
     public Action<Button> EndTurnClick;
 
@@ -45,6 +48,12 @@ namespace VillageGUI.Interface.GUIs
 
       _heroPanel.LoadContent(content);
 
+      _frameCounter = new FrameCounter()
+      {
+        Position = new Vector2(10, 10),
+      };
+      _frameCounter.LoadContent(content);
+
       SetPositions();
     }
 
@@ -57,6 +66,7 @@ namespace VillageGUI.Interface.GUIs
     {
       _endTurnButton.UnloadContent();
       _heroPanel.UnloadContent();
+      _frameCounter.UnloadContent();
     }
 
     private void SetPositions()
@@ -74,11 +84,14 @@ namespace VillageGUI.Interface.GUIs
       SetPositions();
     }
 
-    public void Update(GameTime gameTime)
+    public void Update(GameTime gameTime, bool updatePanel)
     {
+      _frameCounter.Update(gameTime);
+
       _endTurnButton.Update(GameMouse.Rectangle, new List<Button>() { _endTurnButton });
 
-      _heroPanel.Update(gameTime);
+      if (updatePanel)
+        _heroPanel.Update(gameTime);
 
       if (_endTurnButton.Clicked)
         Clear();
@@ -87,6 +100,8 @@ namespace VillageGUI.Interface.GUIs
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.Begin(SpriteSortMode.FrontToBack);
+
+      _frameCounter.Draw(gameTime, spriteBatch);
 
       _endTurnButton.Draw(gameTime, spriteBatch);
 

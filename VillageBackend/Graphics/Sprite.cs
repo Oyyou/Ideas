@@ -64,21 +64,23 @@ namespace VillageBackend.Graphics
       _texture = texture;
     }
 
-    public Sprite(Texture2D texture, int frameCount, int frameWidth, int frameHeight)
+    public Sprite(Texture2D texture, int frameIndex, int frameWidth, int frameHeight)
       :this(texture)
     {
-      SourceRectangle = GetSourceRectangle(texture, frameCount, frameWidth, frameHeight);
+      SourceRectangle = GetSourceRectangle(texture, frameIndex, frameWidth, frameHeight);
     }
 
-    private Rectangle? GetSourceRectangle(Texture2D texture, int frameCount, int frameWidth, int frameHeight)
+    private Rectangle? GetSourceRectangle(Texture2D texture, int frameIndex, int frameWidth, int frameHeight)
     {
       int index = 0;
       for (int y = 0; y < texture.Height / frameHeight; y++)
       {
         for (int x = 0; x < texture.Width / frameWidth; x++)
         {
-          if (index == frameCount)
+          if (index == frameIndex)
+          {
             return new Rectangle(x * frameWidth, y * frameHeight, frameWidth, frameHeight);
+          }
 
           index++;
         }

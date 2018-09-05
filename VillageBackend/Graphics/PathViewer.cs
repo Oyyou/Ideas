@@ -89,6 +89,8 @@ namespace VillageBackend.Graphics
       if (hero.WalkingPath.Count > 0)
         return;
 
+      Console.WriteLine("Start: " + DateTime.Now.ToString("hh:mm:ss:ff"));
+
       for (int y = 0; y < _map.Height; y++)
       {
         for (int x = 0; x < _map.Width; x++)
@@ -98,15 +100,25 @@ namespace VillageBackend.Graphics
           if (centrePoint == point)
             continue;
 
-          if (Vector2.Distance(centrePoint, point) <= distance)
+          var pointRectangle = new Rectangle(x, y, 1, 1);
+
+          var actualDistance = Vector2.Distance(centrePoint, point);
+
+          if (actualDistance <= distance)
           {
-            var result = Pathfinder.Find(_map.GetMap(), centrePoint.ToPoint(), point.ToPoint());
-
-            if (result.Status == PathStatus.Invalid)
+            if (_map.MapObjects.Any(c => c.Intersects(pointRectangle)))
               continue;
 
-            if (result.Path.Count > distance)
-              continue;
+            //if (actualDistance > distance - hero.Villager.Speed)
+            //{
+              var result = Pathfinder.Find(_map.GetMap(), centrePoint.ToPoint(), point.ToPoint());
+
+              if (result.Status == PathStatus.Invalid)
+                continue;
+
+              if (result.Path.Count > distance)
+                continue;
+            //}
 
             var sprite = new Sprite(_texture)
             {
@@ -122,6 +134,8 @@ namespace VillageBackend.Graphics
           }
         }
       }
+
+      Console.WriteLine("End: " + DateTime.Now.ToString("hh:mm:ss:ff"));
     }
 
     public void Clear()

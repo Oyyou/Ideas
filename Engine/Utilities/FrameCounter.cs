@@ -15,6 +15,7 @@ namespace Engine.Utilities
 
     public FrameCounter()
     {
+      new Vector2(GameEngine.ScreenWidth - 100, GameEngine.ScreenHeight - 20);
     }
 
     public long TotalFrames { get; private set; }
@@ -56,7 +57,7 @@ namespace Engine.Utilities
       var fps = string.Format("FPS: {0:00}", AverageFramesPerSecond);
 
 
-      spriteBatch.DrawString(_font, fps, new Vector2(GameEngine.ScreenWidth - 100, GameEngine.ScreenHeight - 20), Color.Black);
+      spriteBatch.DrawString(_font, fps, Position, Color.Black);
 
       // other draw code here
     }

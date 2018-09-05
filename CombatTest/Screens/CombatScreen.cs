@@ -3,6 +3,7 @@ using Engine.Input;
 using Engine.Logic;
 using Engine.Models;
 using Engine.States;
+using Engine.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -73,8 +74,8 @@ namespace CombatTest.Screens
 
       _map = new Map()
       {
-        Width = 20,
-        Height = 20,
+        Width = 30,
+        Height = 30,
         TileWidth = 32,
         TileHeight = 32,
       };
@@ -136,11 +137,13 @@ namespace CombatTest.Screens
           {
             Sprite sprite = null;
 
+            int frameIndex = index - tileset.FirstGId;
+
             switch (tileset.Name)
             {
               case "Terrain":
 
-                sprite = new Sprite(texture, index - 1, tileset.TileWidth, tileset.TileHeight)
+                sprite = new Sprite(texture, frameIndex, tileset.TileWidth, tileset.TileHeight)
                 {
                   Layer = 0.09f,
                   IsFixedLayer = true,
@@ -150,7 +153,7 @@ namespace CombatTest.Screens
 
               case "Roads":
 
-                sprite = new Sprite(texture, index - 1, tileset.TileWidth, tileset.TileHeight)
+                sprite = new Sprite(texture, frameIndex, tileset.TileWidth, tileset.TileHeight)
                 {
                   Layer = 0.1f,
                   IsFixedLayer = true,
@@ -160,7 +163,7 @@ namespace CombatTest.Screens
 
               case "Buildings":
 
-                sprite = new Sprite(texture, index - 1, tileset.TileWidth, tileset.TileHeight)
+                sprite = new Sprite(texture, frameIndex, tileset.TileWidth, tileset.TileHeight)
                 {
                   Layer = 0.5f,
                 };
@@ -262,6 +265,10 @@ namespace CombatTest.Screens
 
     private void PlayerUpdate(GameTime gameTime)
     {
+      /// Pathfinding
+      ///  At the start of each round - find the paths for all NPCs
+      ///  When a hero moves - find all new paths (async?)
+
       /// reasons to update the pathViewer
       ///  Clicked a different hero
       ///  The hero has moved from A to B, and still has a turn
@@ -300,7 +307,6 @@ namespace CombatTest.Screens
             _currentHero.SetPath(path);
             _map.RemoveObject(_currentHero.GridRectangle1x1);
             _map.AddObject(new Rectangle(path.Last().X, path.Last().Y, 1, 1));
-            _map.Write();
             //_gui.Clear();
           }
           else if (result.Status == PathStatus.Invalid)
@@ -318,7 +324,7 @@ namespace CombatTest.Screens
 
       // Only update the "_heroPanel" when nobody is moving
       //if (_heroes.All(c => c.WalkingPath.Count == 0))
-      _gui.Update(gameTime);
+      _gui.Update(gameTime, _heroes.All(c => c.WalkingPath.Count == 0));
 
       if (_heroes.Sum(c => c.Villager.Turns) == 0) // or if we click "end turn"
         State = CombatStates.EnemyTurn;
