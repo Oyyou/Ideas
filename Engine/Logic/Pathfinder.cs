@@ -11,6 +11,15 @@ namespace Engine.Logic
     Invalid,
   }
 
+  public class PathfinderResult
+  {
+    public PathStatus Status { get; set; }
+
+    public List<Point> Path { get; set; }
+
+    public List<string> Errors { get; set; }
+  }
+
   public static class Pathfinder
   {
     /// <summary>
@@ -18,120 +27,181 @@ namespace Engine.Logic
     /// </summary>
     private static string _walkableCharacters = "0";
 
-    public static List<Point> Path { get; set; }
-
-    public static List<string> Errors { get; set; }
-
-    public static PathStatus Find(char[,] map, Point start, Point end)
+    public static PathfinderResult Find(char[,] map, Point start, Point end)
     {
-      var pathStatus = ValidatePositions(map, start, end);
+      // We can't start the search from the original point, so we need to find which of the below 4 is the best route
+      var leftStart = new Point(start.X - 1, start.Y);
+      var rightStart = new Point(start.X + 1, start.Y);
+      var upStart = new Point(start.X, start.Y - 1);
+      var downStart = new Point(start.X, start.Y + 1);
 
-      if (pathStatus == PathStatus.Invalid)
-        return PathStatus.Invalid;
-
-      // nodes that have already been analyzed and have a path from the start to them
-      var closedSet = new List<Point>();
-
-      // nodes that have been identified as a neighbor of an analyzed node, but have 
-      // yet to be fully analyzed
-      var openSet = new List<Point> { start };
-
-      // a dictionary identifying the optimal origin point to each node. this is used 
-      // to back-track from the end to find the optimal path
-      var cameFrom = new Dictionary<Point, Point>();
-
-      // a dictionary indicating how far each analyzed node is from the start
-      var currentDistance = new Dictionary<Point, int>();
-
-      // a dictionary indicating how far it is expected to reach the end, if the path 
-      // travels through the specified node. 
-      var predictedDistance = new Dictionary<Point, float>();
-
-      // initialize the start node as having a distance of 0, and an estmated distance 
-      // of y-distance + x-distance, which is the optimal path in a square grid that 
-      // doesn't allow for diagonal movement
-      currentDistance.Add(start, 0);
-      predictedDistance.Add(
-          start, Math.Abs(start.X - end.X) + Math.Abs(start.Y - end.Y)
-      );
-
-      // if there are any unanalyzed nodes, process them
-      while (openSet.Count > 0)
+      var startPoints = new List<Point>()
       {
-        // get the node with the lowest estimated cost to finish
-        var current = (
-            from p in openSet orderby predictedDistance[p] ascending select p
-        ).First();
+        leftStart,
+        rightStart,
+        upStart,
+        downStart,
+      };
 
-        // if it is the finish, return the path
-        if (current.X == end.X && current.Y == end.Y)
+      var errors = new List<string>();
+
+      for (int i = 0; i < startPoints.Count; i++)
+      {
+        var result = ValidatePositions(map, startPoints[i], end);
+
+        if (result.Status == PathStatus.Invalid)
         {
-          // generate the found path
-          Path = ReconstructPath(cameFrom, end);
-
-          return PathStatus.Valid;
-        }
-
-        // move current node from open to closed
-        openSet.Remove(current);
-        closedSet.Add(current);
-
-        // process each valid node around the current node
-        var neighbours = GetNeighbourNodes(map, current);
-
-        foreach (var neighbor in neighbours)
-        {
-          var tempCurrentDistance = currentDistance[current] + 1;
-
-          // if we already know a faster way to this neighbor, use that route and 
-          // ignore this one
-          if (closedSet.Contains(neighbor)
-              && tempCurrentDistance >= currentDistance[neighbor])
-          {
-            continue;
-          }
-
-          // if we don't know a route to this neighbor, or if this is faster, 
-          // store this route
-          if (!closedSet.Contains(neighbor)
-              || tempCurrentDistance < currentDistance[neighbor])
-          {
-            if (cameFrom.Keys.Contains(neighbor))
-            {
-              cameFrom[neighbor] = current;
-            }
-            else
-            {
-              cameFrom.Add(neighbor, current);
-            }
-
-            currentDistance[neighbor] = tempCurrentDistance;
-            predictedDistance[neighbor] =
-                currentDistance[neighbor]
-                + Math.Abs(neighbor.X - end.X)
-                + Math.Abs(neighbor.Y - end.Y);
-
-            // if this is a new node, add it to processing
-            if (!openSet.Contains(neighbor))
-            {
-              openSet.Add(neighbor);
-            }
-          }
+          errors.AddRange(result.Errors);
+          startPoints.RemoveAt(i);
+          i--;
         }
       }
 
-      Errors = new List<string>();
+      if (startPoints.Count == 0)
+      {
+        return new PathfinderResult()
+        {
+          Status = PathStatus.Invalid,
+          Path = new List<Point>(),
+          Errors = errors,
+        };
+      }
 
-      // unable to figure out a path, abort.
-      Errors.Add(
-          string.Format(
-              "unable to find a path between ({0},{1}) and ({2},{3})",
-              start.X, start.Y,
-              end.X, end.Y
-          )
-      );
+      var endResults = new List<PathfinderResult>();
 
-      return PathStatus.Invalid;
+      foreach (var startPoint in startPoints)
+      {
+        // nodes that have already been analyzed and have a path from the start to them
+        var closedSet = new List<Point>();
+
+        // nodes that have been identified as a neighbor of an analyzed node, but have 
+        // yet to be fully analyzed
+        var openSet = new List<Point> { startPoint };
+
+        // a dictionary identifying the optimal origin point to each node. this is used 
+        // to back-track from the end to find the optimal path
+        var cameFrom = new Dictionary<Point, Point>();
+
+        // a dictionary indicating how far each analyzed node is from the start
+        var currentDistance = new Dictionary<Point, int>();
+
+        // a dictionary indicating how far it is expected to reach the end, if the path 
+        // travels through the specified node. 
+        var predictedDistance = new Dictionary<Point, float>();
+
+        // initialize the start node as having a distance of 0, and an estmated distance 
+        // of y-distance + x-distance, which is the optimal path in a square grid that 
+        // doesn't allow for diagonal movement
+        currentDistance.Add(startPoint, 0);
+        predictedDistance.Add(
+            startPoint, Math.Abs(startPoint.X - end.X) + Math.Abs(startPoint.Y - end.Y)
+        );
+
+        // if there are any unanalyzed nodes, process them
+        while (openSet.Count > 0)
+        {
+          // get the node with the lowest estimated cost to finish
+          var current = (
+              from p in openSet orderby predictedDistance[p] ascending select p
+          ).First();
+
+          // if it is the finish, return the path
+          if (current.X == end.X && current.Y == end.Y)
+          {
+            endResults.Add(new PathfinderResult()
+            {
+              Status = PathStatus.Valid,
+              Path = ReconstructPath(cameFrom, end),
+            });
+          }
+
+          // move current node from open to closed
+          openSet.Remove(current);
+          closedSet.Add(current);
+
+          // process each valid node around the current node
+          var neighbours = GetNeighbourNodes(map, current);
+
+          foreach (var neighbor in neighbours)
+          {
+            var tempCurrentDistance = currentDistance[current] + 1;
+
+            // if we already know a faster way to this neighbor, use that route and 
+            // ignore this one
+            if (closedSet.Contains(neighbor)
+                && tempCurrentDistance >= currentDistance[neighbor])
+            {
+              continue;
+            }
+
+            // if we don't know a route to this neighbor, or if this is faster, 
+            // store this route
+            if (!closedSet.Contains(neighbor)
+                || tempCurrentDistance < currentDistance[neighbor])
+            {
+              if (cameFrom.Keys.Contains(neighbor))
+              {
+                cameFrom[neighbor] = current;
+              }
+              else
+              {
+                cameFrom.Add(neighbor, current);
+              }
+
+              currentDistance[neighbor] = tempCurrentDistance;
+              predictedDistance[neighbor] =
+                  currentDistance[neighbor]
+                  + Math.Abs(neighbor.X - end.X)
+                  + Math.Abs(neighbor.Y - end.Y);
+
+              // if this is a new node, add it to processing
+              if (!openSet.Contains(neighbor))
+              {
+                openSet.Add(neighbor);
+              }
+            }
+          }
+        }
+
+        var endResult = new PathfinderResult()
+        {
+          Status = PathStatus.Invalid,
+          Path = new List<Point>(),
+          Errors = new List<string>(),
+        };
+
+        // unable to figure out a path, abort.
+        endResult.Errors.Add(
+            string.Format(
+                "unable to find a path between ({0},{1}) and ({2},{3})",
+                startPoint.X, startPoint.Y,
+                end.X, end.Y
+            )
+        );
+
+        endResults.Add(endResult);
+      }
+
+      var validResults = endResults.Where(c => c.Status == PathStatus.Valid);
+      var invalidResults = endResults.Where(c => c.Status == PathStatus.Invalid);
+
+      if (validResults.Count() > 0)
+      {
+        return new PathfinderResult()
+        {
+          Status = PathStatus.Valid,
+          Path = validResults.OrderBy(c => c.Path.Count).FirstOrDefault().Path
+        };
+      }
+      else
+      {
+        return new PathfinderResult()
+        {
+          Status = PathStatus.Valid,
+          Path = new List<Point>(),
+          //Errors = new List<string>(invalidResults.SelectMany(c => c.Errors)),
+        };
+      }
     }
 
     /// <summary>
@@ -140,29 +210,36 @@ namespace Engine.Logic
     /// <param name="map">What we need to navigate through</param>
     /// <param name="start">Where we start</param>
     /// <param name="end">Where we end</param>
-    private static PathStatus ValidatePositions(char[,] map, Point start, Point end)
+    private static PathfinderResult ValidatePositions(char[,] map, Point start, Point end)
     {
-      Errors = new List<string>();
+      var result = new PathfinderResult()
+      {
+        Errors = new List<string>(),
+        Path = new List<Point>(),
+        Status = PathStatus.Valid,
+      };
+
+      result.Errors = new List<string>();
 
       if (start.X < 0)
-        Errors.Add("Start.X isn't on map: " + start.X);
+        result.Errors.Add("Start.X isn't on map: " + start.X);
       if (start.X >= map.GetLength(1))
-        Errors.Add("Start.Y isn't on map: " + start.Y);
+        result.Errors.Add("Start.Y isn't on map: " + start.Y);
       if (end.X < 0)
-        Errors.Add("End.X isn't on map: " + end.X);
+        result.Errors.Add("End.X isn't on map: " + end.X);
       if (end.X >= map.GetLength(0))
-        Errors.Add("End.Y isn't on map: " + end.Y);
+        result.Errors.Add("End.Y isn't on map: " + end.Y);
 
       try
       {
         var startCharacter = map[start.Y, start.X];
 
         if (!_walkableCharacters.Contains(startCharacter))
-          Errors.Add(string.Format("Start position ({0}) is on 'unwalkable' character: {1}", start.ToString(), startCharacter));
+          result.Errors.Add(string.Format("Start position ({0}) is on 'unwalkable' character: {1}", start.ToString(), startCharacter));
       }
       catch (IndexOutOfRangeException e)
       {
-        Errors.Add(e.ToString());
+        result.Errors.Add(e.ToString());
       }
 
       try
@@ -170,17 +247,17 @@ namespace Engine.Logic
         var endCharacter = map[end.Y, end.X];
 
         if (!_walkableCharacters.Contains(endCharacter))
-          Errors.Add(string.Format("Start position ({0}) is on 'unwalkable' character: {1}", end.ToString(), endCharacter));
+          result.Errors.Add(string.Format("Start position ({0}) is on 'unwalkable' character: {1}", end.ToString(), endCharacter));
       }
       catch (IndexOutOfRangeException e)
       {
-        Errors.Add(e.ToString());
+        result.Errors.Add(e.ToString());
       }
 
-      if (Errors.Count > 0)
-        return PathStatus.Invalid;
+      if (result.Errors.Count > 0)
+        result.Status = PathStatus.Invalid;
 
-      return PathStatus.Valid;
+      return result;
     }
 
     /// <summary>

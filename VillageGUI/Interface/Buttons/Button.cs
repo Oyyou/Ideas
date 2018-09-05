@@ -22,6 +22,8 @@ namespace VillageGUI.Interface.Buttons
   {
     public Action<Button> Click;
 
+    public bool Clicked;
+
     public Color Color;
 
     public ButtonStates CurrentState;
@@ -84,6 +86,8 @@ namespace VillageGUI.Interface.Buttons
 
     public void Update(Rectangle mouseRectangle, IEnumerable<Button> buttons, Rectangle? mouseRectangleWithCamera = null, Rectangle? windowRectangle = null)
     {
+      Clicked = false;
+
       bool isHovering = mouseRectangle.Intersects(this.Rectangle);
 
       if (mouseRectangleWithCamera != null && windowRectangle != null)
@@ -125,6 +129,7 @@ namespace VillageGUI.Interface.Buttons
             }
 
             this.OnClick();
+            Clicked = true;
           }
 
           break;

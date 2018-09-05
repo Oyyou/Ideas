@@ -48,6 +48,11 @@ namespace VillageGUI.Interface.GUIs
       SetPositions();
     }
 
+    public void Clear()
+    {
+      _heroPanel.Clear();
+    }
+
     public void UnloadContent()
     {
       _endTurnButton.UnloadContent();
@@ -74,6 +79,9 @@ namespace VillageGUI.Interface.GUIs
       _endTurnButton.Update(GameMouse.Rectangle, new List<Button>() { _endTurnButton });
 
       _heroPanel.Update(gameTime);
+
+      if (_endTurnButton.Clicked)
+        Clear();
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

@@ -76,9 +76,15 @@
 /processorParam:TextureFormat=Color
 /build:TileMaps/Roads.png
 
-#begin TileMaps/Buildings.tsx
-/copy:TileMaps/Buildings.tsx
-
-#begin TileMaps/Roads.tsx
-/copy:TileMaps/Roads.tsx
+#begin TileMaps/Terrain.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Terrain.png
 

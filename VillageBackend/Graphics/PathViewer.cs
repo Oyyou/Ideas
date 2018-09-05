@@ -28,6 +28,9 @@ namespace VillageBackend.Graphics
     private Vector2 _currentMousePosition;
     private Vector2 _previousMousePosition;
 
+    private Hero _previouslyUpdatedHero;
+    private Vector2 _previouslyUpdatedPoint;
+
     public PathViewer(GraphicsDevice graphicsDevice, Map map)
     {
       _map = map;
@@ -50,12 +53,35 @@ namespace VillageBackend.Graphics
 
     public void SetTarget(Hero hero)
     {
+      if (hero == null)
+      {
+        _previouslyUpdatedPoint = new Vector2();
+        Clear();
+        _selectedHero = null;
+        return;
+      }
+
+      if (hero.WalkingPath.Count > 0)
+      {
+        Clear();
+        return;
+      }
+
       _selectedHero = hero;
 
       var centrePosition = hero.Position;
       var centrePoint = centrePosition / 32;
 
-      var distance = (hero.Villager.Stamina * hero.Villager.Turns) + 1;
+      if (_previouslyUpdatedPoint == centrePoint)
+        return;
+
+      //if (_previouslyUpdatedHero == hero)
+      //  return;
+
+      _previouslyUpdatedPoint = centrePoint;
+      _previouslyUpdatedHero = hero;
+
+      var distance = hero.Villager.Distance;
 
       Clear();
 
@@ -72,21 +98,21 @@ namespace VillageBackend.Graphics
           if (centrePoint == point)
             continue;
 
-          if (Vector2.Distance(centrePoint, point) < distance)
+          if (Vector2.Distance(centrePoint, point) <= distance)
           {
-            var path = Pathfinder.Find(_map.GetMap(), centrePoint.ToPoint(), point.ToPoint());
+            var result = Pathfinder.Find(_map.GetMap(), centrePoint.ToPoint(), point.ToPoint());
 
-            if (path == PathStatus.Invalid)
+            if (result.Status == PathStatus.Invalid)
               continue;
 
-            if (Pathfinder.Path.Count > distance)
+            if (result.Path.Count > distance)
               continue;
 
             var sprite = new Sprite(_texture)
             {
               Layer = _selectedTile.Layer - 0.02f,
               IsFixedLayer = true,
-              Colour = Pathfinder.Path.Count <= (hero.Villager.Stamina + 1) ? Color.Green : Color.Orange,
+              Colour = result.Path.Count <= (hero.Villager.Speed) ? Color.Green : Color.Orange,
               Position = new Vector2(x * 32, y * 32),
               SourceRectangle = new Rectangle(0, 0, 32, 32),
               Opacity = 0.6f,
@@ -115,7 +141,7 @@ namespace VillageBackend.Graphics
 
       _selectedTile.Opacity = 1f;
 
-      var distance = (_selectedHero.Villager.Stamina * _selectedHero.Villager.Turns) + 1;
+      var distance = _selectedHero.Villager.Distance;
 
       var centrePosition = _selectedHero.Position;
       var centrePoint = centrePosition / 32;
@@ -123,15 +149,15 @@ namespace VillageBackend.Graphics
       _previousMousePosition = _currentMousePosition;
       _currentMousePosition = new Vector2((int)Math.Floor(GameMouse.RectangleWithCamera.X / 32d) * 32, (int)Math.Floor(GameMouse.RectangleWithCamera.Y / 32d) * 32);
 
-      //if (_previousMousePosition != _currentMousePosition) // Figure out why this is incorrect
+      if (_previousMousePosition != _currentMousePosition) // Figure out why this is incorrect
       {
         _selectedTile.Position = _currentMousePosition;
 
-        var pathStatus = Pathfinder.Find(_map.GetMap(), centrePoint.ToPoint(), (_currentMousePosition / 32).ToPoint());
+        var result = Pathfinder.Find(_map.GetMap(), centrePoint.ToPoint(), (_currentMousePosition / 32).ToPoint());
 
-        if (pathStatus == PathStatus.Valid)
+        if (result.Status == PathStatus.Valid)
         {
-          _currentPath = Pathfinder.Path.Select(c => new Sprite(_texture)
+          _currentPath = result.Path.Select(c => new Sprite(_texture)
           {
             Position = c.ToVector2() * 32,
             Layer = _selectedTile.Layer - 0.01f,

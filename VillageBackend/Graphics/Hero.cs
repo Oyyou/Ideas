@@ -11,6 +11,11 @@ namespace VillageBackend.Graphics
 {
   public class Hero : Sprite
   {
+    /// <summary>
+    /// Set this to "WalkingPath" when we first set it
+    /// </summary>
+    private List<Vector2> _originalWalkingPath = null;
+
     public List<Vector2> WalkingPath { get; private set; } = new List<Vector2>();
 
     private Vector2 _velocity;
@@ -58,13 +63,22 @@ namespace VillageBackend.Graphics
       if (WalkingPath.Count == 0)
         return;
 
+      if (_originalWalkingPath == null)
+        _originalWalkingPath = new List<Vector2>(WalkingPath);
+
       if (WalkingPath.FirstOrDefault() == Position)
         WalkingPath.RemoveAt(0);
 
       if (WalkingPath.Count == 0)
       {
-        Villager.Turns--;
+        var distance = _originalWalkingPath.Count;
+        var usedTurns = (int)Math.Ceiling((float)distance / (float)Villager.Speed);
+
+        Console.WriteLine(usedTurns);
+
+        Villager.Turns -= usedTurns;
         HasFinishedWalking = true;
+        _originalWalkingPath = null;
       }
 
       var targetPosition = WalkingPath.Count > 0 ? WalkingPath.FirstOrDefault() : Position;

@@ -85,14 +85,14 @@ namespace CombatTest.Screens
 
       _sprites = new List<Sprite>();
 
-      foreach (var villager in _squad.Villagers)
+      for (int i = 0; i < _squad.Villagers.Count; i++)
       {
         _heroes.Add(new Hero(_content.Load<Texture2D>("Villagers/Pig"))
         {
-          Position = new Vector2(32, 64),
+          Position = new Vector2(32 * i, 64),
           Layer = 0.4f,
           Origin = new Vector2(0, 15),
-          Villager = villager,
+          Villager = _squad.Villagers[i],
         });
       }
 
@@ -105,7 +105,10 @@ namespace CombatTest.Screens
       LoadTiledMap();
 
       foreach (var sprite in _sprites)
-        _map.AddObject(new Rectangle(sprite.GridRectangle.X / 32, sprite.GridRectangle.Y / 32, sprite.GridRectangle.Width / 32, sprite.GridRectangle.Height / 32));
+        _map.AddObject(sprite.GridRectangle1x1);
+
+      foreach (var sprite in _heroes)
+        _map.AddObject(sprite.GridRectangle1x1);
 
       OnScreenResize();
     }
@@ -135,6 +138,16 @@ namespace CombatTest.Screens
 
             switch (tileset.Name)
             {
+              case "Terrain":
+
+                sprite = new Sprite(texture, index - 1, tileset.TileWidth, tileset.TileHeight)
+                {
+                  Layer = 0.09f,
+                  IsFixedLayer = true,
+                };
+
+                break;
+
               case "Roads":
 
                 sprite = new Sprite(texture, index - 1, tileset.TileWidth, tileset.TileHeight)
@@ -192,6 +205,7 @@ namespace CombatTest.Screens
               switch (layer.Name)
               {
                 case "Roads":
+                case "Terrain":
 
                   _tiles.Add(sprite);
 
@@ -255,13 +269,19 @@ namespace CombatTest.Screens
       _previousHero = _currentHero;
       _currentHero = _gui.SelectedHeroIndex > -1 ? _heroes[_gui.SelectedHeroIndex] : null;
 
-      if (_previousHero != _currentHero)
-      {
-        _pathViewer.SetTarget(_currentHero);
-      }
+      //if (_previousHero != _currentHero)
+      //{
+      _pathViewer.SetTarget(_currentHero);
+      //}
 
-      if (_currentHero != null && _currentHero.HasFinishedWalking)
-        _pathViewer.SetTarget(_currentHero);
+      //if (_currentHero != null && _currentHero.HasFinishedWalking)
+      //{
+      //  // This method keeps getting called. Try and f
+      //  _pathViewer.SetTarget(_currentHero);
+      //}
+
+      if (_currentHero != null && _currentHero.Villager.Turns == 0)
+        _gui.Clear();
 
       if (GameMouse.ClickableObjects.Count == 0 && GameMouse.Clicked && _currentHero != null && _heroes.All(c => c.WalkingPath.Count == 0))
       {
@@ -271,16 +291,21 @@ namespace CombatTest.Screens
         {
           var point = new Point((int)_currentHero.Position.X / 32, (int)_currentHero.Position.Y / 32);
 
-          var status = Pathfinder.Find(_map.GetMap(), point, targetPoint);
+          var result = Pathfinder.Find(_map.GetMap(), point, targetPoint);
 
-          if (status == PathStatus.Valid)
+          if (result.Status == PathStatus.Valid)
           {
-            _currentHero.SetPath(Pathfinder.Path);
-            _pathViewer.Clear();
+            var path = result.Path.Take(_currentHero.Villager.Distance).ToList();
+
+            _currentHero.SetPath(path);
+            _map.RemoveObject(_currentHero.GridRectangle1x1);
+            _map.AddObject(new Rectangle(path.Last().X, path.Last().Y, 1, 1));
+            _map.Write();
+            //_gui.Clear();
           }
-          else if (status == PathStatus.Invalid)
+          else if (result.Status == PathStatus.Invalid)
           {
-            foreach (var error in Pathfinder.Errors)
+            foreach (var error in result.Errors)
               Console.WriteLine(error);
           }
         }
@@ -293,7 +318,7 @@ namespace CombatTest.Screens
 
       // Only update the "_heroPanel" when nobody is moving
       //if (_heroes.All(c => c.WalkingPath.Count == 0))
-        _gui.Update(gameTime);
+      _gui.Update(gameTime);
 
       if (_heroes.Sum(c => c.Villager.Turns) == 0) // or if we click "end turn"
         State = CombatStates.EnemyTurn;

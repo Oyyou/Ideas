@@ -25,9 +25,21 @@ namespace VillageBackend.World
     public void AddObject(Rectangle rectangle)
     {
       if (MapObjects.Any(c => c.Intersects(rectangle)))
+      {
+        foreach (var obj in MapObjects)
+          Console.WriteLine(obj);
         throw new Exception("Object already exists in position: " + rectangle);
+      }
 
       MapObjects.Add(rectangle);
+    }
+
+    public void RemoveObject(Rectangle rectangle)
+    {
+      if (!MapObjects.Contains(rectangle))
+        throw new Exception("Object doesn't exist in position: " + rectangle);
+
+      MapObjects.Remove(rectangle);
     }
 
     public char[,] GetMap()

@@ -96,6 +96,16 @@ namespace VillageGUI.Interface.Combat
         button.UnloadContent();
     }
 
+    public void Clear()
+    {
+      foreach (var b in _heroButtons)
+      {
+        b.CurrentState = ButtonStates.Nothing;
+      }
+
+      SelectedHeroIndex = -1;
+    }
+
     public void Update(GameTime gameTime)
     {
       _previousKeyboardState = _currentKeyboardState;

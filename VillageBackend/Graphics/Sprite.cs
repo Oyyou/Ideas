@@ -34,6 +34,14 @@ namespace VillageBackend.Graphics
       }
     }
 
+    public Rectangle GridRectangle1x1
+    {
+      get
+      {
+        return new Rectangle(GridRectangle.X / 32, GridRectangle.Y / 32, GridRectangle.Width / 32, GridRectangle.Height / 32);
+      }
+    }
+
     public Rectangle? SourceRectangle { get; set; } = null;
 
     public Color Colour { get; set; } = Color.White;
