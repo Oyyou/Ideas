@@ -17,6 +17,8 @@ namespace CombatTest
 
     public Game1()
     {
+      Random = new Random();
+
       _graphics = new GraphicsDeviceManager(this);
       Content.RootDirectory = "Content";
     }

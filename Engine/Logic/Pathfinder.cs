@@ -27,8 +27,11 @@ namespace Engine.Logic
     /// </summary>
     private static string _walkableCharacters = "0";
 
-    public static PathfinderResult Find(char[,] map, Point start, Point end)
+    public static PathfinderResult Find(char[,] map_, Point start, Point end)
     {
+      var map = map_;
+      map[start.Y, start.X] = '0';
+
       // We can't start the search from the original point, so we need to find which of the below 4 is the best route
       var leftStart = new Point(start.X - 1, start.Y);
       var rightStart = new Point(start.X + 1, start.Y);
@@ -37,10 +40,11 @@ namespace Engine.Logic
 
       var startPoints = new List<Point>()
       {
-        leftStart,
-        rightStart,
-        upStart,
-        downStart,
+        start
+        //leftStart,
+        //rightStart,
+        //upStart,
+        //downStart,
       };
 
       var errors = new List<string>();
@@ -71,6 +75,13 @@ namespace Engine.Logic
 
       foreach (var startPoint in startPoints)
       {
+        //var straightLineStatus = GetStraightLineStatus(map, startPoint, end);
+
+        //if (straightLineStatus.Status == PathStatus.Valid)
+        //{
+        //  return straightLineStatus;
+        //}
+
         // nodes that have already been analyzed and have a path from the start to them
         var closedSet = new List<Point>();
 
@@ -187,21 +198,99 @@ namespace Engine.Logic
 
       if (validResults.Count() > 0)
       {
+        var newPath = validResults.OrderBy(c => c.Path.Count).FirstOrDefault().Path;
+        newPath.RemoveAt(0);
+
         return new PathfinderResult()
         {
           Status = PathStatus.Valid,
-          Path = validResults.OrderBy(c => c.Path.Count).FirstOrDefault().Path
+          Path = newPath,
         };
       }
       else
       {
         return new PathfinderResult()
         {
-          Status = PathStatus.Valid,
+          Status = PathStatus.Invalid,
           Path = new List<Point>(),
           //Errors = new List<string>(invalidResults.SelectMany(c => c.Errors)),
         };
       }
+    }
+
+    private static PathfinderResult GetStraightLineStatus(char[,] map, Point start, Point end)
+    {
+      var isStraightX = start.X == end.X;
+      var isStraightY = start.Y == end.Y;
+
+      if (isStraightX)
+      {
+        var points = new List<Point>();
+        bool isValid = true;
+        for (int y = Math.Min(start.Y, end.Y); y < Math.Max(start.Y, end.Y); y++)
+        {
+          isValid = false;
+
+          var point = map[y, start.X];
+
+          if (_walkableCharacters.Contains(point))
+          {
+            points.Add(new Point(start.X, y));
+            isValid = true;
+          }
+          else
+          {
+            break;
+          }
+        }
+
+        if (isValid)
+        {
+          return new PathfinderResult()
+          {
+            Status = PathStatus.Valid,
+            Path = start.Y > end.Y ? points.OrderByDescending(c => c.Y).ToList() : points,
+          };
+        }
+      }
+
+      if (isStraightY)
+      {
+        var points = new List<Point>();
+        bool isValid = true;
+        for (int x = Math.Min(start.X, end.X); x < Math.Max(start.X, end.X); x++)
+        {
+          isValid = false;
+
+          var point = map[start.Y, x];
+
+          if (_walkableCharacters.Contains(point))
+          {
+            points.Add(new Point(x, start.Y));
+            isValid = true;
+          }
+          else
+          {
+            break;
+          }
+        }
+
+        if (isValid)
+        {
+          return new PathfinderResult()
+          {
+            Status = PathStatus.Valid,
+            Path = start.X > end.X ? points.OrderByDescending(c => c.X).ToList() : points,
+          };
+        }
+      }
+
+      return new PathfinderResult()
+      {
+        Status = PathStatus.Invalid,
+        Path = new List<Point>(),
+        Errors = new List<string>(),
+      };
     }
 
     /// <summary>

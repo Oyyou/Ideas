@@ -1,4 +1,5 @@
-﻿using Engine.Cameras;
+﻿using Engine;
+using Engine.Cameras;
 using Engine.Input;
 using Engine.Logic;
 using Engine.Models;
@@ -97,6 +98,8 @@ namespace CombatTest.Screens
         });
       }
 
+      _heroes.Last().Position = new Vector2(8 * 32, 18 * 32);
+
       _gui = new CombatGUI(_squad)
       {
         EndTurnClick = EndTurnClick,
@@ -125,6 +128,8 @@ namespace CombatTest.Screens
       Console.WriteLine("-->Map");
       var tiledMap = TiledMap.Load("Content/TileMaps", "Level_001.tmx");
 
+      var grassSprites = GetGrassSprites();
+
       foreach (var tileset in tiledMap.Tileset)
       {
         var texture = _content.Load<Texture2D>("TileMaps/" + System.IO.Path.GetFileNameWithoutExtension(tileset.Image.Source));
@@ -141,16 +146,6 @@ namespace CombatTest.Screens
 
             switch (tileset.Name)
             {
-              case "Terrain":
-
-                sprite = new Sprite(texture, frameIndex, tileset.TileWidth, tileset.TileHeight)
-                {
-                  Layer = 0.09f,
-                  IsFixedLayer = true,
-                };
-
-                break;
-
               case "Roads":
 
                 sprite = new Sprite(texture, frameIndex, tileset.TileWidth, tileset.TileHeight)
@@ -208,7 +203,6 @@ namespace CombatTest.Screens
               switch (layer.Name)
               {
                 case "Roads":
-                case "Terrain":
 
                   _tiles.Add(sprite);
 
@@ -224,6 +218,16 @@ namespace CombatTest.Screens
                   break;
               }
             }
+            else
+            {
+              if(layer.Name == "Roads")
+              {
+                var grassSprite = grassSprites[GameEngine.Random.Next(0, grassSprites.Count)].Clone() as Sprite;
+                grassSprite.Position = new Vector2(x * 32, y * 32);
+
+                _tiles.Add(grassSprite);
+              }
+            }
 
             x++;
           }
@@ -231,6 +235,30 @@ namespace CombatTest.Screens
           x = 0;
         }
       }
+    }
+
+    private List<Sprite> GetGrassSprites()
+    {
+      var grassSprites = new List<Sprite>();
+
+      var grassTexture = _content.Load<Texture2D>("TileMaps/Grass");
+
+      int grassIndex = 0;
+      for (int y = 0; y < grassTexture.Height / 32; y++)
+      {
+        for (int x = 0; x < grassTexture.Width / 32; x++)
+        {
+          grassSprites.Add(new Sprite(grassTexture, grassIndex, 32, 32)
+          {
+            Layer = 0.1f,
+            IsFixedLayer = true,
+          });
+
+          grassIndex++;
+        }
+      }
+
+      return grassSprites;
     }
 
     public override void UnloadContent()
@@ -296,23 +324,30 @@ namespace CombatTest.Screens
 
         if (_currentHero.Villager.Turns > 0 && _currentHero.WalkingPath.Count == 0)
         {
-          var point = new Point((int)_currentHero.Position.X / 32, (int)_currentHero.Position.Y / 32);
+          var heroPoint = new Point((int)_currentHero.Position.X / 32, (int)_currentHero.Position.Y / 32);
 
-          var result = Pathfinder.Find(_map.GetMap(), point, targetPoint);
+          var distance = _currentHero.Villager.Distance + 1;
 
-          if (result.Status == PathStatus.Valid)
+          var actualDistance = Vector2.Distance(heroPoint.ToVector2(), targetPoint.ToVector2());
+
+          if (actualDistance <= distance)
           {
-            var path = result.Path.Take(_currentHero.Villager.Distance).ToList();
+            var result = Pathfinder.Find(_map.GetMap(), heroPoint, targetPoint);
 
-            _currentHero.SetPath(path);
-            _map.RemoveObject(_currentHero.GridRectangle1x1);
-            _map.AddObject(new Rectangle(path.Last().X, path.Last().Y, 1, 1));
-            //_gui.Clear();
-          }
-          else if (result.Status == PathStatus.Invalid)
-          {
-            foreach (var error in result.Errors)
-              Console.WriteLine(error);
+            if (result.Status == PathStatus.Valid)
+            {
+              var path = result.Path.Take(_currentHero.Villager.Distance).ToList();
+
+              _currentHero.SetPath(path);
+              _map.RemoveObject(_currentHero.GridRectangle1x1);
+              _map.AddObject(new Rectangle(path.Last().X, path.Last().Y, 1, 1));
+              //_gui.Clear();
+            }
+            else if (result.Status == PathStatus.Invalid)
+            {
+              foreach (var error in result.Errors)
+                Console.WriteLine(error);
+            }
           }
         }
       }
@@ -353,7 +388,7 @@ namespace CombatTest.Screens
 
     public override void Draw(GameTime gameTime)
     {
-      _graphicsDevice.Clear(Color.CornflowerBlue);
+      _graphicsDevice.Clear(new Color(40, 40, 40));
 
       _spriteBatch.Begin(
         SpriteSortMode.FrontToBack,
