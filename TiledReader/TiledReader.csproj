@@ -44,6 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CollisionObject.cs" />
+    <Compile Include="CollisionObjectGroup.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="Image.cs" />
     <Compile Include="Layer.cs" />

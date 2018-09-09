@@ -44,6 +44,8 @@ namespace CombatTest.Screens
     private Hero _currentHero;
     private Hero _previousHero;
 
+    private List<Enemy> _enemies = new List<Enemy>();
+
     private List<Hero> _heroes = new List<Hero>();
 
     private List<Sprite> _tiles = new List<Sprite>();
@@ -98,7 +100,8 @@ namespace CombatTest.Screens
         });
       }
 
-      _heroes.Last().Position = new Vector2(8 * 32, 18 * 32);
+      _heroes[2].Position = new Vector2(12 * 32, 12 * 32);
+      _heroes[3].Position = new Vector2(8 * 32, 18 * 32);
 
       _gui = new CombatGUI(_squad)
       {
@@ -129,6 +132,39 @@ namespace CombatTest.Screens
       var tiledMap = TiledMap.Load("Content/TileMaps", "Level_001.tmx");
 
       var grassSprites = GetGrassSprites();
+
+      foreach (var objectGroup in tiledMap.ObjectGroups)
+      {
+        switch (objectGroup.Name)
+        {
+          case "EnemySpawns":
+
+            var enemyTexture = _content.Load<Texture2D>("Enemies/Chicken");
+
+            for (int y = 0; y < 2; y++)
+            {
+              for (int x = 0; x < 2; x++)
+              {
+                var patrolPaths = objectGroup.CollisionObjects.Select(c => new Vector2(c.X, c.Y) + new Vector2(x * 32, y * 32)).ToList();
+
+                var enemy = new Enemy(enemyTexture)
+                {
+                  Position = patrolPaths.FirstOrDefault(),
+                  PatrolPaths = patrolPaths,
+                  Layer = 0.4f,
+                };
+
+                _enemies.Add(enemy);
+
+                _map.AddObject(enemy.GridRectangle1x1);
+              }
+            }
+
+            break;
+          default:
+            throw new Exception("Unknown group: " + objectGroup.Name);
+        }
+      }
 
       foreach (var tileset in tiledMap.Tileset)
       {
@@ -220,7 +256,7 @@ namespace CombatTest.Screens
             }
             else
             {
-              if(layer.Name == "Roads")
+              if (layer.Name == "Roads")
               {
                 var grassSprite = grassSprites[GameEngine.Random.Next(0, grassSprites.Count)].Clone() as Sprite;
                 grassSprite.Position = new Vector2(x * 32, y * 32);
@@ -367,10 +403,69 @@ namespace CombatTest.Screens
 
     private void EnemyUpdate(GameTime gameTime)
     {
-      // TODO: Implement
+      /// Check to see if all enemies can walk
+      ///  Remove current point from map
+      ///  Check to see if we can move to the patrol point
+      ///   if we can - set path
+      ///   otherise - try another position to the side
+      ///  Add target point to map
+      ///  
+      /// Update the enemies
+      /// 
+      /// Check to see if all enemies have finished walking
+      ///  Change the state to player turn
+      ///  Reset the heroes
 
-      State = CombatStates.PlayerTurn;
-      ResetHeroes();
+      if (_enemies.All(c => c.WalkingPath.Count == 0))
+      {
+        foreach (var enemy in _enemies)
+        {
+          _map.RemoveObject(enemy.GridRectangle1x1);
+        }
+
+        //var enemiesRectangle = new Rectangle(
+        //  _enemies.OrderBy(c => c.Rectangle.Left).First().Rectangle.Left,
+        //  _enemies.OrderBy(c => c.Rectangle.Top).First().Rectangle.Top,
+        //  64,
+        //  64);
+
+        //if(_map.MapObjects.Any(c => c.Intersects(enemiesRectangle)))
+        //{
+
+        //}
+
+        foreach (var enemy in _enemies)
+        {
+          var firstItem = enemy.PatrolPaths.FirstOrDefault();
+          enemy.PatrolPaths.Remove(firstItem);
+          enemy.PatrolPaths.Add(firstItem);
+
+          var targetPoint = (enemy.PatrolPaths.FirstOrDefault() / 32).ToPoint();
+
+          var pathStatus = Pathfinder.Find(_map.GetMap(), (enemy.Position / 32).ToPoint(), targetPoint);
+
+          if (pathStatus.Status == PathStatus.Valid)
+          {
+            enemy.SetPath(pathStatus.Path);
+          }
+        }
+
+        foreach (var enemy in _enemies)
+        {
+          var targetPoint = (enemy.WalkingPath.Last() / 32).ToPoint();
+
+          _map.AddObject(new Rectangle(targetPoint.X, targetPoint.Y, 1, 1));
+        }
+      }
+
+      foreach (var enemy in _enemies)
+        enemy.Update(gameTime);
+
+      if (_enemies.All(c => c.HasFinishedWalking))
+      {
+        State = CombatStates.PlayerTurn;
+        ResetHeroes();
+      }
     }
 
     private void ResetHeroes()
@@ -393,7 +488,7 @@ namespace CombatTest.Screens
       _spriteBatch.Begin(
         SpriteSortMode.FrontToBack,
         BlendState.AlphaBlend,
-        SamplerState.PointWrap, null, null, null,
+        SamplerState.PointClamp, null, null, null,
        _camera.Transform);
 
       _grid.Draw(gameTime, _spriteBatch);
@@ -406,6 +501,9 @@ namespace CombatTest.Screens
       foreach (var villager in _heroes)
         villager.Draw(gameTime, _spriteBatch);
 
+      foreach (var enemy in _enemies)
+        enemy.Draw(gameTime, _spriteBatch);
+
       foreach (var sprite in _sprites)
       {
         if (_camera.Position.Y < sprite.Rectangle.Y)
@@ -417,7 +515,8 @@ namespace CombatTest.Screens
 
       _spriteBatch.End();
 
-      _gui.Draw(gameTime, _spriteBatch);
+      if (State == CombatStates.PlayerTurn)
+        _gui.Draw(gameTime, _spriteBatch);
     }
   }
 }

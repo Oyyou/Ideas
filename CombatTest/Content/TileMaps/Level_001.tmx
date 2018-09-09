@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="13">
  <tileset firstgid="1" name="Roads" tilewidth="32" tileheight="32" tilecount="12" columns="4">
   <image source="Roads.png" width="128" height="96"/>
  </tileset>
@@ -7,6 +7,12 @@
   <tileoffset x="0" y="128"/>
   <image source="Buildings.png" width="160" height="160"/>
  </tileset>
+ <objectgroup name="EnemySpawns">
+  <object id="4" x="0" y="128" width="64" height="64"/>
+  <object id="11" x="416" y="128" width="64" height="64"/>
+  <object id="10" x="416" y="288" width="64" height="64"/>
+  <object id="12" x="0" y="288" width="64" height="64"/>
+ </objectgroup>
  <layer name="Roads" width="30" height="30">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

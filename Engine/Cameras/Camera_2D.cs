@@ -24,7 +24,7 @@ namespace Engine.Cameras
       get { return _scale; }
       set
       {
-        _scale = MathHelper.Clamp(value, 0.5f, 1.2f);
+        _scale = MathHelper.Clamp(value, 0.8f, 1.4f);
       }
     }
 

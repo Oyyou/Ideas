@@ -49,8 +49,8 @@ namespace TiledReader
     [XmlAttribute("data")]
     public string Data;
 
-    //[XmlElement("objectgroup")]
-    //public CollisionObjectGroup[] ObjectGroups;
+    [XmlElement("objectgroup")]
+    public CollisionObjectGroup[] ObjectGroups;
 
     //[XmlElement("imagelayer")]
     //public ImageLayer ImageLayer;
