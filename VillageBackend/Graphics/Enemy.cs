@@ -3,43 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Engine.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace VillageBackend.Graphics
 {
-  public class Enemy : Sprite
+  public class Enemy : Person
   {
-    private List<Vector2> _originalWalkingPath = null;
-
-    public List<Vector2> WalkingPath { get; private set; } = new List<Vector2>();
-
-    private Vector2 _velocity;
-
-    public bool HasFinishedWalking { get; private set; }
-
     public List<Vector2> PatrolPaths;
 
-    public override Rectangle GridRectangle
+    public Enemy(Dictionary<string, Animation> animations) : base(animations)
     {
-      get
-      {
-        return Rectangle;
-      }
-    }
 
-    public Enemy(Texture2D texture) : base(texture)
-    {
-    }
-
-    public void SetPath(List<Point> points)
-    {
-      HasFinishedWalking = false;
-
-      if (WalkingPath.Count > 0)
-        return;
-
-      WalkingPath = points.Select(c => new Vector2(c.X * 32, c.Y * 32)).ToList();
     }
 
     public override void Update(GameTime gameTime)
@@ -47,9 +23,13 @@ namespace VillageBackend.Graphics
       Walk();
 
       Position += _velocity;
+
+      SetAnimation();
+
+      _animationManager.Update(gameTime);
     }
 
-    private void Walk()
+    protected override void Walk()
     {
       if (WalkingPath == null)
         return;

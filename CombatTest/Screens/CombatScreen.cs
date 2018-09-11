@@ -89,9 +89,17 @@ namespace CombatTest.Screens
 
       _sprites = new List<Sprite>();
 
+      var heroAnimations = new Dictionary<string, Animation>()
+      {
+        { "WalkDown", new Animation(_content.Load<Texture2D>("Heroes/PigWalkingDown"), 4) },
+        { "WalkUp", new Animation(_content.Load<Texture2D>("Heroes/PigWalkingUp"), 4) },
+        { "WalkLeft", new Animation(_content.Load<Texture2D>("Heroes/PigWalkingLeft"), 4) },
+        { "WalkRight", new Animation(_content.Load<Texture2D>("Heroes/PigWalkingRight"), 4) },
+      };
+
       for (int i = 0; i < _squad.Villagers.Count; i++)
       {
-        _heroes.Add(new Hero(_content.Load<Texture2D>("Villagers/Pig"))
+        _heroes.Add(new Hero(heroAnimations.ToDictionary(c => c.Key, v => v.Value))
         {
           Position = new Vector2(32 * i, 64),
           Layer = 0.4f,
@@ -139,7 +147,13 @@ namespace CombatTest.Screens
         {
           case "EnemySpawns":
 
-            var enemyTexture = _content.Load<Texture2D>("Enemies/Chicken");
+            var enemyAnimations = new Dictionary<string, Animation>()
+            {
+              { "WalkDown", new Animation(_content.Load<Texture2D>("Enemies/ChickenWalkingDown"), 4) },
+              { "WalkUp", new Animation(_content.Load<Texture2D>("Enemies/ChickenWalkingUp"), 4) },
+              { "WalkLeft", new Animation(_content.Load<Texture2D>("Enemies/ChickenWalkingLeft"), 4) },
+              { "WalkRight", new Animation(_content.Load<Texture2D>("Enemies/ChickenWalkingRight"), 4) },
+            };
 
             for (int y = 0; y < 2; y++)
             {
@@ -147,7 +161,7 @@ namespace CombatTest.Screens
               {
                 var patrolPaths = objectGroup.CollisionObjects.Select(c => new Vector2(c.X, c.Y) + new Vector2(x * 32, y * 32)).ToList();
 
-                var enemy = new Enemy(enemyTexture)
+                var enemy = new Enemy(enemyAnimations.ToDictionary(c => c.Key, v => v.Value))
                 {
                   Position = patrolPaths.FirstOrDefault(),
                   PatrolPaths = patrolPaths,
@@ -157,6 +171,10 @@ namespace CombatTest.Screens
                 _enemies.Add(enemy);
 
                 _map.AddObject(enemy.GridRectangle1x1);
+
+                var firstItem = enemy.PatrolPaths.FirstOrDefault();
+                enemy.PatrolPaths.Remove(firstItem);
+                enemy.PatrolPaths.Add(firstItem);
               }
             }
 
@@ -423,24 +441,43 @@ namespace CombatTest.Screens
           _map.RemoveObject(enemy.GridRectangle1x1);
         }
 
-        //var enemiesRectangle = new Rectangle(
-        //  _enemies.OrderBy(c => c.Rectangle.Left).First().Rectangle.Left,
-        //  _enemies.OrderBy(c => c.Rectangle.Top).First().Rectangle.Top,
-        //  64,
-        //  64);
+        var targetPoints = _enemies.Select(c => c.PatrolPaths.FirstOrDefault() / 32);
 
-        //if(_map.MapObjects.Any(c => c.Intersects(enemiesRectangle)))
-        //{
+        Vector2 offset = new Vector2();
 
-        //}
+        var currentRectangle = new Rectangle(
+          (int)_enemies.OrderBy(c => c.Rectangle.Left).First().Rectangle.Left / 32,
+          (int)_enemies.OrderBy(c => c.Rectangle.Top).First().Rectangle.Top / 32,
+          2,
+          2);
+
+        var targetRectangle = new Rectangle(
+          (int)_enemies.OrderBy(c => c.PatrolPaths.FirstOrDefault().X).First().PatrolPaths.FirstOrDefault().X / 32,
+          (int)_enemies.OrderBy(c => c.PatrolPaths.FirstOrDefault().Y).First().PatrolPaths.FirstOrDefault().Y / 32,
+          2,
+          2);
+
+        if (currentRectangle.X < targetRectangle.X)
+          offset = new Vector2(-1, 0);
+        else if (currentRectangle.X > targetRectangle.X)
+          offset = new Vector2(1, 0);
+        else if (currentRectangle.Y < targetRectangle.Y)
+          offset = new Vector2(0, -1);
+        else if (currentRectangle.Y > targetRectangle.Y)
+          offset = new Vector2(0, 1);
+
+        int count = 0;
+        while (_map.MapObjects.Any(v => v.Intersects(targetRectangle)))
+        {
+          count++;
+          targetRectangle = new Rectangle(targetRectangle.X + (int)offset.X, targetRectangle.Y + (int)offset.Y, targetRectangle.Width, targetRectangle.Height);
+        }
 
         foreach (var enemy in _enemies)
         {
           var firstItem = enemy.PatrolPaths.FirstOrDefault();
-          enemy.PatrolPaths.Remove(firstItem);
-          enemy.PatrolPaths.Add(firstItem);
 
-          var targetPoint = (enemy.PatrolPaths.FirstOrDefault() / 32).ToPoint();
+          var targetPoint = ((firstItem / 32) + (offset * count)).ToPoint();
 
           var pathStatus = Pathfinder.Find(_map.GetMap(), (enemy.Position / 32).ToPoint(), targetPoint);
 
@@ -448,6 +485,9 @@ namespace CombatTest.Screens
           {
             enemy.SetPath(pathStatus.Path);
           }
+
+          enemy.PatrolPaths.Remove(firstItem);
+          enemy.PatrolPaths.Add(firstItem);
         }
 
         foreach (var enemy in _enemies)

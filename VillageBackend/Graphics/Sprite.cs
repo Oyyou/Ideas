@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Engine.Managers;
+using Engine.Models;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -10,19 +12,52 @@ namespace VillageBackend.Graphics
 {
   public class Sprite : ICloneable
   {
+    private Vector2 _position;
+
+    private float _layer;
+
     private float _opacity = 1f;
+
+    protected Dictionary<string, Animation> _animations;
+
+    protected AnimationManager _animationManager;
 
     protected Texture2D _texture;
 
     public bool IsFixedLayer = false;
 
-    public Vector2 Position { get; set; }
+    public Vector2 Position
+    {
+      get { return _position; }
+      set
+      {
+        _position = value;
+
+        if (_animationManager != null)
+          _animationManager.Position = _position;
+      }
+    }
 
     public Rectangle Rectangle
     {
       get
       {
-        return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+        int width = 0;
+        int height = 0;
+
+        if (_animationManager != null)
+        {
+          width = _animationManager.FrameWidth;
+          height = _animationManager.FrameHeight;
+        }
+
+        if (_texture != null)
+        {
+          width = _texture.Width;
+          height = _texture.Height;
+        }
+
+        return new Rectangle((int)Position.X, (int)Position.Y, width, height);
       }
     }
 
@@ -30,7 +65,7 @@ namespace VillageBackend.Graphics
     {
       get
       {
-        return new Rectangle((int)Position.X, (int)Position.Y + 64, _texture.Width, _texture.Height - 64);
+        return new Rectangle((int)Position.X, (int)Position.Y + 64, Rectangle.Width, Rectangle.Height - 64);
       }
     }
 
@@ -57,15 +92,38 @@ namespace VillageBackend.Graphics
 
     public Vector2 Origin { get; set; } = new Vector2(0, 0);
 
-    public float Layer { get; set; }
+    public float Layer
+    {
+      get { return IsFixedLayer ? _layer : 0.3f + ((float)GridRectangle.Y / 1000f); }
+      set
+      {
+        _layer = value;
+
+        if (_animationManager != null)
+          _animationManager.Layer = _layer;
+      }
+    }
 
     public Sprite(Texture2D texture)
     {
       _texture = texture;
+
+      _animations = null;
+
+      _animationManager = null;
+    }
+
+    public Sprite(Dictionary<string, Animation> animations)
+    {
+      _animations = animations;
+
+      _animationManager = new AnimationManager(_animations.FirstOrDefault().Value);
+
+      _texture = null;
     }
 
     public Sprite(Texture2D texture, int frameIndex, int frameWidth, int frameHeight)
-      :this(texture)
+      : this(texture)
     {
       SourceRectangle = GetSourceRectangle(texture, frameIndex, frameWidth, frameHeight);
     }
@@ -96,7 +154,14 @@ namespace VillageBackend.Graphics
 
     public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(_texture, Position, SourceRectangle, Colour * Opacity, 0f, Origin, 1f, SpriteEffects.None, IsFixedLayer ? Layer : 0.3f + ((float)GridRectangle.Y / 1000f));
+      if (_texture != null)
+        spriteBatch.Draw(_texture, Position, SourceRectangle, Colour * Opacity, 0f, Origin, 1f, SpriteEffects.None, Layer);
+
+      if (_animationManager != null)
+      {
+        _animationManager.Layer = this.Layer;
+        _animationManager.Draw(gameTime, spriteBatch);
+      }
     }
 
     public object Clone()

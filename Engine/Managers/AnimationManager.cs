@@ -57,6 +57,10 @@ namespace Engine.Managers
       _updated = false;
 
       SpriteEffect = SpriteEffects.None;
+
+      Scale = 1f;
+
+      Color = Color.White;
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -98,7 +102,6 @@ namespace Engine.Managers
 
     public void Stop()
     {
-
       PreviousFrame = 0;
       CurrentFrame = 0;
       _timer = 0;
@@ -113,7 +116,7 @@ namespace Engine.Managers
     {
       _updated = true;
 
-      _timer += (float)gameTime.ElapsedGameTime.TotalSeconds * States.State.GameSpeed;
+      _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;// * States.State.GameSpeed;
 
       PreviousFrame = CurrentFrame;
 
