@@ -114,6 +114,7 @@ namespace CombatTest.Screens
       _gui = new CombatGUI(_squad)
       {
         EndTurnClick = EndTurnClick,
+        EndTurnIsClickable = EndTurnIsClickable,
       };
       _gui.LoadContent(_content);
 
@@ -128,10 +129,16 @@ namespace CombatTest.Screens
       OnScreenResize();
     }
 
+    private bool EndTurnIsClickable()
+    {
+      return _heroes.All(c => c.WalkingPath.Count == 0);
+    }
+
     private void EndTurnClick(Button button)
     {
       State = CombatStates.EnemyTurn;
       button.CurrentState = ButtonStates.Hovering;
+      _pathViewer.Clear();
     }
 
     private void LoadTiledMap()
@@ -484,15 +491,15 @@ namespace CombatTest.Screens
           if (pathStatus.Status == PathStatus.Valid)
           {
             enemy.SetPath(pathStatus.Path);
-          }
 
-          enemy.PatrolPaths.Remove(firstItem);
-          enemy.PatrolPaths.Add(firstItem);
+            enemy.PatrolPaths.Remove(firstItem);
+            enemy.PatrolPaths.Add(firstItem);
+          }
         }
 
         foreach (var enemy in _enemies)
         {
-          var targetPoint = (enemy.WalkingPath.Last() / 32).ToPoint();
+          var targetPoint = enemy.WalkingPath.Count > 0 ? (enemy.WalkingPath.Last() / 32).ToPoint() : (enemy.Position / 32).ToPoint();
 
           _map.AddObject(new Rectangle(targetPoint.X, targetPoint.Y, 1, 1));
         }

@@ -25,6 +25,8 @@ namespace VillageGUI.Interface.GUIs
 
     public Action<Button> EndTurnClick;
 
+    public Func<bool> EndTurnIsClickable;
+
     public int SelectedHeroIndex
     {
       get
@@ -44,6 +46,7 @@ namespace VillageGUI.Interface.GUIs
       {
         Layer = 1f,
         Click = EndTurnClick,
+        IsClickable = EndTurnIsClickable,
       };
 
       _heroPanel.LoadContent(content);

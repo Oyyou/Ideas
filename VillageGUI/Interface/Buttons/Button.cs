@@ -28,6 +28,8 @@ namespace VillageGUI.Interface.Buttons
 
     public ButtonStates CurrentState;
 
+    public Func<bool> IsClickable;
+
     public readonly SpriteFont Font;
 
     public readonly Vector2 Origin;
@@ -120,7 +122,7 @@ namespace VillageGUI.Interface.Buttons
             break;
           }
 
-          if (GameMouse.Clicked)
+          if (GameMouse.Clicked && (IsClickable != null && IsClickable()))
           {
             foreach (var b in buttons)
             {
@@ -151,7 +153,7 @@ namespace VillageGUI.Interface.Buttons
           throw new Exception("Unknown ButtonState: " + this.CurrentState.ToString());
       }
     }
-    
+
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       switch (this.CurrentState)
